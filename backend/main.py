@@ -59,6 +59,7 @@ def get_all_football():
     """Get all football matches (live and upcoming)."""
     try:
         matches = get_all_football_matches()
+        print(matches)
         return {
             "status": "success",
             "sport": "Football",

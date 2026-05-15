@@ -16,18 +16,18 @@ DEFAULT_HEADERS = json.loads(DEFAULT_HEADERS_JSON)
 
 
 def fetch_api_data():
-    """Fetch raw data from  API."""
+    """Fetch raw data from Stoiximan API."""
     try:
         response = requests.get(API_URL, headers=DEFAULT_HEADERS, timeout=10)
         response.raise_for_status()
         return response.json()
     except requests.RequestException as e:
-        raise Exception(f"Failed to fetch  data: {str(e)}")
+        raise Exception(f"Failed to fetch Stoiximan data: {str(e)}")
 
 
 def extract_football_matches(raw_data):
     """
-    Extract and parse football matches from  API response.
+    Extract and parse football matches from Stoiximan API response.
     Filters for FOOT sport type and returns clean match data.
     """
     matches = []
@@ -37,7 +37,7 @@ def extract_football_matches(raw_data):
         if not isinstance(raw_data, dict):
             return matches
 
-        #  API structure: zones contain sports, sports contain leagues, leagues contain events
+        # Stoiximan API structure: zones contain sports, sports contain leagues, leagues contain events
         zones = raw_data.get("Zones", [])
 
         for zone in zones:
@@ -116,4 +116,5 @@ def get_live_football_matches():
 def get_all_football_matches():
     """Get all football matches regardless of status."""
     raw_data = fetch_api_data()
+    print(raw_data)
     return extract_football_matches(raw_data)
