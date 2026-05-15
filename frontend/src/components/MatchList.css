@@ -1,0 +1,16 @@
+.match-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.no-matches {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+
+.no-matches p {
+  font-size: 18px;
+  margin: 0;
+}

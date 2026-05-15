@@ -6,8 +6,16 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from services.fetch_service import (
+    get_all_football_matches,
+    get_live_football_matches,
+)
+
 load_dotenv()
-app = FastAPI(title="Sports Notifications API", description="API for sports notifications")
+app = FastAPI(
+    title="Sports Notifications API",
+    description="Professional sports notifications API with football focus",
+)
 
 # CORS for frontend
 app.add_middleware(
@@ -18,27 +26,44 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-API_URL = os.getenv("API_URL")
-
-if not API_URL:
-    raise ValueError("API_URL environment variable is not set. Please check your .env file.")
-
-DEFAULT_HEADERS_JSON = os.getenv("DEFAULT_HEADERS")
-
-if not DEFAULT_HEADERS_JSON:
-    raise ValueError("DEFAULT_HEADERS environment variable is not set. Please check your .env file.")
-
-DEFAULT_HEADERS = json.loads(DEFAULT_HEADERS_JSON)
-
-@app.get("/api/live-matches")
-def get_live_matches():
-    try:
-        response = requests.get(API_URL, headers=DEFAULT_HEADERS, timeout=10)
-        response.raise_for_status()
-        return response.json()
-    except requests.RequestException as e:
-        return {"error": str(e)}
 
 @app.get("/")
 def root():
-    return {"message": "Sports Notifications API"}
+    return {
+        "message": "Sports Notifications API",
+        "version": "1.0.0",
+        "endpoints": {
+            "football_live": "/api/football/matches/live",
+            "football_all": "/api/football/matches/all",
+        },
+    }
+
+
+@app.get("/api/football/matches/live")
+def get_live_football():
+    """Get all live football matches."""
+    try:
+        matches = get_live_football_matches()
+        return {
+            "status": "success",
+            "sport": "Football",
+            "count": len(matches),
+            "matches": matches,
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}, 500
+
+
+@app.get("/api/football/matches/all")
+def get_all_football():
+    """Get all football matches (live and upcoming)."""
+    try:
+        matches = get_all_football_matches()
+        return {
+            "status": "success",
+            "sport": "Football",
+            "count": len(matches),
+            "matches": matches,
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}, 500

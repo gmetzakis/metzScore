@@ -1,0 +1,25 @@
+.error-display {
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 8px;
+  padding: 30px;
+  text-align: center;
+  margin: 20px;
+  color: #c33;
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.error-display h3 {
+  margin: 15px 0 10px 0;
+  font-size: 20px;
+}
+
+.error-display p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
