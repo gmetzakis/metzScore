@@ -160,8 +160,8 @@ def extract_match_odds(event, raw_data):
         if not isinstance(market_id_list, list):
             return odds
         
-        # Focus on main markets (Match Result = type 1 or typeId 1)
-        for market_id in market_id_list[:5]:  # Limit to first 5 markets
+        # Extract all markets for this event (up to 15 to capture all FOOT types)
+        for market_id in market_id_list[:15]:
             market_id_str = str(market_id)
             if market_id_str not in markets_dict:
                 continue
@@ -183,8 +183,10 @@ def extract_match_odds(event, raw_data):
                     if isinstance(selection, dict):
                         selections.append({
                             "id": sel_id,
-                            "name": selection.get("fullName") or selection.get("name"),
+                            "name": selection.get("name"),
+                            "fullName": selection.get("fullName"),
                             "price": selection.get("price"),
+                            "handicap": selection.get("handicap"),
                         })
             
             # Add to odds dict if we have selections
