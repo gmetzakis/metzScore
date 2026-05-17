@@ -84,9 +84,17 @@ def parse_match_event(event, league_name, raw_data):
     try:
         event_id = event.get("id")
         start_time = event.get("startTime")
-        home_score = event.get("homeScore", "-")
-        away_score = event.get("awayScore", "-")
-        event_status = event.get("eventStatus", "")  # 0=Not started, 1=Live, 2=Finished
+        is_live = event.get("isLive", False)
+        
+        # Extract scores from liveData if available
+        home_score = "-"
+        away_score = "-"
+        live_data = event.get("liveData")
+        if isinstance(live_data, dict):
+            score_data = live_data.get("score")
+            if isinstance(score_data, dict):
+                home_score = score_data.get("home", "-")
+                away_score = score_data.get("away", "-")
 
         # Extract team names from participants
         home_team = "Unknown"
@@ -111,25 +119,19 @@ def parse_match_event(event, league_name, raw_data):
             "away_team": away_team,
             "home_score": home_score,
             "away_score": away_score,
-            "status": get_match_status(event_status),
+            "status": "Live" if is_live else "Not Started",
             "start_time": start_time,
-            "raw_status": event_status,
+            "is_live": is_live,
         }
     except Exception as e:
         print(f"Error parsing match event: {str(e)}")
         return None
 
 
-def get_match_status(event_status):
-    """Convert event status code to human-readable status."""
-    status_map = {"0": "Not Started", "1": "Live", "2": "Finished"}
-    return status_map.get(str(event_status), "Unknown")
-
-
 def get_live_football_matches():
     """Get only live football matches."""
     all_matches = get_all_football_matches()
-    return [match for match in all_matches if match["raw_status"] == "1"]
+    return [match for match in all_matches if match.get("is_live", False)]
 
 
 def get_all_football_matches():
