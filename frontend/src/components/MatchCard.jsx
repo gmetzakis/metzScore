@@ -1,7 +1,11 @@
+import { useFavorites } from '../context/FavoritesContext';
 import './MatchCard.css';
 import OddsDisplay from './OddsDisplay';
 
 export default function MatchCard({ match }) {
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const fav = isFavorite(match.id);
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'Live':
@@ -27,12 +31,21 @@ export default function MatchCard({ match }) {
         <div className={`match-status ${getStatusColor(match.status)}`}>
           {match.status}
         </div>
-        
+
         {isLive && match.injury_time > 0 && (
           <div className="injury-time">+{match.injury_time}' added time</div>
         )}
+
+        <button
+          className={`fav-btn ${fav ? 'fav-on' : 'fav-off'}`}
+          onClick={() => toggleFavorite(match.id)}
+          title={fav ? 'Remove from favorites' : 'Add to favorites'}
+          aria-label={fav ? 'Remove from favorites' : 'Add to favorites'}
+        >
+          {fav ? '★' : '☆'}
+        </button>
       </div>
-      
+
       <div className="match-header">
         <span className="match-league">{match.league}</span>
         <span className="match-time">

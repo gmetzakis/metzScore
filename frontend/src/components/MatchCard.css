@@ -141,3 +141,29 @@
   font-weight: bold;
   font-size: 14px;
 }
+
+/* ── Favorite toggle ─────────────────────────────────────── */
+.fav-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+  border-radius: 50%;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.fav-btn:hover {
+  transform: scale(1.2);
+}
+
+.fav-off {
+  color: #bbb;
+}
+
+.fav-on {
+  color: #ffc107;
+  filter: drop-shadow(0 0 4px rgba(255, 193, 7, 0.5));
+}

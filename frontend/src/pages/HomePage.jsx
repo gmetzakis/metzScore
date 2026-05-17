@@ -10,6 +10,7 @@ export default function HomePage() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetchLiveMatches();
@@ -29,6 +30,16 @@ export default function HomePage() {
     }
   };
 
+  const filteredMatches = matches.filter(m => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return (
+      (m.home_team || '').toLowerCase().includes(q) ||
+      (m.away_team || '').toLowerCase().includes(q) ||
+      (m.league || '').toLowerCase().includes(q)
+    );
+  });
+
   return (
     <div className="home-page">
       <div className="page-header">
@@ -43,6 +54,24 @@ export default function HomePage() {
         <Link to="/all-matches" className="nav-link">
           All Matches
         </Link>
+        <Link to="/favorites" className="nav-link">
+          ☆ Favorites
+        </Link>
+      </div>
+
+      <div className="search-wrapper">
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search by team or league name..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        {search && (
+          <button className="search-clear" onClick={() => setSearch('')}>
+            ✕
+          </button>
+        )}
       </div>
 
       <div className="page-content">
@@ -51,9 +80,12 @@ export default function HomePage() {
         {!loading && !error && (
           <>
             <div className="matches-info">
-              <span>{matches.length} matches found</span>
+              <span>
+                {filteredMatches.length} match{filteredMatches.length !== 1 ? 'es' : ''} found
+                {search && ` for "${search}"`}
+              </span>
             </div>
-            <MatchList matches={matches} />
+            <MatchList matches={filteredMatches} />
           </>
         )}
       </div>

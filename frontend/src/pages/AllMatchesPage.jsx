@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import MatchList from '../components/MatchList';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -10,7 +10,8 @@ export default function AllMatchesPage() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filter, setFilter] = useState('all'); // all, live, upcoming, finished
+  const [filter, setFilter] = useState('all');
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetchAllMatches();
@@ -30,15 +31,26 @@ export default function AllMatchesPage() {
     }
   };
 
-  const getFilteredMatches = () => {
-    if (filter === 'all') return matches;
-    return matches.filter((match) => match.status === filter);
-  };
+  const filteredMatches = useMemo(() => {
+    let list = matches;
+    if (filter === 'Live') list = list.filter(m => m.status === 'Live');
+    else if (filter === 'Not Started') list = list.filter(m => m.status === 'Not Started');
+    else if (filter === 'Finished') list = list.filter(m => m.status === 'Finished');
 
-  const filteredMatches = getFilteredMatches();
-  const liveCount = matches.filter((m) => m.status === 'Live').length;
-  const upcomingCount = matches.filter((m) => m.status === 'Not Started').length;
-  const finishedCount = matches.filter((m) => m.status === 'Finished').length;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(m =>
+        (m.home_team || '').toLowerCase().includes(q) ||
+        (m.away_team || '').toLowerCase().includes(q) ||
+        (m.league || '').toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [matches, filter, search]);
+
+  const liveCount = matches.filter(m => m.status === 'Live').length;
+  const upcomingCount = matches.filter(m => m.status === 'Not Started').length;
+  const finishedCount = matches.filter(m => m.status === 'Finished').length;
 
   return (
     <div className="all-matches-page">
@@ -54,6 +66,24 @@ export default function AllMatchesPage() {
         <Link to="/all-matches" className="nav-link active">
           All Matches
         </Link>
+        <Link to="/favorites" className="nav-link">
+          ☆ Favorites
+        </Link>
+      </div>
+
+      <div className="search-wrapper">
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search by team or league name..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        {search && (
+          <button className="search-clear" onClick={() => setSearch('')}>
+            ✕
+          </button>
+        )}
       </div>
 
       <div className="filter-tabs">
@@ -89,7 +119,11 @@ export default function AllMatchesPage() {
         {!loading && !error && (
           <>
             <div className="matches-info">
-              <span>{filteredMatches.length} matches found</span>
+              <span>
+                {filteredMatches.length} match{filteredMatches.length !== 1 ? 'es' : ''} found
+                {filter !== 'all' && ` (${filter})`}
+                {search && ` matching "${search}"`}
+              </span>
             </div>
             <MatchList matches={filteredMatches} />
           </>
