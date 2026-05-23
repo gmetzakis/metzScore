@@ -1,0 +1,73 @@
+=== LEAGUES (Country names) ===
+18312: name=Campeonato Femenino - Primera Division (Γ), countryName=, country=
+196183: name=Segunda Division, countryName=, country=
+17078: name=Primera Division, countryName=, country=
+192395: name=The CJ CUP Byron Nelson, countryName=, country=
+204853: name=Άνδρες, countryName=, country=
+182510: name=Brasileirao - Serie D, countryName=, country=
+5: name=LaLiga, countryName=, country=
+1662: name=MLB, countryName=, country=
+196937: name=NCAA Division I, countryName=, country=
+194789: name=Copa Simon Bolivar, countryName=, country=
+194430: name=Battle - Διεθνή - 2x4 λεπτά, countryName=, country=
+18350: name=Premier Soccer League (Γ), countryName=, country=
+200372: name=Liga Nacional, countryName=, country=
+181769: name=Brasileirao Feminino - Serie A1 (Γ), countryName=, country=
+204599: name=NBA H2H GG League 4x5 λεπτά, countryName=, country=
+204848: name=Άνδρες, countryName=, country=
+205126: name=Primera Division (Γ), countryName=, country=
+16939: name=Copa Colombia, countryName=, country=
+204894: name=Άνδρες, countryName=, country=
+206009: name=BB Storm, countryName=, country=
+16932: name=Liga de Primera, countryName=, country=
+17244: name=Primera B Nacional, countryName=, country=
+185795: name=1η Κατηγορία (Γ), countryName=, country=
+18249: name=Brasileirao - Serie C, countryName=, country=
+202400: name=Liga Elite, countryName=, country=
+187544: name=Liga Femenina Profesional (Γ), countryName=, country=
+17385: name=Liga 2, countryName=, country=
+187192: name=Liga Nacional (Γ), countryName=, country=
+17103: name=MLS, countryName=, country=
+194781: name=Battle - La Liga - 2x4 λεπτά, countryName=, country=
+17548: name=Primera C Metropolitana, countryName=, country=
+198819: name=MLS Next Pro, countryName=, country=
+197937: name=2a Divisao (Γ), countryName=, country=
+17079: name=Liga 1, countryName=, country=
+10017: name=Brasileirao - Serie B, countryName=, country=
+183517: name=Segunda Division, countryName=, country=
+195867: name=GT Leagues - 2x6 λεπτά, countryName=, country=
+192540: name=1η Κατηγορία, countryName=, country=
+203860: name=Battle - Primera - 2x4 λεπτά, countryName=, country=
+195559: name=Divisional A (Γ), countryName=, country=
+17600: name=Segunda Division, countryName=, country=
+17127: name=Segunda Division, countryName=, country=
+186008: name=Serie B, countryName=, country=
+206190: name=XPortal Series, countryName=, country=
+199199: name=Liga de Honor Plata (Γ), countryName=, country=
+205029: name=CCT South America, countryName=, country=
+192686: name=3a Divisao, countryName=, country=
+204604: name=H2H GG League - 2x4 λεπτά, countryName=, country=
+181896: name=LPB, countryName=, country=
+199208: name=MiLB, countryName=, country=
+201034: name=eAdriatic League - Διεθνή - 2x5 λεπτά, countryName=, country=
+202368: name=Modus Super Series, countryName=, country=
+193761: name=LCS, countryName=, country=
+190064: name=Taca Nacional de Seniores, countryName=, country=
+193176: name=International Darts Open, countryName=, country=
+204652: name=Northern Super League (Γ), countryName=, country=
+192552: name=Torneo Feminino (Γ), countryName=, country=
+18237: name=USL W League (Γ), countryName=, country=
+17525: name=Botola Pro, countryName=, country=
+181562: name=Division Intermedia, countryName=, country=
+16972: name=Προκριματικά, countryName=, country=
+17249: name=Liga Pro Serie A, countryName=, country=
+186148: name=2a Divisao, countryName=, country=
+203044: name=LBF Κύπελλο (Γ), countryName=, country=
+190266: name=Brasileirao Feminino - Serie A2 (Γ), countryName=, country=
+199085: name=CFL - Preseason, countryName=, country=
+189485: name=Nacional 2A, countryName=, country=
+10016: name=Brasileirao - Serie A Betano, countryName=, country=
+202678: name=UFL, countryName=, country=
+18207: name=National Soccer League (Γ), countryName=, country=
+186645: name=Primera (Γ), countryName=, country=
+199230: name=1η Κατηγορία (Γ), countryName=, country=
