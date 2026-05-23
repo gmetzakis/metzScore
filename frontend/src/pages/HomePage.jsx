@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import MatchList from '../components/MatchList';
+import LeagueGroupedList from '../components/LeagueGroupedList';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorDisplay from '../components/ErrorDisplay';
 import { apiService } from '../services/api';
@@ -85,7 +85,7 @@ export default function HomePage() {
                 {search && ` for "${search}"`}
               </span>
             </div>
-            <MatchList matches={filteredMatches} />
+            <LeagueGroupedList matches={filteredMatches} />
           </>
         )}
       </div>

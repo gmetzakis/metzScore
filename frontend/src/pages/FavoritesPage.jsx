@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import MatchList from '../components/MatchList';
+import LeagueGroupedList from '../components/LeagueGroupedList';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorDisplay from '../components/ErrorDisplay';
 import { apiService } from '../services/api';
@@ -78,7 +78,7 @@ export default function FavoritesPage() {
                     <span className="fav-finished"> {finishedCount} Finished</span>
                   </span>
                 </div>
-                <MatchList matches={favoriteMatches} />
+                <LeagueGroupedList matches={favoriteMatches} />
               </>
             )}
           </>
