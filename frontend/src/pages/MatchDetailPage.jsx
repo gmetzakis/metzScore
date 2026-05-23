@@ -209,12 +209,27 @@ function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isPi
 
 // ── Roster Section ───────────────────────────────────────────────────────────
 
-function RosterSection({ roster }) {
+function RosterSection({ roster, results }) {
   if (!roster) return null;
 
   const homeLineup = roster.lineups?.homeLineup;
   const awayLineup = roster.lineups?.awayLineup;
   const subs = roster.subs || {};
+
+  // Parse scorers from results to extract player names
+  // Format: "23' S. Moreo" -> extract "S. Moreo"
+  const scorerNames = new Set();
+  if (results?.scorers && Array.isArray(results.scorers)) {
+    for (const s of results.scorers) {
+      if (s.description) {
+        const parts = s.description.split("' ");
+        if (parts.length >= 2) {
+          const name = parts.slice(1).join("' ").trim();
+          if (name) scorerNames.add(name);
+        }
+      }
+    }
+  }
 
   if (!homeLineup && !awayLineup) return null;
 
@@ -223,15 +238,15 @@ function RosterSection({ roster }) {
 
     const teamSubs = teamSide === 0 ? subs.homeSubs : subs.awaySubs;
 
-    // Build maps: by name for players who were subbed IN, and who was subbed OUT
-    const subbedInByMinute = {}; // minute -> player name who came in
+    // Build maps by name for players who were subbed IN and who was subbed OUT
+    const subbedInByName = {}; // player name -> minute they came in
     const subbedOutByName = {}; // player name -> minute they went out
     if (teamSubs) {
       for (const sub of teamSubs) {
         const inName = sub.playerIn?.name;
         const outName = sub.playerOut?.name;
         const minute = sub.substitutedOnMinute;
-        if (inName && minute) subbedInByMinute[minute] = inName;
+        if (inName && minute) subbedInByName[inName] = minute;
         if (outName && minute) subbedOutByName[outName] = minute;
       }
     }
@@ -270,9 +285,11 @@ function RosterSection({ roster }) {
             <div className="roster-players">
               {starters.map((p, i) => {
                 const outMinute = subbedOutByName[p.name];
+                const isScorer = scorerNames.has(p.name);
                 return (
                   <div key={`${p.id || p.name}-${i}`} className="roster-player">
                     <span className="player-name">{p.name}</span>
+                    {isScorer && <span className="player-goal">⚽</span>}
                     {outMinute && <span className="player-sub-out">{outMinute}'</span>}
                   </div>
                 );
@@ -285,11 +302,12 @@ function RosterSection({ roster }) {
             <div className="roster-subsection-title">Bench</div>
             <div className="roster-players">
               {bench.map((p, i) => {
-                const inMinute = Object.entries(subbedInByMinute).find(([, name]) => name === p.name);
-                const minuteStr = inMinute ? inMinute[0] : null;
+                const minuteStr = subbedInByName[p.name] || null;
+                const isScorer = scorerNames.has(p.name);
                 return (
                   <div key={`${p.id || p.name}-${i}`} className="roster-player roster-bench-player">
                     <span className="player-name">{p.name}</span>
+                    {isScorer && <span className="player-goal">⚽</span>}
                     {minuteStr && <span className="player-sub-minute">{minuteStr}'</span>}
                   </div>
                 );
@@ -565,7 +583,7 @@ export default function MatchDetailPage() {
       </div>
 
 {/* ── Roster ── */}
-       <RosterSection roster={roster} />
-    </div>
-  );
-}
+       <RosterSection roster={roster} results={results} />
+     </div>
+   );
+ }
