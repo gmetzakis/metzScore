@@ -483,6 +483,15 @@
   font-size: 11px;
 }
 
+.player-sub-minute {
+  font-size: 11px;
+  color: #2196f3;
+  background: #e3f2fd;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
 @media (max-width: 480px) {
   .roster-container {
     flex-direction: column;

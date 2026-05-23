@@ -153,11 +153,7 @@ def get_match_detail(event_id: int) -> dict | None:
             "away": score.get("away", "-"),
             "seconds_since_start": clock.get("secondsSinceStart", 0),
         },
-        "results": {
-            "penalties": results.get("penalties", {}),
-            "yellow":    results.get("yellow", {}),
-            "corners":   results.get("corners", {}),
-        },
+        "results": results,
         "odds":         odds,
         "incidents":    incidents,
         "incident_filters": incident_filters,

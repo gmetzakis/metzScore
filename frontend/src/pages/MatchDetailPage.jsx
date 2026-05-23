@@ -209,7 +209,7 @@ function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isPi
 
 // ── Roster Section ───────────────────────────────────────────────────────────
 
-function RosterSection({ roster }) {
+function RosterSection({ roster, incidents }) {
   if (!roster) return null;
 
   const homeRoster = roster.homeRoster;
@@ -218,18 +218,35 @@ function RosterSection({ roster }) {
 
   if (!homeRoster && !awayRoster) return null;
 
-  const getPlayerById = (players, id) => {
-    if (!players) return null;
-    return Object.values(players).find(p => p.id === id);
+  const parseSubstitution = (description) => {
+    const match = description?.match(/(\d+)η\s*Αλλαγή:\s*\(?([^)]+)\)?/i);
+    if (match) {
+      return { playerName: match[2].trim(), order: parseInt(match[1]) };
+    }
+    return null;
   };
 
-  const renderStartingAndBench = (rosterData, lineupData) => {
+  const extractSubstitutions = (incidents, teamSide) => {
+    if (!incidents) return {};
+    const subs = {};
+    for (const inc of incidents) {
+      if (inc.type === 'SUBS' && inc.teamSide === teamSide) {
+        const parsed = parseSubstitution(inc.description);
+        if (parsed) {
+          subs[parsed.playerName] = { minute: inc.time || '', order: parsed.order };
+        }
+      }
+    }
+    return subs;
+  };
+
+  const renderStartingAndBench = (rosterData, lineupData, teamSide, incidents) => {
     if (!rosterData?.players) return null;
 
     const players = rosterData.players;
     const benchPlayers = lineupData?.benchPlayers || [];
+    const substitutions = extractSubstitutions(incidents, teamSide);
 
-    // Get starting XI player IDs from lineup
     const startingIds = new Set();
     if (lineupData?.lineup) {
       for (const row of lineupData.lineup) {
@@ -239,7 +256,6 @@ function RosterSection({ roster }) {
       }
     }
 
-    // Separate starters and bench
     const starters = [];
     const bench = [];
 
@@ -251,7 +267,6 @@ function RosterSection({ roster }) {
       }
     }
 
-    // Sort starters by position and shirt number
     const sortedStarters = starters.sort((a, b) => {
       const posOrder = { GK: 0, DF: 1, MF: 2, FW: 3 };
       const aPos = a.position || '';
@@ -260,8 +275,14 @@ function RosterSection({ roster }) {
       return (a.shirtNumber || 999) - (b.shirtNumber || 999);
     });
 
-    // Sort bench by shirt number
-    const sortedBench = bench.sort((a, b) => (a.shirtNumber || 999) - (b.shirtNumber || 999));
+    const sortedBench = bench.sort((a, b) => {
+      const aSub = substitutions[a.shortName || a.name];
+      const bSub = substitutions[b.shortName || b.name];
+      if (aSub && bSub) return aSub.order - bSub.order;
+      if (aSub) return -1;
+      if (bSub) return 1;
+      return (a.shirtNumber || 999) - (b.shirtNumber || 999);
+    });
 
     return (
       <div className="roster-details">
@@ -283,12 +304,16 @@ function RosterSection({ roster }) {
           <div className="roster-bench">
             <div className="roster-subsection-title">Bench</div>
             <div className="roster-players">
-              {sortedBench.map(player => (
-                <div key={player.id} className="roster-player roster-bench-player">
-                  <span className="player-number">{player.shirtNumber || ''}</span>
-                  <span className="player-name">{player.shortName || player.name}</span>
-                </div>
-              ))}
+              {sortedBench.map(player => {
+                const subInfo = substitutions[player.shortName || player.name];
+                return (
+                  <div key={player.id} className="roster-player roster-bench-player">
+                    <span className="player-number">{player.shirtNumber || ''}</span>
+                    <span className="player-name">{player.shortName || player.name}</span>
+                    {subInfo && <span className="player-sub-minute">{subInfo.minute}</span>}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -302,11 +327,11 @@ function RosterSection({ roster }) {
       <div className="roster-container">
         <div className="roster-team">
           <h3 className="roster-team-name">{homeRoster?.name || 'Home'}</h3>
-          {homeRoster && renderStartingAndBench(homeRoster, lineups?.homeLineup)}
+          {homeRoster && renderStartingAndBench(homeRoster, lineups?.homeLineup, 0, incidents)}
         </div>
         <div className="roster-team">
           <h3 className="roster-team-name">{awayRoster?.name || 'Away'}</h3>
-          {awayRoster && renderStartingAndBench(awayRoster, lineups?.awayLineup)}
+          {awayRoster && renderStartingAndBench(awayRoster, lineups?.awayLineup, 1, incidents)}
         </div>
       </div>
     </div>
@@ -559,8 +584,8 @@ export default function MatchDetailPage() {
         />
       </div>
 
-      {/* ── Roster ── */}
-      <RosterSection roster={roster} />
+{/* ── Roster ── */}
+       <RosterSection roster={roster} incidents={data.incidents} />
     </div>
   );
 }
