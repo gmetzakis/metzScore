@@ -90,7 +90,7 @@ def get_match_detail(event_id: int) -> dict | None:
 
     # Parse markets for this match
     odds = {}
-    for mid in event.get("marketIdList", [])[:15]:
+    for mid in event.get("marketIdList", []):
         mid_str = str(mid)
         mk = markets_dict.get(mid_str)
         if not isinstance(mk, dict):
@@ -108,7 +108,12 @@ def get_match_detail(event_id: int) -> dict | None:
                     "handicap": s.get("handicap"),
                 })
         if sels:
-            odds[str(mk.get("typeId"))] = {
+            type_id = str(mk.get("typeId"))
+            key = type_id
+            # For Over/Under markets (HCTG, OUH1, etc.), create unique keys per handicap
+            if mk.get("type") in ("HCTG", "OUH1") and mk.get("handicap") is not None:
+                key = f"{type_id}_{mk.get('handicap')}"
+            odds[key] = {
                 "market_id":   mid,
                 "market_type": mk.get("typeId"),
                 "name":        mk.get("name"),
