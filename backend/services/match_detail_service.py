@@ -86,6 +86,7 @@ def get_match_detail(event_id: int) -> dict | None:
     incidents       = event.get("incidents", []) or []
     incident_filters = event.get("incidentFilters", []) or []
     statistics      = event.get("statistics", {}) or {}
+    roster          = event.get("roster", {}) or {}
 
     # Parse markets for this match
     odds = {}
@@ -161,4 +162,5 @@ def get_match_detail(event_id: int) -> dict | None:
         "incidents":    incidents,
         "incident_filters": incident_filters,
         "statistics":   statistics,
+        "roster":       roster,
     }

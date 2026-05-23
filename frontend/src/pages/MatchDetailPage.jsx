@@ -35,14 +35,8 @@ const INCIDENT_ICONS = {
   Aggregated: '📊',
 };
 
-function IncidentIcon({ type, teamSide }) {
-  const icon = INCIDENT_ICONS[type] || '•';
-  const cls = teamSide == null ? '' : `inc-icon ${teamSide === 0 ? 'home-side' : 'away-side'}`;
-  return <span className={cls}>{icon}</span>;
-}
-
 function IncidentRow({ incident, homeName, awayName }) {
-  const { description, type, time, teamSide, props = {} } = incident;
+  const { description, type, time, teamSide } = incident;
   const sideLabel = teamSide === 0 ? homeName : teamSide === 1 ? awayName : '';
   const cls = [
     'incident-row',
@@ -54,7 +48,7 @@ function IncidentRow({ incident, homeName, awayName }) {
   return (
     <div className={cls}>
       <div className="inc-time">{time || ''}</div>
-      <IncidentIcon type={type} teamSide={teamSide} />
+      <span className="inc-icon">{INCIDENT_ICONS[type] || '•'}</span>
       <div className="inc-body">
         <span className="inc-desc">{description}</span>
         {sideLabel && <span className="inc-team"> · {sideLabel}</span>}
@@ -63,75 +57,26 @@ function IncidentRow({ incident, homeName, awayName }) {
   );
 }
 
-function IncidentTimeline({ incidents, incidentFilters, homeName, awayName }) {
-  if (!incidents || incidents.length === 0) {
-    return (
-      <div className="section-empty">
-        <p>No match events recorded yet.</p>
-      </div>
-    );
-  }
-
-  // Build filter map: id → tag
-  const filterMap = {};
-  if (Array.isArray(incidentFilters)) {
-    for (const f of incidentFilters) filterMap[f.id] = f;
-  }
-
-  return (
-    <div className="incidents-section">
-      <h2 className="section-title">Match Events</h2>
-      <div className="incident-list">
-        {incidents.map((inc, i) => {
-          const tag = filterMap[inc.props?.filterIds?.[0]];
-          return (
-            <IncidentRow
-              key={`${inc.type}-${i}`}
-              incident={inc}
-              homeName={homeName}
-              awayName={awayName}
-            />
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 // ── Statistics ───────────────────────────────────────────────────────────────
 
-// Map raw stat codes → display labels
-const STAT_LABELS = {
-  310:  'Yellow Cards',
-  311:  'Yellow Cards',
-  313:  'Goals',
-  314:  'Goals',
-  315:  'Shots on Target',
-  317:  'Shots on Target',
-  318:  'Shots on Target',
-  330:  'Corners',
-  331:  'Goals',
-  333:  'Corners',
-  334:  'Corners',
-  335:  'Yellow Cards',
-  336:  'Yellow Cards',
-  337:  'Shots on Target',
-  338:  'Goal Attempts',
+// Maps liveData.results field names to display labels
+const RESULTS_LABEL_MAP = {
+  yellow: 'Yellow Cards',
+  corners: 'Corners',
+  penalties: 'Penalties',
+  xGoals: 'Expected Goals',
+  shots: 'Shots',
+  shotsOnTarget: 'Shots on Target',
+  attacks: 'Attacks',
+  dangerousAttacks: 'Dangerous Attacks',
+  possession: 'Possession %',
+  fouls: 'Fouls',
+  offsides: 'Offsides',
 };
 
-/** Build side-by-side stat rows from the per-match detail response.
- *
- * Priority of sources (first wins per label):
- *  1. liveData.results  → named { home, away } pairs
- *     (corners, yellow Cards, penalties — live in-play snapshot)
- *  2. liveData.score    → current goals { home, away }
- *  3. statistics.teams  → { "<statCode>": { "<teamId>": "<value>" } }
- *     per-team stat codes ordered by known type
- *  4. statistics.event  → match-wide totals
- *
- * The LIVE named_fields block mirrors the user's preferred "match-events-by-name"
- * parsing style; code-based passes only fill gaps when named data is absent.
- */
+// Order of display for stats
+const STATS_PRIORITY = ['Goals', 'Expected Goals', 'Shots', 'Shots on Target', 'Corners', 'Yellow Cards', 'Fouls', 'Offsides', 'Possession %', 'Penalties'];
+
 function getSideBySideStats(
   statsTeams,
   homeTeamId,
@@ -154,44 +99,32 @@ function getSideBySideStats(
     seenLabels.add('Goals');
   }
 
-  // Corners from liveData.results.corners
-  if (liveResults?.corners?.home != null || liveResults?.corners?.away != null) {
-    result.push({
-      label: 'Corners',
-      home: liveResults.corners.home ?? 0,
-      away: liveResults.corners.away ?? 0,
-      kind: 'live-results',
-    });
-    seenLabels.add('Corners');
-  }
+  // All other stats from liveData.results - iterate dynamically
+  if (liveResults && typeof liveResults === 'object') {
+    for (const [field, sides] of Object.entries(liveResults)) {
+      // Skip non-object values (like scorers array) and sportId
+      if (!sides || typeof sides !== 'object' || Array.isArray(sides)) continue;
+      if (seenLabels.has(field)) continue;
 
-  // Yellow Cards from liveData.results.yellow
-  if (liveResults?.yellow?.home != null || liveResults?.yellow?.away != null) {
-    result.push({
-      label: 'Yellow Cards',
-      home: liveResults.yellow.home ?? 0,
-      away: liveResults.yellow.away ?? 0,
-      kind: 'live-results',
-    });
-    seenLabels.add('Yellow Cards');
-  }
+      const homeVal = sides.home;
+      const awayVal = sides.away;
+      if (homeVal == null && awayVal == null) continue;
 
-  // Penalties from liveData.results.penalties
-  if (liveResults?.penalties?.home != null || liveResults?.penalties?.away != null) {
-    result.push({
-      label: 'Penalties',
-      home: liveResults.penalties.home ?? 0,
-      away: liveResults.penalties.away ?? 0,
-      kind: 'live-results',
-    });
-    seenLabels.add('Penalties');
+      const label = RESULTS_LABEL_MAP[field] || field;
+      seenLabels.add(field);
+      result.push({
+        label,
+        home: homeVal ?? 0,
+        away: awayVal ?? 0,
+        kind: 'live-results',
+      });
+    }
   }
 
   // ── Sort ─────────────────────────────────────────────────────────────────
-  const priority = ['Goals', 'Shots on Target', 'Corners', 'Yellow Cards', 'Goal Attempts', 'Penalties'];
   result.sort((a, b) => {
-    const pa = priority.indexOf(a.label);
-    const pb = priority.indexOf(b.label);
+    const pa = STATS_PRIORITY.indexOf(a.label);
+    const pb = STATS_PRIORITY.indexOf(b.label);
     if (pa === -1 && pb === -1) return a.label.localeCompare(b.label);
     if (pa === -1) return 1;
     if (pb === -1) return -1;
@@ -270,6 +203,112 @@ function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isPi
   return (
     <div className="stats-section">
       {sections}
+    </div>
+  );
+}
+
+// ── Roster Section ───────────────────────────────────────────────────────────
+
+function RosterSection({ roster }) {
+  if (!roster) return null;
+
+  const homeRoster = roster.homeRoster;
+  const awayRoster = roster.awayRoster;
+  const lineups = roster.lineups;
+
+  if (!homeRoster && !awayRoster) return null;
+
+  const getPlayerById = (players, id) => {
+    if (!players) return null;
+    return Object.values(players).find(p => p.id === id);
+  };
+
+  const renderStartingAndBench = (rosterData, lineupData) => {
+    if (!rosterData?.players) return null;
+
+    const players = rosterData.players;
+    const benchPlayers = lineupData?.benchPlayers || [];
+
+    // Get starting XI player IDs from lineup
+    const startingIds = new Set();
+    if (lineupData?.lineup) {
+      for (const row of lineupData.lineup) {
+        for (const player of row) {
+          startingIds.add(player.playerId);
+        }
+      }
+    }
+
+    // Separate starters and bench
+    const starters = [];
+    const bench = [];
+
+    for (const player of Object.values(players)) {
+      if (startingIds.has(player.id)) {
+        starters.push(player);
+      } else if (benchPlayers.some(bp => bp.playerId === player.id)) {
+        bench.push(player);
+      }
+    }
+
+    // Sort starters by position and shirt number
+    const sortedStarters = starters.sort((a, b) => {
+      const posOrder = { GK: 0, DF: 1, MF: 2, FW: 3 };
+      const aPos = a.position || '';
+      const bPos = b.position || '';
+      if (posOrder[aPos] !== posOrder[bPos]) return (posOrder[aPos] || 99) - (posOrder[bPos] || 99);
+      return (a.shirtNumber || 999) - (b.shirtNumber || 999);
+    });
+
+    // Sort bench by shirt number
+    const sortedBench = bench.sort((a, b) => (a.shirtNumber || 999) - (b.shirtNumber || 999));
+
+    return (
+      <div className="roster-details">
+        {sortedStarters.length > 0 && (
+          <div className="roster-starters">
+            <div className="roster-subsection-title">Starting XI</div>
+            <div className="roster-players">
+              {sortedStarters.map(player => (
+                <div key={player.id} className="roster-player">
+                  <span className="player-number">{player.shirtNumber || ''}</span>
+                  <span className="player-name">{player.shortName || player.name}</span>
+                  {player.isCaptain && <span className="player-captain">©</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {sortedBench.length > 0 && (
+          <div className="roster-bench">
+            <div className="roster-subsection-title">Bench</div>
+            <div className="roster-players">
+              {sortedBench.map(player => (
+                <div key={player.id} className="roster-player roster-bench-player">
+                  <span className="player-number">{player.shirtNumber || ''}</span>
+                  <span className="player-name">{player.shortName || player.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="detail-section">
+      <h2 className="section-title">Lineups</h2>
+      <div className="roster-container">
+        <div className="roster-team">
+          <h3 className="roster-team-name">{homeRoster?.name || 'Home'}</h3>
+          {homeRoster && renderStartingAndBench(homeRoster, lineups?.homeLineup)}
+        </div>
+        <div className="roster-team">
+          <h3 className="roster-team-name">{awayRoster?.name || 'Away'}</h3>
+          {awayRoster && renderStartingAndBench(awayRoster, lineups?.awayLineup)}
+        </div>
+      </div>
     </div>
   );
 }
@@ -400,7 +439,7 @@ export default function MatchDetailPage() {
 
   if (!data) return null;
 
-  const { league, home_team, away_team, score, results, odds, incidents, incident_filters, statistics, is_live, status, is_pitch_available, is_stats_available } = data;
+  const { league, home_team, away_team, score, results, odds, incident_filters, statistics, is_live, status, is_pitch_available, is_stats_available, roster } = data;
 
   return (
     <div className="detail-page">
@@ -519,6 +558,9 @@ export default function MatchDetailPage() {
           isLive={is_live}
         />
       </div>
+
+      {/* ── Roster ── */}
+      <RosterSection roster={roster} />
     </div>
   );
 }

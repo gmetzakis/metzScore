@@ -413,3 +413,79 @@
 .detail-section .odds-display {
   background: white;
 }
+
+/* ── Roster Section ───────────────────────────────────────────────────────────── */
+.roster-container {
+  display: flex;
+  gap: 20px;
+}
+
+.roster-team {
+  flex: 1;
+  background: #fafafa;
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.roster-team-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 12px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #ddd;
+}
+
+.roster-players {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.roster-player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  font-size: 13px;
+  color: #444;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+.player-number {
+  min-width: 20px;
+  font-weight: 700;
+  color: #888;
+}
+
+.player-name {
+  flex: 1;
+}
+
+.roster-subsection-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #555;
+  margin: 12px 0 6px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.roster-bench-player {
+  opacity: 0.8;
+  font-size: 12px;
+}
+
+.roster-bench-player .player-number {
+  font-size: 11px;
+}
+
+@media (max-width: 480px) {
+  .roster-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
