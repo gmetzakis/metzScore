@@ -55,14 +55,27 @@ def extract_football_matches(raw_data):
                 if sport_id != "FOOT":
                     continue
                 
+                # Filter out esoccer and other virtual sports
+                zone_id = event.get("zoneId")
+                if zone_id:
+                    zones_dict = raw_data.get("zones", {})
+                    zone_str = str(zone_id)
+                    if zone_str in zones_dict:
+                        zone = zones_dict[zone_str]
+                        zone_name = zone.get("name", "") or ""
+                        zone_lower = zone_name.lower()
+                        # Skip esoccer, ebasketball, virtual, and similar simulated sports
+                        if any(x in zone_lower for x in ["esoccer", "ebasketball", "virtual", "esports", "counter strike", "league of legends", "battle"]):
+                            continue
+                else:
+                    continue
+                
                 # Get league info
                 league_id = event.get("leagueId")
                 league_name = "Unknown League"
                 
                 # Look up league name from top-level leagues
                 leagues_dict = raw_data.get("leagues", {})
-                # Convert league_id to string for lookup since dict keys are strings
-                zone_id = event.get("zoneId")
                 country_name = None
                 if zone_id:
                     zones_dict = raw_data.get("zones", {})

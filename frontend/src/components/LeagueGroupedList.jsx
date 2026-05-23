@@ -78,14 +78,18 @@ const COUNTRY_FLAGS_BY_NAME = {
 };
 
 export default function LeagueGroupedList({ matches }) {
-  // Group matches by league
-  const groupedMatches = {};
+  // Group matches by country first, then by league
+  const groupedByCountry = {};
   for (const match of matches) {
+    const countryName = match.country_name || 'Unknown';
     const league = match.league || 'Unknown';
-    if (!groupedMatches[league]) {
-      groupedMatches[league] = [];
+    if (!groupedByCountry[countryName]) {
+      groupedByCountry[countryName] = {};
     }
-    groupedMatches[league].push(match);
+    if (!groupedByCountry[countryName][league]) {
+      groupedByCountry[countryName][league] = [];
+    }
+    groupedByCountry[countryName][league].push(match);
   }
 
   // All leagues collapsed by default
@@ -99,46 +103,49 @@ export default function LeagueGroupedList({ matches }) {
     );
   }
 
-  const toggleLeague = (league) => {
-    setExpanded(prev => ({ ...prev, [league]: !prev[league] }));
+  const toggleLeague = (key) => {
+    setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // Get country info from first match in league
-  const getCountryInfo = (leagueMatches) => {
-    const countryName = leagueMatches[0]?.country_name;
-    return countryName || null;
-  };
+  // Sort countries alphabetically
+  const sortedCountries = Object.keys(groupedByCountry).sort((a, b) => a.localeCompare(b));
 
   return (
     <div className="league-grouped-list">
-      {Object.entries(groupedMatches).map(([league, leagueMatches]) => {
-        const isOpen = expanded[league];
-        const countryName = getCountryInfo(leagueMatches);
-        const flag = countryName && COUNTRY_FLAGS_BY_NAME[countryName] ? COUNTRY_FLAGS_BY_NAME[countryName] : null;
+      {sortedCountries.map((countryName) => {
+        const countryLeagues = groupedByCountry[countryName];
+        const flag = COUNTRY_FLAGS_BY_NAME[countryName] ? COUNTRY_FLAGS_BY_NAME[countryName] : null;
+        const sortedLeagues = Object.keys(countryLeagues).sort((a, b) => a.localeCompare(b));
+        
         return (
-          <div key={league} className="league-group">
-            <div
-              className="league-header"
-              onClick={() => toggleLeague(league)}
-            >
-              {flag && <span className="league-flag">{flag}</span>}
-              <span className="league-name">{league}</span>
-              {countryName && (
-                <span className="league-country">
-                  {flag && <span className="country-flag-inline">{flag}</span>}
-                  {countryName}
-                </span>
-              )}
-              <span className="league-count">{leagueMatches.length} match{leagueMatches.length !== 1 ? 'es' : ''}</span>
-              <span className="league-toggle">{isOpen ? '▲' : '▼'}</span>
+          <div key={countryName} className="country-group">
+            <div className="country-header">
+              {flag && <span className="country-flag">{flag}</span>}
+              <span className="country-name">{countryName}</span>
             </div>
-            {isOpen && (
-              <div className="league-matches">
-                {leagueMatches.map((match) => (
-                  <MatchCard key={match.id} match={match} />
-                ))}
-              </div>
-            )}
+            {sortedLeagues.map((league) => {
+              const leagueMatches = countryLeagues[league];
+              const isOpen = expanded[`${countryName}-${league}`];
+              return (
+                <div key={league} className="league-group">
+                  <div
+                    className="league-header"
+                    onClick={() => toggleLeague(`${countryName}-${league}`)}
+                  >
+                    <span className="league-name">{league}</span>
+                    <span className="league-count">{leagueMatches.length} match{leagueMatches.length !== 1 ? 'es' : ''}</span>
+                    <span className="league-toggle">{isOpen ? '▲' : '▼'}</span>
+                  </div>
+                  {isOpen && (
+                    <div className="league-matches">
+                      {leagueMatches.map((match) => (
+                        <MatchCard key={match.id} match={match} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         );
       })}
