@@ -218,27 +218,23 @@ function RosterSection({ roster }) {
 
   if (!homeLineup && !awayLineup) return null;
 
-  // Build substitution map: key by playerId OR name for lookups
-  const buildSubstitutionMap = (teamSubs) => {
-    const map = {};
-    if (!teamSubs) return map;
-    for (const sub of teamSubs) {
-      const playerIn = sub.playerIn;
-      if (!playerIn) continue;
-      const idKey = playerIn.playerId || playerIn.unknownPlayerId;
-      const nameKey = playerIn.name;
-      const entry = { minute: sub.substitutedOnMinute, name: nameKey };
-      if (idKey) map[idKey] = entry;
-      if (nameKey) map[nameKey] = entry;
-    }
-    return map;
-  };
-
   const renderTeamLineup = (lineupData, teamSide) => {
     if (!lineupData) return null;
 
     const teamSubs = teamSide === 0 ? subs.homeSubs : subs.awaySubs;
-    const substitutions = buildSubstitutionMap(teamSubs);
+
+    // Build maps: by name for players who were subbed IN, and who was subbed OUT
+    const subbedInByMinute = {}; // minute -> player name who came in
+    const subbedOutByName = {}; // player name -> minute they went out
+    if (teamSubs) {
+      for (const sub of teamSubs) {
+        const inName = sub.playerIn?.name;
+        const outName = sub.playerOut?.name;
+        const minute = sub.substitutedOnMinute;
+        if (inName && minute) subbedInByMinute[minute] = inName;
+        if (outName && minute) subbedOutByName[outName] = minute;
+      }
+    }
 
     // Flatten all starting XI from lineup rows
     const starters = [];
@@ -248,8 +244,7 @@ function RosterSection({ roster }) {
           starters.push({
             id: p.playerId || p.unknownPlayerId,
             name: p.name,
-            shirtNumber: null, // not available in lineup
-            subbedIn: p.subbedIn,
+            shirtNumber: null,
           });
         }
       }
@@ -263,30 +258,7 @@ function RosterSection({ roster }) {
           id: bp.playerId || bp.unknownPlayerId,
           name: bp.name,
           shirtNumber: null,
-          subbedIn: bp.subbedIn || false,
         });
-      }
-    }
-
-    // Find players who were subbed IN (they started on bench, came on)
-    const subbedInNames = new Set();
-    if (teamSubs) {
-      for (const sub of teamSubs) {
-        if (sub.playerIn?.name) {
-          subbedInNames.add(sub.playerIn.name);
-        }
-      }
-    }
-
-    // Separate bench into "subbed in" and "unused"
-    const benchWithSubs = [];
-    const benchWithoutSubs = [];
-    for (const bp of bench) {
-      if (subbedInNames.has(bp.name)) {
-        bp.minute = substitutions[bp.name]?.minute || null;
-        benchWithSubs.push(bp);
-      } else {
-        benchWithoutSubs.push(bp);
       }
     }
 
@@ -296,36 +268,32 @@ function RosterSection({ roster }) {
           <div className="roster-starters">
             <div className="roster-subsection-title">Starting XI</div>
             <div className="roster-players">
-              {starters.map((p, i) => (
-                <div key={`${p.id || p.name}-${i}`} className="roster-player">
-                  <span className="player-name">{p.name}</span>
-                </div>
-              ))}
+              {starters.map((p, i) => {
+                const outMinute = subbedOutByName[p.name];
+                return (
+                  <div key={`${p.id || p.name}-${i}`} className="roster-player">
+                    <span className="player-name">{p.name}</span>
+                    {outMinute && <span className="player-sub-out">{outMinute}'</span>}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
-        {benchWithSubs.length > 0 && (
+        {bench.length > 0 && (
           <div className="roster-bench">
-            <div className="roster-subsection-title">Bench (Used)</div>
+            <div className="roster-subsection-title">Bench</div>
             <div className="roster-players">
-              {benchWithSubs.map((p, i) => (
-                <div key={`${p.id || p.name}-${i}`} className="roster-player roster-bench-player">
-                  <span className="player-name">{p.name}</span>
-                  {p.minute && <span className="player-sub-minute">{p.minute}'</span>}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        {benchWithoutSubs.length > 0 && (
-          <div className="roster-bench">
-            <div className="roster-subsection-title">Bench (Unused)</div>
-            <div className="roster-players">
-              {benchWithoutSubs.map((p, i) => (
-                <div key={`${p.id || p.name}-${i}`} className="roster-player roster-bench-player">
-                  <span className="player-name">{p.name}</span>
-                </div>
-              ))}
+              {bench.map((p, i) => {
+                const inMinute = Object.entries(subbedInByMinute).find(([, name]) => name === p.name);
+                const minuteStr = inMinute ? inMinute[0] : null;
+                return (
+                  <div key={`${p.id || p.name}-${i}`} className="roster-player roster-bench-player">
+                    <span className="player-name">{p.name}</span>
+                    {minuteStr && <span className="player-sub-minute">{minuteStr}'</span>}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
