@@ -209,27 +209,55 @@ function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isPi
 
 // ── Roster Section ───────────────────────────────────────────────────────────
 
-function RosterSection({ roster, results }) {
+function RosterSection({ roster, results, incidents, homeName, awayName }) {
   if (!roster) return null;
 
   const homeLineup = roster.lineups?.homeLineup;
   const awayLineup = roster.lineups?.awayLineup;
   const subs = roster.subs || {};
 
-  // Parse scorers from results to extract player names
-  // Format: "23' S. Moreo" -> extract "S. Moreo"
-  const scorerNames = new Set();
-  if (results?.scorers && Array.isArray(results.scorers)) {
-    for (const s of results.scorers) {
-      if (s.description) {
-        const parts = s.description.split("' ");
-        if (parts.length >= 2) {
-          const name = parts.slice(1).join("' ").trim();
-          if (name) scorerNames.add(name);
+  // Parse scorers from results AND goal incidents
+  // Returns Map of player name -> goal count
+  const buildGoalCounts = () => {
+    const goalCounts = new Map();
+
+    // From results.scorers - format: "23' S. Moreo"
+    if (results?.scorers && Array.isArray(results.scorers)) {
+      for (const s of results.scorers) {
+        if (s.description) {
+          const parts = s.description.split("' ");
+          if (parts.length >= 2) {
+            const name = parts.slice(1).join("' ").trim();
+            if (name) goalCounts.set(name, (goalCounts.get(name) || 0) + 1);
+          }
         }
       }
     }
-  }
+
+    // From incidents of type GOAL - format: "2-1 Lazio Pedro (με Σουτ)"
+    if (incidents && Array.isArray(incidents)) {
+      for (const inc of incidents) {
+        if (inc.type === 'GOAL' && inc.description) {
+          let desc = inc.description;
+          // Remove annotation suffixes like "(με Σουτ)", "(pen)", "(o.g.)"
+          desc = desc.replace(/\s*\([^)]*\)\s*$/, '').trim();
+          // Remove score prefix like "2-1 " at the start
+          desc = desc.replace(/^\d+-\d+\s*/, '').trim();
+          // Strip team name (home or away) from the beginning to get player name
+          if (homeName && desc.startsWith(homeName)) {
+            desc = desc.slice(homeName.length).trim();
+          } else if (awayName && desc.startsWith(awayName)) {
+            desc = desc.slice(awayName.length).trim();
+          }
+          if (desc) goalCounts.set(desc, (goalCounts.get(desc) || 0) + 1);
+        }
+      }
+    }
+
+    return goalCounts;
+  };
+
+  const goalCounts = buildGoalCounts();
 
   if (!homeLineup && !awayLineup) return null;
 
@@ -285,11 +313,15 @@ function RosterSection({ roster, results }) {
             <div className="roster-players">
               {starters.map((p, i) => {
                 const outMinute = subbedOutByName[p.name];
-                const isScorer = scorerNames.has(p.name);
+                const goalCount = goalCounts.get(p.name) || 0;
                 return (
                   <div key={`${p.id || p.name}-${i}`} className="roster-player">
                     <span className="player-name">{p.name}</span>
-                    {isScorer && <span className="player-goal">⚽</span>}
+                    {goalCount > 0 && (
+                      <span className="player-goal">
+                        {'⚽'.repeat(goalCount)}
+                      </span>
+                    )}
                     {outMinute && <span className="player-sub-out">{outMinute}'</span>}
                   </div>
                 );
@@ -303,11 +335,15 @@ function RosterSection({ roster, results }) {
             <div className="roster-players">
               {bench.map((p, i) => {
                 const minuteStr = subbedInByName[p.name] || null;
-                const isScorer = scorerNames.has(p.name);
+                const goalCount = goalCounts.get(p.name) || 0;
                 return (
                   <div key={`${p.id || p.name}-${i}`} className="roster-player roster-bench-player">
                     <span className="player-name">{p.name}</span>
-                    {isScorer && <span className="player-goal">⚽</span>}
+                    {goalCount > 0 && (
+                      <span className="player-goal">
+                        {'⚽'.repeat(goalCount)}
+                      </span>
+                    )}
                     {minuteStr && <span className="player-sub-minute">{minuteStr}'</span>}
                   </div>
                 );
@@ -583,7 +619,7 @@ export default function MatchDetailPage() {
       </div>
 
 {/* ── Roster ── */}
-       <RosterSection roster={roster} results={results} />
+       <RosterSection roster={roster} results={results} incidents={data.incidents} homeName={home_team?.name} awayName={away_team?.name} />
      </div>
    );
  }
