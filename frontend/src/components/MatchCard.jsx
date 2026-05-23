@@ -1,8 +1,10 @@
+import { useNavigate } from 'react-router-dom';
 import { useFavorites } from '../context/FavoritesContext';
 import './MatchCard.css';
 import OddsDisplay from './OddsDisplay';
 
 export default function MatchCard({ match }) {
+  const navigate = useNavigate();
   const { isFavorite, toggleFavorite } = useFavorites();
   const fav = isFavorite(match.id);
 
@@ -26,7 +28,7 @@ export default function MatchCard({ match }) {
   const isLive = match.is_live && match.match_time && match.match_time !== '-';
 
   return (
-    <div className="match-card">
+    <div className="match-card" onClick={() => navigate(`/match/${match.id}`)}>
       <div className="match-top-row">
         <div className={`match-status ${getStatusColor(match.status)}`}>
           {match.status}
@@ -38,7 +40,7 @@ export default function MatchCard({ match }) {
 
         <button
           className={`fav-btn ${fav ? 'fav-on' : 'fav-off'}`}
-          onClick={() => toggleFavorite(match.id)}
+          onClick={(e) => { e.stopPropagation(); toggleFavorite(match.id); }}
           title={fav ? 'Remove from favorites' : 'Add to favorites'}
           aria-label={fav ? 'Remove from favorites' : 'Add to favorites'}
         >

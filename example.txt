@@ -1,0 +1,1876 @@
+{
+    "version": 1229,
+    "versionsPerAudience": {
+        "7": 20,
+        "1": 136,
+        "4": 1037,
+        "2": 36,
+        "8": 0
+    },
+    "syncedAtUtc": 1779539595029,
+    "sport": {
+        "id": "FOOT",
+        "sportId": 1,
+        "name": "Ποδόσφαιρο",
+        "displayOrder": 0
+    },
+    "zone": {
+        "code": "denmark",
+        "displayOrder": -9501,
+        "id": 11339,
+        "name": "Δανία"
+    },
+    "league": {
+        "displayOrder": 16520,
+        "id": 17223,
+        "name": "2. division"
+    },
+    "event": {
+        "id": 85879875,
+        "zoneId": 11339,
+        "leagueId": 17223,
+        "sportId": "FOOT",
+        "ardSportId": 1,
+        "marketIdList": [
+            2765717373,
+            2769449635,
+            2775860661,
+            2775868530,
+            2775868538,
+            2765717383,
+            2765717382,
+            2775868532,
+            2775868535,
+            2775860662,
+            2775868531,
+            2765717415,
+            2765717410,
+            2765717411,
+            2765717380,
+            2775759329,
+            2765717404,
+            2765717403,
+            2765717402,
+            2765717395,
+            2765717394,
+            2765717409
+        ],
+        "chatChannelId": "Stoiximangr-85879875-isoetz-xelsingor",
+        "roster": {
+            "homeRoster": {
+                "players": {},
+                "id": 1926992,
+                "name": "Ίσοετζ"
+            },
+            "awayRoster": {
+                "players": {},
+                "id": 117729,
+                "name": "Χέλσινγκορ"
+            },
+            "unknownPlayers": {}
+        },
+        "breadcrumbUrls": {
+            "sport": "/sport/podosfairo/",
+            "zone": "/sport/podosfairo/diorganoseis/dania/11339/",
+            "league": "/sport/podosfairo/dania/2-division/17223/"
+        },
+        "matchComboEnabled": true,
+        "matchComboAllowedMarketTypes": [
+            69,
+            1001133,
+            1001134,
+            1001135,
+            1001136,
+            1001137,
+            1001061,
+            1001062,
+            1001054,
+            1001055,
+            1001056,
+            1001057,
+            1000661,
+            1000675,
+            1000676,
+            1000680,
+            1000681,
+            1000682,
+            1000683,
+            407,
+            408,
+            67,
+            15,
+            596,
+            595,
+            593,
+            599,
+            597,
+            1000115,
+            4072,
+            4073,
+            4074,
+            644,
+            1000111,
+            1000112,
+            439,
+            1000113,
+            1000114,
+            4159,
+            4160,
+            4161,
+            34,
+            37,
+            38,
+            33,
+            17,
+            118,
+            9,
+            43,
+            73,
+            80,
+            68,
+            13,
+            16,
+            8,
+            75,
+            20,
+            24,
+            116,
+            115,
+            1,
+            85,
+            14,
+            131,
+            84,
+            76,
+            79,
+            65,
+            503,
+            121,
+            120,
+            104,
+            39,
+            40,
+            480,
+            587,
+            588,
+            649,
+            49,
+            51,
+            52,
+            66,
+            62,
+            346,
+            171,
+            172,
+            224,
+            546,
+            548,
+            629,
+            226,
+            569,
+            608,
+            462,
+            175,
+            176,
+            614,
+            615,
+            618,
+            4153,
+            4154,
+            174,
+            471,
+            472,
+            465,
+            551,
+            2787,
+            173,
+            470,
+            2,
+            3,
+            4,
+            5,
+            4151,
+            4152,
+            93,
+            2818,
+            114,
+            4049,
+            4050,
+            41,
+            524,
+            42,
+            526,
+            351,
+            436,
+            437,
+            460,
+            643,
+            11,
+            4066,
+            4067,
+            4069,
+            4070,
+            4071,
+            4155,
+            4156,
+            4165,
+            4166,
+            4167,
+            4168,
+            5014,
+            343,
+            535,
+            449,
+            534
+        ],
+        "matchComboUrl": "/live/ishoej-if-vs-fc-helsingor/betbuilder/85879875/",
+        "incidents": [
+            {
+                "description": "Έναρξη αγώνα",
+                "type": "EBEG",
+                "props": {
+                    "title": "Έναρξη αγώνα",
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "1ο Κόρνερ: Χέλσινγκορ",
+                "time": "3'",
+                "type": "CRNR",
+                "teamSide": 1,
+                "props": {
+                    "title": "1ο Κόρνερ",
+                    "description": "Χέλσινγκορ",
+                    "minute": 3,
+                    "filterIds": [
+                        5,
+                        15
+                    ]
+                }
+            },
+            {
+                "description": "2ο Κόρνερ: Χέλσινγκορ",
+                "time": "3'",
+                "type": "CRNR",
+                "teamSide": 1,
+                "props": {
+                    "title": "2ο Κόρνερ",
+                    "description": "Χέλσινγκορ",
+                    "minute": 3,
+                    "filterIds": [
+                        5,
+                        15
+                    ]
+                }
+            },
+            {
+                "description": "3ο Κόρνερ: Ίσοετζ",
+                "time": "7'",
+                "type": "CRNR",
+                "teamSide": 0,
+                "props": {
+                    "title": "3ο Κόρνερ",
+                    "description": "Ίσοετζ",
+                    "minute": 7,
+                    "filterIds": [
+                        5,
+                        15
+                    ]
+                }
+            },
+            {
+                "description": "4o Κόρνερ: Ίσοετζ",
+                "time": "10'",
+                "type": "CRNR",
+                "teamSide": 0,
+                "props": {
+                    "title": "4o Κόρνερ",
+                    "description": "Ίσοετζ",
+                    "minute": 10,
+                    "filterIds": [
+                        5,
+                        15
+                    ]
+                }
+            },
+            {
+                "description": "00:00 - 09:59 : 3 Πλάγια, 0 Φάουλ, 5 Ελεύθερα",
+                "time": "11'",
+                "type": "Aggregated",
+                "props": {
+                    "timeRange": "00:00 - 09:59",
+                    "title": "3 Πλάγια, 0 Φάουλ, 5 Ελεύθερα",
+                    "minute": 11,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "5ο Κόρνερ: Ίσοετζ",
+                "time": "21'",
+                "type": "CRNR",
+                "teamSide": 0,
+                "props": {
+                    "title": "5ο Κόρνερ",
+                    "description": "Ίσοετζ",
+                    "minute": 21,
+                    "filterIds": [
+                        5,
+                        15
+                    ]
+                }
+            },
+            {
+                "description": "10:00 - 19:59 : 8 Πλάγια, 2 Φάουλ, 1 Ελεύθερο",
+                "time": "21'",
+                "type": "Aggregated",
+                "props": {
+                    "timeRange": "10:00 - 19:59",
+                    "title": "8 Πλάγια, 2 Φάουλ, 1 Ελεύθερο",
+                    "minute": 21,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "1-0 Ίσοετζ",
+                "time": "25'",
+                "type": "GOAL",
+                "teamSide": 0,
+                "props": {
+                    "scoreHome": 1,
+                    "scoreAway": 0,
+                    "title": "Γκολ",
+                    "description": "Ίσοετζ",
+                    "minute": 25,
+                    "filterIds": [
+                        5,
+                        10
+                    ]
+                }
+            },
+            {
+                "description": "20:00 - 29:59 : 5 Πλάγια, 3 Φάουλ, 1 Ελεύθερο",
+                "time": "31'",
+                "type": "Aggregated",
+                "props": {
+                    "timeRange": "20:00 - 29:59",
+                    "title": "5 Πλάγια, 3 Φάουλ, 1 Ελεύθερο",
+                    "minute": 31,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "30:00 - 39:59 : 6 Πλάγια, 2 Φάουλ, 1 Ελεύθερο",
+                "time": "41'",
+                "type": "Aggregated",
+                "props": {
+                    "timeRange": "30:00 - 39:59",
+                    "title": "6 Πλάγια, 2 Φάουλ, 1 Ελεύθερο",
+                    "minute": 41,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "6o Κόρνερ: Ίσοετζ",
+                "time": "43'",
+                "type": "CRNR",
+                "teamSide": 0,
+                "props": {
+                    "title": "6o Κόρνερ",
+                    "description": "Ίσοετζ",
+                    "minute": 43,
+                    "filterIds": [
+                        5,
+                        15
+                    ]
+                }
+            },
+            {
+                "description": "7ο Κόρνερ: Ίσοετζ",
+                "time": "44'",
+                "type": "CRNR",
+                "teamSide": 0,
+                "props": {
+                    "title": "7ο Κόρνερ",
+                    "description": "Ίσοετζ",
+                    "minute": 44,
+                    "filterIds": [
+                        5,
+                        15
+                    ]
+                }
+            },
+            {
+                "description": "40:00 - 45:00+ : 6 Πλάγια, 2 Φάουλ, 1 Ελεύθερο",
+                "time": "45'+4'",
+                "type": "Aggregated",
+                "props": {
+                    "timeRange": "40:00 - 45:00+",
+                    "title": "6 Πλάγια, 2 Φάουλ, 1 Ελεύθερο",
+                    "minute": 45,
+                    "overtimeMinute": 4,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "Λήξη 1ου ημιχρόνου",
+                "type": "PEND",
+                "props": {
+                    "title": "Λήξη 1ου ημιχρόνου",
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "Έναρξη 2ου ημιχρόνου",
+                "type": "PBEG",
+                "props": {
+                    "title": "Έναρξη 2ου ημιχρόνου",
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "1η Αλλαγή: (Χέλσινγκορ)",
+                "time": "46'",
+                "type": "SUBS",
+                "teamSide": 1,
+                "props": {
+                    "title": "1η Αλλαγή",
+                    "description": "Χέλσινγκορ",
+                    "minute": 46,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "1η Κίτρινη Κάρτα: Ίσοετζ",
+                "time": "47'",
+                "type": "YELL",
+                "teamSide": 0,
+                "props": {
+                    "title": "1η Κίτρινη Κάρτα",
+                    "description": "Ίσοετζ",
+                    "minute": 47,
+                    "filterIds": [
+                        5,
+                        20
+                    ]
+                }
+            },
+            {
+                "description": "1-1 Χέλσινγκορ",
+                "time": "48'",
+                "type": "GOAL",
+                "teamSide": 1,
+                "props": {
+                    "scoreHome": 1,
+                    "scoreAway": 1,
+                    "title": "Γκολ",
+                    "description": "Χέλσινγκορ",
+                    "minute": 48,
+                    "filterIds": [
+                        5,
+                        10
+                    ]
+                }
+            },
+            {
+                "description": "45:00 - 49:59 : 1 Πλάγιο, 3 Φάουλ, 0 Ελεύθερα",
+                "time": "51'",
+                "type": "Aggregated",
+                "props": {
+                    "timeRange": "45:00 - 49:59",
+                    "title": "1 Πλάγιο, 3 Φάουλ, 0 Ελεύθερα",
+                    "minute": 51,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "2η Κίτρινη Κάρτα: Χέλσινγκορ",
+                "time": "53'",
+                "type": "YELL",
+                "teamSide": 1,
+                "props": {
+                    "title": "2η Κίτρινη Κάρτα",
+                    "description": "Χέλσινγκορ",
+                    "minute": 53,
+                    "filterIds": [
+                        5,
+                        20
+                    ]
+                }
+            },
+            {
+                "description": "2η Αλλαγή: (Ίσοετζ)",
+                "time": "54'",
+                "type": "SUBS",
+                "teamSide": 0,
+                "props": {
+                    "title": "2η Αλλαγή",
+                    "description": "Ίσοετζ",
+                    "minute": 54,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "3η Αλλαγή: (Ίσοετζ)",
+                "time": "54'",
+                "type": "SUBS",
+                "teamSide": 0,
+                "props": {
+                    "title": "3η Αλλαγή",
+                    "description": "Ίσοετζ",
+                    "minute": 54,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "8ο Κόρνερ: Χέλσινγκορ",
+                "time": "59'",
+                "type": "CRNR",
+                "teamSide": 1,
+                "props": {
+                    "title": "8ο Κόρνερ",
+                    "description": "Χέλσινγκορ",
+                    "minute": 59,
+                    "filterIds": [
+                        5,
+                        15
+                    ]
+                }
+            },
+            {
+                "description": "3η Κίτρινη Κάρτα: Χέλσινγκορ",
+                "time": "60'",
+                "type": "YELL",
+                "teamSide": 1,
+                "props": {
+                    "title": "3η Κίτρινη Κάρτα",
+                    "description": "Χέλσινγκορ",
+                    "minute": 60,
+                    "filterIds": [
+                        5,
+                        20
+                    ]
+                }
+            },
+            {
+                "description": "2-1 Ίσοετζ",
+                "time": "61'",
+                "type": "GOAL",
+                "teamSide": 0,
+                "props": {
+                    "scoreHome": 2,
+                    "scoreAway": 1,
+                    "title": "Γκολ",
+                    "description": "Ίσοετζ",
+                    "minute": 61,
+                    "filterIds": [
+                        5,
+                        10
+                    ]
+                }
+            },
+            {
+                "description": "50:00 - 59:59 : 2 Πλάγια, 4 Φάουλ, 0 Ελεύθερα",
+                "time": "61'",
+                "type": "Aggregated",
+                "props": {
+                    "timeRange": "50:00 - 59:59",
+                    "title": "2 Πλάγια, 4 Φάουλ, 0 Ελεύθερα",
+                    "minute": 61,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "9ο Κόρνερ: Χέλσινγκορ",
+                "time": "64'",
+                "type": "CRNR",
+                "teamSide": 1,
+                "props": {
+                    "title": "9ο Κόρνερ",
+                    "description": "Χέλσινγκορ",
+                    "minute": 64,
+                    "filterIds": [
+                        5,
+                        15
+                    ]
+                }
+            },
+            {
+                "description": "4η Αλλαγή: (Χέλσινγκορ)",
+                "time": "67'",
+                "type": "SUBS",
+                "teamSide": 1,
+                "props": {
+                    "title": "4η Αλλαγή",
+                    "description": "Χέλσινγκορ",
+                    "minute": 67,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "1ο Πέναλτι: Χέλσινγκορ",
+                "time": "68'",
+                "type": "PENL",
+                "teamSide": 1,
+                "props": {
+                    "title": "1ο Πέναλτι",
+                    "description": "Χέλσινγκορ",
+                    "minute": 68,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "2-2 Χέλσινγκορ (με Πέναλτι)",
+                "time": "69'",
+                "type": "GOAL",
+                "teamSide": 1,
+                "props": {
+                    "scoreHome": 2,
+                    "scoreAway": 2,
+                    "title": "Γκολ",
+                    "description": "Χέλσινγκορ (με Πέναλτι)",
+                    "minute": 69,
+                    "filterIds": [
+                        5,
+                        10
+                    ]
+                }
+            },
+            {
+                "description": "10ο Κόρνερ: Χέλσινγκορ",
+                "time": "71'",
+                "type": "CRNR",
+                "teamSide": 1,
+                "props": {
+                    "title": "10ο Κόρνερ",
+                    "description": "Χέλσινγκορ",
+                    "minute": 71,
+                    "filterIds": [
+                        5,
+                        15
+                    ]
+                }
+            },
+            {
+                "description": "60:00 - 69:59 : 1 Πλάγιο, 2 Φάουλ, 2 Ελεύθερα",
+                "time": "71'",
+                "type": "Aggregated",
+                "props": {
+                    "timeRange": "60:00 - 69:59",
+                    "title": "1 Πλάγιο, 2 Φάουλ, 2 Ελεύθερα",
+                    "minute": 71,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "5η Αλλαγή: (Ίσοετζ)",
+                "time": "74'",
+                "type": "SUBS",
+                "teamSide": 0,
+                "props": {
+                    "title": "5η Αλλαγή",
+                    "description": "Ίσοετζ",
+                    "minute": 74,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "6η Αλλαγή: (Ίσοετζ)",
+                "time": "74'",
+                "type": "SUBS",
+                "teamSide": 0,
+                "props": {
+                    "title": "6η Αλλαγή",
+                    "description": "Ίσοετζ",
+                    "minute": 74,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            },
+            {
+                "description": "Οφσάιντ: Ίσοετζ",
+                "time": "76'",
+                "type": "OFFS",
+                "teamSide": 0,
+                "props": {
+                    "title": "Οφσάιντ",
+                    "description": "Ίσοετζ",
+                    "minute": 76,
+                    "filterIds": [
+                        5
+                    ]
+                }
+            }
+        ],
+        "incidentFilters": [
+            {
+                "tag": "All",
+                "id": 5,
+                "name": "Όλα"
+            },
+            {
+                "tag": "Goals",
+                "id": 10,
+                "name": "Γκολ"
+            },
+            {
+                "tag": "Corners",
+                "id": 15,
+                "name": "Κόρνερ"
+            },
+            {
+                "tag": "Cards",
+                "id": 20,
+                "name": "Κάρτες"
+            }
+        ],
+        "statistics": {
+            "event": {
+                "330": "10",
+                "331": "7",
+                "310": "3"
+            },
+            "teams": {
+                "334": {
+                    "117729": "5"
+                },
+                "336": {
+                    "117729": "2"
+                },
+                "333": {
+                    "1926992": "5"
+                },
+                "335": {
+                    "1926992": "5"
+                },
+                "313": {
+                    "1926992": "1"
+                },
+                "317": {
+                    "1926992": "1"
+                },
+                "314": {
+                    "117729": "2"
+                },
+                "318": {
+                    "117729": "2"
+                },
+                "338": {
+                    "117729": "3"
+                }
+            }
+        },
+        "totalMarketsAvailable": 22,
+        "url": "/live/isoetz-xelsingor/85879875/",
+        "participants": [
+            {
+                "name": "Ίσοετζ",
+                "isHome": true,
+                "teamId": 1926992
+            },
+            {
+                "name": "Χέλσινγκορ",
+                "teamId": 117729
+            }
+        ],
+        "notes": [],
+        "isPitchAvailable": true,
+        "isPrettyTechStatsAvailable": true,
+        "isLive": true,
+        "willGoLive": true,
+        "startTime": 1779534000000,
+        "liveData": {
+            "score": {
+                "home": "2",
+                "away": "2"
+            },
+            "clock": {
+                "secondsSinceStart": 4586
+            },
+            "results": {
+                "penalties": {
+                    "home": "0",
+                    "away": "1"
+                },
+                "yellow": {
+                    "home": "1",
+                    "away": "2"
+                },
+                "corners": {
+                    "home": "5",
+                    "away": "5"
+                },
+                "sportId": 1
+            }
+        },
+        "displayOrder": 6,
+        "betradarMatchId": 70730378
+    },
+    "markets": {
+        "2765717373": {
+            "selectionIdList": [
+                9626264407,
+                9626264408,
+                9626264409
+            ],
+            "type": "MRES",
+            "typeId": 1,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 4,
+            "displayOrder": 0,
+            "id": 2765717373,
+            "name": "Τελικό Αποτέλεσμα"
+        },
+        "2769449635": {
+            "selectionIdList": [
+                9641372868,
+                9641372869
+            ],
+            "type": "HCTG",
+            "typeId": 13,
+            "handicap": 4.5,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 2,
+            "displayOrder": 55,
+            "id": 2769449635,
+            "name": "Γκολ Over/Under"
+        },
+        "2775860661": {
+            "selectionIdList": [
+                9667184055,
+                9667184056
+            ],
+            "type": "HCTG",
+            "typeId": 13,
+            "handicap": 5.5,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 2,
+            "displayOrder": 55,
+            "id": 2775860661,
+            "name": "Γκολ Over/Under"
+        },
+        "2775868530": {
+            "selectionIdList": [
+                9667213183,
+                9667213184
+            ],
+            "type": "HCTG",
+            "typeId": 13,
+            "handicap": 6.5,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 2,
+            "displayOrder": 55,
+            "id": 2775868530,
+            "name": "Γκολ Over/Under"
+        },
+        "2775868538": {
+            "selectionIdList": [
+                9667213199,
+                9667213200,
+                9667213201
+            ],
+            "type": "INTS",
+            "typeId": 11,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 3,
+            "instanceRef": 5,
+            "displayOrder": 60,
+            "id": 2775868538,
+            "name": "Επόμενο Γκολ (Γκολ 5)"
+        },
+        "2765717383": {
+            "selectionIdList": [
+                9626264468,
+                9626264469,
+                9626264470
+            ],
+            "type": "DBLC",
+            "typeId": 9,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 3,
+            "displayOrder": 70,
+            "id": 2765717383,
+            "name": "Διπλή ευκαιρία"
+        },
+        "2765717382": {
+            "selectionIdList": [
+                9626264466,
+                9626264467
+            ],
+            "type": "DNOB",
+            "typeId": 10,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 2,
+            "displayOrder": 80,
+            "id": 2765717382,
+            "name": "Draw No Bet"
+        },
+        "2775868532": {
+            "selectionIdList": [
+                9667213187,
+                9667213188
+            ],
+            "type": "AHRF",
+            "typeId": 185,
+            "handicap": 0,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 2,
+            "displayOrder": 85,
+            "id": 2775868532,
+            "name": "Ασιατικό Χάντικαπ (Τρέχον σκορ 2 - 2)"
+        },
+        "2775868535": {
+            "selectionIdList": [
+                9667213193,
+                9667213194
+            ],
+            "type": "ASOU",
+            "typeId": 189,
+            "handicap": 4.75,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 2,
+            "displayOrder": 90,
+            "id": 2775868535,
+            "name": "Ασιατικό (Over/Under) Γκολ"
+        },
+        "2775860662": {
+            "selectionIdList": [
+                9667184057,
+                9667184058
+            ],
+            "type": "OUHG",
+            "typeId": 84,
+            "handicap": 2.5,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 2,
+            "displayOrder": 120,
+            "id": 2775860662,
+            "name": "Ίσοετζ - Γκολ Over/Under"
+        },
+        "2775868531": {
+            "selectionIdList": [
+                9667213185,
+                9667213186
+            ],
+            "type": "OUAG",
+            "typeId": 85,
+            "handicap": 2.5,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 2,
+            "displayOrder": 125,
+            "id": 2775868531,
+            "name": "Χέλσινγκορ - Γκολ Over/Under"
+        },
+        "2765717415": {
+            "selectionIdList": [
+                9641372922,
+                9641372923,
+                9641372929,
+                9641372930,
+                9641372924,
+                9641372935,
+                9641372931,
+                9641372936,
+                9641372925,
+                9641372941,
+                9641372932,
+                9641372937,
+                9641372942,
+                9641372926
+            ],
+            "type": "1001086",
+            "typeId": 1001086,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 2,
+            "displayOrder": 150,
+            "id": 2765717415,
+            "name": "Ακριβές Σκορ"
+        },
+        "2765717410": {
+            "selectionIdList": [
+                9626264548,
+                9626264550,
+                9626264552
+            ],
+            "type": "MROU",
+            "typeId": 24,
+            "handicap": 2.5,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 2,
+            "displayOrder": 165,
+            "id": 2765717410,
+            "name": "Τελικό Αποτέλεσμα & Συνολικά Γκολ (2.5)"
+        },
+        "2765717411": {
+            "selectionIdList": [
+                9626264554,
+                9626264556,
+                9626264558
+            ],
+            "type": "MROU",
+            "typeId": 24,
+            "handicap": 3.5,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 2,
+            "displayOrder": 165,
+            "id": 2765717411,
+            "name": "Τελικό Αποτέλεσμα & Συνολικά Γκολ (3.5)"
+        },
+        "2765717380": {
+            "selectionIdList": [
+                9626264451,
+                9626264453,
+                9626264455
+            ],
+            "type": "MRBT",
+            "typeId": 20,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 3,
+            "displayOrder": 170,
+            "id": 2765717380,
+            "name": "Τελικό Αποτέλεσμα / Να σκοράρουν και οι 2 ομάδες"
+        },
+        "2775759329": {
+            "selectionIdList": [
+                9666772455,
+                9666772454,
+                9666772456
+            ],
+            "type": "FHMR",
+            "typeId": 408,
+            "handicap": 1,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 3,
+            "displayOrder": 735,
+            "id": 2775759329,
+            "name": "Χάντικαπ - Τελικό Αποτέλεσμα"
+        },
+        "2765717404": {
+            "selectionIdList": [
+                9626264514,
+                9626264515
+            ],
+            "type": "TOTG",
+            "typeId": 104,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 2,
+            "displayOrder": 805,
+            "id": 2765717404,
+            "name": "Γκολ"
+        },
+        "2765717403": {
+            "selectionIdList": [
+                9626264509,
+                9626264510,
+                9626264511
+            ],
+            "type": "HGTO",
+            "typeId": 105,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 3,
+            "teamId": 1926992,
+            "displayOrder": 820,
+            "id": 2765717403,
+            "name": "Ίσοετζ Γκολ"
+        },
+        "2765717402": {
+            "selectionIdList": [
+                9626264504,
+                9626264505,
+                9626264506
+            ],
+            "type": "AGTO",
+            "typeId": 106,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 3,
+            "teamId": 117729,
+            "displayOrder": 825,
+            "id": 2765717402,
+            "name": "Χέλσινγκορ Γκολ"
+        },
+        "2765717395": {
+            "selectionIdList": [
+                9626264485,
+                9626264486,
+                9626264487
+            ],
+            "type": "H2RS",
+            "typeId": 133,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 3,
+            "displayOrder": 945,
+            "id": 2765717395,
+            "name": "2ο Ημίχρονο - Αποτέλεσμα"
+        },
+        "2765717394": {
+            "selectionIdList": [
+                9626264483,
+                9626264484
+            ],
+            "type": "2DNB",
+            "typeId": 135,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 2,
+            "displayOrder": 955,
+            "id": 2765717394,
+            "name": "2ο Ημίχρονο - Draw No Bet"
+        },
+        "2765717409": {
+            "selectionIdList": [
+                9626264546,
+                9626264547
+            ],
+            "type": "ODEV",
+            "typeId": 148,
+            "isSuspended": true,
+            "marketCloseTimeMillis": 0,
+            "renderingLayout": 2,
+            "displayOrder": 1180,
+            "id": 2765717409,
+            "name": "Συνολικά Γκολ Μονά/Ζυγά"
+        }
+    },
+    "selections": {
+        "9626264407": {
+            "price": 4,
+            "typeId": 1,
+            "renderingLayout": 4,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9626264407,
+            "name": "1",
+            "fullName": "Ίσοετζ"
+        },
+        "9626264408": {
+            "price": 1.8,
+            "typeId": 2,
+            "renderingLayout": 4,
+            "columnIndex": 1,
+            "displayOrder": 2,
+            "id": 9626264408,
+            "name": "X",
+            "fullName": "Ισοπαλία"
+        },
+        "9626264409": {
+            "price": 3.3,
+            "typeId": 3,
+            "renderingLayout": 4,
+            "columnIndex": 2,
+            "displayOrder": 3,
+            "id": 9626264409,
+            "name": "2",
+            "fullName": "Χέλσινγκορ"
+        },
+        "9641372868": {
+            "price": 1.67,
+            "handicap": 4.5,
+            "typeId": 39,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9641372868,
+            "name": "Over 4.5",
+            "fullName": "Over"
+        },
+        "9641372869": {
+            "price": 2.02,
+            "handicap": 4.5,
+            "typeId": 40,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 2,
+            "id": 9641372869,
+            "name": "Under 4.5",
+            "fullName": "Under"
+        },
+        "9667184055": {
+            "price": 4.25,
+            "handicap": 5.5,
+            "typeId": 39,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9667184055,
+            "name": "Over 5.5",
+            "fullName": "Over"
+        },
+        "9667184056": {
+            "price": 1.17,
+            "handicap": 5.5,
+            "typeId": 40,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 2,
+            "id": 9667184056,
+            "name": "Under 5.5",
+            "fullName": "Under"
+        },
+        "9667213183": {
+            "price": 8.75,
+            "handicap": 6.5,
+            "typeId": 39,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9667213183,
+            "name": "Over 6.5",
+            "fullName": "Over"
+        },
+        "9667213184": {
+            "price": 1.025,
+            "handicap": 6.5,
+            "typeId": 40,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 2,
+            "id": 9667213184,
+            "name": "Under 6.5",
+            "fullName": "Under"
+        },
+        "9667213199": {
+            "price": 3.45,
+            "typeId": 33,
+            "renderingLayout": 3,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9667213199,
+            "name": "Ίσοετζ",
+            "fullName": "Ίσοετζ"
+        },
+        "9667213200": {
+            "price": 2.02,
+            "typeId": 34,
+            "renderingLayout": 3,
+            "columnIndex": 1,
+            "displayOrder": 2,
+            "id": 9667213200,
+            "name": "Κανένα γκολ",
+            "fullName": "Κανένα γκολ"
+        },
+        "9667213201": {
+            "price": 2.95,
+            "typeId": 35,
+            "renderingLayout": 3,
+            "columnIndex": 2,
+            "displayOrder": 3,
+            "id": 9667213201,
+            "name": "Χέλσινγκορ",
+            "fullName": "Χέλσινγκορ"
+        },
+        "9626264468": {
+            "price": 1.3,
+            "typeId": 28,
+            "renderingLayout": 3,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9626264468,
+            "name": "1X",
+            "fullName": "1X"
+        },
+        "9626264469": {
+            "price": 1.23,
+            "typeId": 29,
+            "renderingLayout": 3,
+            "columnIndex": 1,
+            "displayOrder": 2,
+            "id": 9626264469,
+            "name": "X2",
+            "fullName": "X2"
+        },
+        "9626264470": {
+            "price": 1.78,
+            "typeId": 30,
+            "renderingLayout": 3,
+            "columnIndex": 2,
+            "displayOrder": 3,
+            "id": 9626264470,
+            "name": "12",
+            "fullName": "12"
+        },
+        "9626264466": {
+            "price": 2.02,
+            "typeId": 31,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9626264466,
+            "name": "Ίσοετζ",
+            "fullName": "Ίσοετζ"
+        },
+        "9626264467": {
+            "price": 1.67,
+            "typeId": 32,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 2,
+            "id": 9626264467,
+            "name": "Χέλσινγκορ",
+            "fullName": "Χέλσινγκορ"
+        },
+        "9667213187": {
+            "price": 2,
+            "handicap": 0,
+            "typeId": 6766,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9667213187,
+            "name": "Ίσοετζ 0.0",
+            "fullName": "Ίσοετζ"
+        },
+        "9667213188": {
+            "price": 1.67,
+            "handicap": 0,
+            "typeId": 6767,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 2,
+            "id": 9667213188,
+            "name": "Χέλσινγκορ 0.0",
+            "fullName": "Χέλσινγκορ"
+        },
+        "9667213193": {
+            "price": 2,
+            "handicap": 4.75,
+            "typeId": 1525,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 0,
+            "id": 9667213193,
+            "name": "Over 4.75",
+            "fullName": "Over"
+        },
+        "9667213194": {
+            "price": 1.7,
+            "handicap": 4.75,
+            "typeId": 1526,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 1,
+            "id": 9667213194,
+            "name": "Under 4.75",
+            "fullName": "Under"
+        },
+        "9667184057": {
+            "price": 2.87,
+            "handicap": 2.5,
+            "typeId": 263,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9667184057,
+            "name": "Over 2.5",
+            "fullName": "Over"
+        },
+        "9667184058": {
+            "price": 1.36,
+            "handicap": 2.5,
+            "typeId": 264,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 2,
+            "id": 9667184058,
+            "name": "Under 2.5",
+            "fullName": "Under"
+        },
+        "9667213185": {
+            "price": 2.55,
+            "handicap": 2.5,
+            "typeId": 265,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9667213185,
+            "name": "Over 2.5",
+            "fullName": "Over"
+        },
+        "9667213186": {
+            "price": 1.45,
+            "handicap": 2.5,
+            "typeId": 266,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 2,
+            "id": 9667213186,
+            "name": "Under 2.5",
+            "fullName": "Under"
+        },
+        "9641372922": {
+            "price": 2.02,
+            "typeId": 1003980,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 0,
+            "id": 9641372922,
+            "name": "2 - 2",
+            "fullName": "2 - 2"
+        },
+        "9641372923": {
+            "price": 3.35,
+            "typeId": 1003980,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 0,
+            "id": 9641372923,
+            "name": "2 - 3",
+            "fullName": "2 - 3"
+        },
+        "9641372929": {
+            "price": 3.8,
+            "typeId": 1003980,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 0,
+            "id": 9641372929,
+            "name": "3 - 2",
+            "fullName": "3 - 2"
+        },
+        "9641372930": {
+            "price": 6.9,
+            "typeId": 1003980,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 0,
+            "id": 9641372930,
+            "name": "3 - 3",
+            "fullName": "3 - 3"
+        },
+        "9641372924": {
+            "price": 10,
+            "typeId": 1003980,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 0,
+            "id": 9641372924,
+            "name": "2 - 4",
+            "fullName": "2 - 4"
+        },
+        "9641372935": {
+            "price": 12.5,
+            "typeId": 1003980,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 0,
+            "id": 9641372935,
+            "name": "4 - 2",
+            "fullName": "4 - 2"
+        },
+        "9641372931": {
+            "price": 19,
+            "typeId": 1003980,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 0,
+            "id": 9641372931,
+            "name": "3 - 4",
+            "fullName": "3 - 4"
+        },
+        "9641372936": {
+            "price": 21,
+            "typeId": 1003980,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 0,
+            "id": 9641372936,
+            "name": "4 - 3",
+            "fullName": "4 - 3"
+        },
+        "9641372925": {
+            "price": 32,
+            "typeId": 1003980,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 0,
+            "id": 9641372925,
+            "name": "2 - 5",
+            "fullName": "2 - 5"
+        },
+        "9641372941": {
+            "price": 40,
+            "typeId": 1003980,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 0,
+            "id": 9641372941,
+            "name": "5 - 2",
+            "fullName": "5 - 2"
+        },
+        "9641372932": {
+            "price": 45,
+            "typeId": 1003980,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 0,
+            "id": 9641372932,
+            "name": "3 - 5",
+            "fullName": "3 - 5"
+        },
+        "9641372937": {
+            "price": 45,
+            "typeId": 1003980,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 0,
+            "id": 9641372937,
+            "name": "4 - 4",
+            "fullName": "4 - 4"
+        },
+        "9641372942": {
+            "price": 50,
+            "typeId": 1003980,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 0,
+            "id": 9641372942,
+            "name": "5 - 3",
+            "fullName": "5 - 3"
+        },
+        "9641372926": {
+            "price": 65,
+            "typeId": 1003980,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 0,
+            "id": 9641372926,
+            "name": "2 - 6",
+            "fullName": "2 - 6"
+        },
+        "9626264548": {
+            "price": 4,
+            "handicap": 2.5,
+            "typeId": 84,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9626264548,
+            "name": "1 και Over 2.5",
+            "fullName": "1 και Over"
+        },
+        "9626264550": {
+            "price": 3.3,
+            "handicap": 2.5,
+            "typeId": 86,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 3,
+            "id": 9626264550,
+            "name": "2 και Over 2.5",
+            "fullName": "2 και Over"
+        },
+        "9626264552": {
+            "price": 1.8,
+            "handicap": 2.5,
+            "typeId": 88,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 5,
+            "id": 9626264552,
+            "name": "X και Over 2.5",
+            "fullName": "X και Over"
+        },
+        "9626264554": {
+            "price": 4,
+            "handicap": 3.5,
+            "typeId": 84,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9626264554,
+            "name": "1 και Over 3.5",
+            "fullName": "1 και Over"
+        },
+        "9626264556": {
+            "price": 3.3,
+            "handicap": 3.5,
+            "typeId": 86,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 3,
+            "id": 9626264556,
+            "name": "2 και Over 3.5",
+            "fullName": "2 και Over"
+        },
+        "9626264558": {
+            "price": 1.8,
+            "handicap": 3.5,
+            "typeId": 88,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 5,
+            "id": 9626264558,
+            "name": "X και Over 3.5",
+            "fullName": "X και Over"
+        },
+        "9626264451": {
+            "price": 4,
+            "typeId": 68,
+            "renderingLayout": 3,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9626264451,
+            "name": "Ίσοετζ / Ναι",
+            "fullName": "Ίσοετζ / Ναι"
+        },
+        "9626264453": {
+            "price": 1.8,
+            "typeId": 70,
+            "renderingLayout": 3,
+            "columnIndex": 1,
+            "displayOrder": 3,
+            "id": 9626264453,
+            "name": "Ισοπαλία / Ναι",
+            "fullName": "Ισοπαλία / Ναι"
+        },
+        "9626264455": {
+            "price": 3.3,
+            "typeId": 72,
+            "renderingLayout": 3,
+            "columnIndex": 2,
+            "displayOrder": 5,
+            "id": 9626264455,
+            "name": "Χέλσινγκορ / Ναι",
+            "fullName": "Χέλσινγκορ / Ναι"
+        },
+        "9666772455": {
+            "price": 1.3,
+            "handicap": 1,
+            "typeId": 596,
+            "renderingLayout": 3,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9666772455,
+            "name": "Ίσοετζ +1",
+            "fullName": "Ίσοετζ",
+            "shortName": "+1"
+        },
+        "9666772454": {
+            "price": 3.8,
+            "handicap": 1,
+            "typeId": 595,
+            "renderingLayout": 3,
+            "columnIndex": 1,
+            "displayOrder": 2,
+            "id": 9666772454,
+            "name": "Draw +1",
+            "fullName": "Ισοπαλία",
+            "shortName": "+1"
+        },
+        "9666772456": {
+            "price": 13,
+            "handicap": -1,
+            "typeId": 597,
+            "renderingLayout": 3,
+            "columnIndex": 2,
+            "displayOrder": 3,
+            "id": 9666772456,
+            "name": "Χέλσινγκορ -1",
+            "fullName": "Χέλσινγκορ",
+            "shortName": "-1"
+        },
+        "9626264514": {
+            "price": 1.025,
+            "typeId": 6939,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 3,
+            "id": 9626264514,
+            "name": "4-6",
+            "fullName": "4-6"
+        },
+        "9626264515": {
+            "price": 8.75,
+            "typeId": 6940,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 4,
+            "id": 9626264515,
+            "name": "7+",
+            "fullName": "7+"
+        },
+        "9626264509": {
+            "price": 1.36,
+            "typeId": 6960,
+            "renderingLayout": 3,
+            "columnIndex": 0,
+            "displayOrder": 3,
+            "id": 9626264509,
+            "name": "2",
+            "fullName": "2"
+        },
+        "9626264510": {
+            "price": 3.2,
+            "typeId": 6961,
+            "renderingLayout": 3,
+            "columnIndex": 1,
+            "displayOrder": 4,
+            "id": 9626264510,
+            "name": "3",
+            "fullName": "3"
+        },
+        "9626264511": {
+            "price": 12,
+            "typeId": 6962,
+            "renderingLayout": 3,
+            "columnIndex": 2,
+            "displayOrder": 5,
+            "id": 9626264511,
+            "name": "4+",
+            "fullName": "4+"
+        },
+        "9626264504": {
+            "price": 1.45,
+            "typeId": 6965,
+            "renderingLayout": 3,
+            "columnIndex": 0,
+            "displayOrder": 3,
+            "id": 9626264504,
+            "name": "2",
+            "fullName": "2"
+        },
+        "9626264505": {
+            "price": 2.95,
+            "typeId": 6966,
+            "renderingLayout": 3,
+            "columnIndex": 1,
+            "displayOrder": 4,
+            "id": 9626264505,
+            "name": "3",
+            "fullName": "3"
+        },
+        "9626264506": {
+            "price": 9.75,
+            "typeId": 6967,
+            "renderingLayout": 3,
+            "columnIndex": 2,
+            "displayOrder": 5,
+            "id": 9626264506,
+            "name": "4+",
+            "fullName": "4+"
+        },
+        "9626264485": {
+            "price": 16,
+            "typeId": 400,
+            "renderingLayout": 3,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9626264485,
+            "name": "Ίσοετζ",
+            "fullName": "Ίσοετζ"
+        },
+        "9626264486": {
+            "price": 4.2,
+            "typeId": 401,
+            "renderingLayout": 3,
+            "columnIndex": 1,
+            "displayOrder": 2,
+            "id": 9626264486,
+            "name": "Ισοπαλία",
+            "fullName": "Ισοπαλία"
+        },
+        "9626264487": {
+            "price": 1.22,
+            "typeId": 402,
+            "renderingLayout": 3,
+            "columnIndex": 2,
+            "displayOrder": 3,
+            "id": 9626264487,
+            "name": "Χέλσινγκορ",
+            "fullName": "Χέλσινγκορ"
+        },
+        "9626264483": {
+            "price": 7.8,
+            "typeId": 406,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9626264483,
+            "name": "Ίσοετζ",
+            "fullName": "Ίσοετζ"
+        },
+        "9626264484": {
+            "price": 1.02,
+            "typeId": 407,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 2,
+            "id": 9626264484,
+            "name": "Χέλσινγκορ",
+            "fullName": "Χέλσινγκορ"
+        },
+        "9626264546": {
+            "price": 2.25,
+            "typeId": 433,
+            "renderingLayout": 2,
+            "columnIndex": 0,
+            "displayOrder": 1,
+            "id": 9626264546,
+            "name": "Μονά",
+            "fullName": "Μονά"
+        },
+        "9626264547": {
+            "price": 1.57,
+            "typeId": 434,
+            "renderingLayout": 2,
+            "columnIndex": 1,
+            "displayOrder": 2,
+            "id": 9626264547,
+            "name": "Ζυγά",
+            "fullName": "Ζυγά"
+        }
+    }
+}

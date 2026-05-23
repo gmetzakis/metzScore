@@ -39,4 +39,22 @@ export const apiService = {
       throw error;
     }
   },
+
+  /**
+   * Get the full detail payload for a single match by event id.
+   * Use the id returned in the matches list.
+   */
+  getMatchDetail: async (matchId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/football/matches/${matchId}`);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.statusText}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching match detail:", error);
+      throw error;
+    }
+  },
 };
