@@ -1,12 +1,10 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorDisplay from '../components/ErrorDisplay';
 import OddsDisplay from '../components/OddsDisplay';
 import { apiService } from '../services/api';
 import './MatchDetailPage.css';
-
-// ── Formatters ────────────────────────────────────────────────────────────────
 
 function formatEpochTime(epochMs) {
   if (!epochMs) return 'TBD';
@@ -19,8 +17,6 @@ function formatClock(seconds) {
   const secs = seconds % 60;
   return `${mins}:${String(secs).padStart(2, '0')}`;
 }
-
-// ── Incident Timeline ─────────────────────────────────────────────────────────
 
 const INCIDENT_ICONS = {
   GOAL:   '⚽',
@@ -57,9 +53,6 @@ function IncidentRow({ incident, homeName, awayName }) {
   );
 }
 
-// ── Statistics ───────────────────────────────────────────────────────────────
-
-// Maps liveData.results field names to display labels
 const RESULTS_LABEL_MAP = {
   yellow: 'Yellow Cards',
   corners: 'Corners',
@@ -74,7 +67,6 @@ const RESULTS_LABEL_MAP = {
   offsides: 'Offsides',
 };
 
-// Order of display for stats
 const STATS_PRIORITY = ['Goals', 'Expected Goals', 'Shots', 'Shots on Target', 'Corners', 'Yellow Cards', 'Fouls', 'Offsides', 'Possession %', 'Penalties'];
 
 function getSideBySideStats(
@@ -82,13 +74,12 @@ function getSideBySideStats(
   homeTeamId,
   awayTeamId,
   eventStats,
-  liveResults,   // liveData.results  (corners, yellow, penalties …)
-  score,         // liveData.score    (home, away)
+  liveResults,
+  score,
 ) {
   const result = [];
   const seenLabels = new Set();
 
-  // Goals from liveData.score
   if (score?.home != null && score?.away != null) {
     result.push({
       label: 'Goals',
@@ -99,10 +90,8 @@ function getSideBySideStats(
     seenLabels.add('Goals');
   }
 
-  // All other stats from liveData.results - iterate dynamically
   if (liveResults && typeof liveResults === 'object') {
     for (const [field, sides] of Object.entries(liveResults)) {
-      // Skip non-object values (like scorers array) and sportId
       if (!sides || typeof sides !== 'object' || Array.isArray(sides)) continue;
       if (seenLabels.has(field)) continue;
 
@@ -121,7 +110,6 @@ function getSideBySideStats(
     }
   }
 
-  // ── Sort ─────────────────────────────────────────────────────────────────
   result.sort((a, b) => {
     const pa = STATS_PRIORITY.indexOf(a.label);
     const pb = STATS_PRIORITY.indexOf(b.label);
@@ -144,7 +132,6 @@ function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isPi
     teamsStats, homeTeamId, awayTeamId, eventStats, liveResults, scores,
   );
 
-  // Collect sub-sections depending on what data we have
   const sections = [];
 
   if (isPitchAvailable && sbStats.some(s => ['Goals', 'Corners', 'Yellow Cards'].includes(s.label))) {
@@ -207,8 +194,6 @@ function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isPi
   );
 }
 
-// ── Roster Section ───────────────────────────────────────────────────────────
-
 function RosterSection({ roster, results, incidents, homeName, awayName }) {
   if (!roster) return null;
 
@@ -216,12 +201,9 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
   const awayLineup = roster.lineups?.awayLineup;
   const subs = roster.subs || {};
 
-  // Parse scorers from results AND goal incidents
-  // Returns Map of player name -> goal count
   const buildGoalCounts = () => {
     const goalCounts = new Map();
 
-    // From results.scorers - format: "23' S. Moreo"
     if (results?.scorers && Array.isArray(results.scorers)) {
       for (const s of results.scorers) {
         if (s.description) {
@@ -234,16 +216,12 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
       }
     }
 
-    // From incidents of type GOAL - format: "2-1 Lazio Pedro (με Σουτ)"
     if (incidents && Array.isArray(incidents)) {
       for (const inc of incidents) {
         if (inc.type === 'GOAL' && inc.description) {
           let desc = inc.description;
-          // Remove annotation suffixes like "(με Σουτ)", "(pen)", "(o.g.)"
           desc = desc.replace(/\s*\([^)]*\)\s*$/, '').trim();
-          // Remove score prefix like "2-1 " at the start
           desc = desc.replace(/^\d+-\d+\s*/, '').trim();
-          // Strip team name (home or away) from the beginning to get player name
           if (homeName && desc.startsWith(homeName)) {
             desc = desc.slice(homeName.length).trim();
           } else if (awayName && desc.startsWith(awayName)) {
@@ -266,9 +244,8 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
 
     const teamSubs = teamSide === 0 ? subs.homeSubs : subs.awaySubs;
 
-    // Build maps by name for players who were subbed IN and who was subbed OUT
-    const subbedInByName = {}; // player name -> minute they came in
-    const subbedOutByName = {}; // player name -> minute they went out
+    const subbedInByName = {};
+    const subbedOutByName = {};
     if (teamSubs) {
       for (const sub of teamSubs) {
         const inName = sub.playerIn?.name;
@@ -279,7 +256,6 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
       }
     }
 
-    // Flatten all starting XI from lineup rows
     const starters = [];
     if (lineupData.lineup) {
       for (const row of lineupData.lineup) {
@@ -293,7 +269,6 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
       }
     }
 
-    // Bench players from benchPlayers array
     const bench = [];
     if (lineupData.benchPlayers) {
       for (const bp of lineupData.benchPlayers) {
@@ -372,8 +347,6 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
   );
 }
 
-// ── Match Info ────────────────────────────────────────────────────────────────
-
 function MatchInfoSection({ matchData }) {
   const { league, zone, start_time, url, betradar_id, total_markets, is_pitch_available, is_stats_available } = matchData;
 
@@ -440,42 +413,51 @@ function MatchInfoSection({ matchData }) {
   );
 }
 
-// ── Main Page ────────────────────────────────────────────────────────────────
-
 export default function MatchDetailPage() {
   const { matchId } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const isInitialLoad = useRef(true);
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
-      setLoading(true);
+      if (isInitialLoad.current) {
+        setLoading(true);
+      }
       setError(null);
       try {
         const res = await apiService.getMatchDetail(matchId);
-        if (!cancelled) setData(res);
+        if (!cancelled) {
+          setData(res);
+        }
       } catch (err) {
-        if (!cancelled) setError(err.message);
+        if (!cancelled) {
+          setError(err.message);
+          if (!isInitialLoad.current) {
+            setData(null);
+          }
+        }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled && isInitialLoad.current) {
+          setLoading(false);
+          isInitialLoad.current = false;
+        }
       }
     }
     load();
-    return () => { cancelled = true; };
+    const interval = setInterval(load, 5000);
+    return () => { cancelled = true; clearInterval(interval); };
   }, [matchId]);
 
-  // Filter the incident list (All / Goals / Corners / Cards)
   const [activeFilter, setActiveFilter] = useState(null);
 
-  const filteredIncidents = useMemo(() => {
-    if (!data || !data.incidents) return [];
-    if (!activeFilter) return data.incidents;
-    return data.incidents.filter(inc =>
-      (inc.props?.filterIds || []).includes(activeFilter)
-    );
-  }, [data, activeFilter]);
+  const filteredIncidents = data?.incidents
+    ? (activeFilter
+        ? data.incidents.filter(inc => (inc.props?.filterIds || []).includes(activeFilter))
+        : data.incidents)
+    : [];
 
   if (loading) {
     return (
@@ -502,13 +484,11 @@ export default function MatchDetailPage() {
 
   return (
     <div className="detail-page">
-      {/* ── Navigation bar ── */}
       <div className="detail-nav">
         <Link to="/" className="back-link">← Back to All Matches</Link>
         <Link to="/" className="back-link-mobile">← Back</Link>
       </div>
 
-      {/* ── Header ── */}
       <div className="detail-header">
         <div className="detail-top-row">
           <span className="detail-league">{league?.name || 'Unknown League'}</span>
@@ -518,7 +498,6 @@ export default function MatchDetailPage() {
         </div>
       </div>
 
-      {/* ── Scoreboard ── */}
       <div className="scoreboard">
         <div className="scoreboard-team">
           <span className="team-name">{home_team?.name || 'Home'}</span>
@@ -550,10 +529,8 @@ export default function MatchDetailPage() {
         </div>
       </div>
 
-      {/* ── Match Info ── */}
       <MatchInfoSection matchData={data} />
 
-      {/* ── Odds ── */}
       {odds && Object.keys(odds).length > 0 && (
         <div className="detail-section">
           <h2 className="section-title">Odds &amp; Markets</h2>
@@ -561,7 +538,6 @@ export default function MatchDetailPage() {
         </div>
       )}
 
-      {/* ── Incidents ── */}
       <div className="detail-section">
         <h2 className="section-title">Match Events</h2>
 
@@ -605,7 +581,6 @@ export default function MatchDetailPage() {
         )}
       </div>
 
-      {/* ── Statistics ── */}
       <div className="detail-section">
         <StatsSection
           statistics={statistics}
@@ -618,8 +593,7 @@ export default function MatchDetailPage() {
         />
       </div>
 
-{/* ── Roster ── */}
-       <RosterSection roster={roster} results={results} incidents={data.incidents} homeName={home_team?.name} awayName={away_team?.name} />
-     </div>
-   );
- }
+      <RosterSection roster={roster} results={results} incidents={data.incidents} homeName={home_team?.name} awayName={away_team?.name} />
+    </div>
+  );
+}

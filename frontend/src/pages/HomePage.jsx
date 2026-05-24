@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import LeagueGroupedList from '../components/LeagueGroupedList';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -11,24 +11,35 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
+  const isInitialLoad = useRef(true);
 
-  useEffect(() => {
-    fetchLiveMatches();
-  }, []);
-
-  const fetchLiveMatches = async () => {
-    try {
+  const fetchLiveMatches = useCallback(async () => {
+    if (isInitialLoad.current) {
       setLoading(true);
-      setError(null);
+    }
+    setError(null);
+    try {
       const data = await apiService.getLiveFootballMatches();
       setMatches(data.matches || []);
     } catch (err) {
       setError(err.message);
-      setMatches([]);
+      if (!isInitialLoad.current) {
+        setMatches([]);
+      }
     } finally {
-      setLoading(false);
+      if (isInitialLoad.current) {
+        setLoading(false);
+        isInitialLoad.current = false;
+      }
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchLiveMatches();
+    const interval = setInterval(fetchLiveMatches, 5000);
+    return () => clearInterval(interval);
+  }, [fetchLiveMatches]);
 
   const filteredMatches = matches.filter(m => {
     if (!search.trim()) return true;

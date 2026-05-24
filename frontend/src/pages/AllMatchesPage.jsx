@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import LeagueGroupedList from '../components/LeagueGroupedList';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -12,24 +12,35 @@ export default function AllMatchesPage() {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const isInitialLoad = useRef(true);
 
-  useEffect(() => {
-    fetchAllMatches();
-  }, []);
-
-  const fetchAllMatches = async () => {
-    try {
+  const fetchAllMatches = useCallback(async () => {
+    if (isInitialLoad.current) {
       setLoading(true);
-      setError(null);
+    }
+    setError(null);
+    try {
       const data = await apiService.getAllFootballMatches();
       setMatches(data.matches || []);
     } catch (err) {
       setError(err.message);
-      setMatches([]);
+      if (!isInitialLoad.current) {
+        setMatches([]);
+      }
     } finally {
-      setLoading(false);
+      if (isInitialLoad.current) {
+        setLoading(false);
+        isInitialLoad.current = false;
+      }
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchAllMatches();
+    const interval = setInterval(fetchAllMatches, 5000);
+    return () => clearInterval(interval);
+  }, [fetchAllMatches]);
 
   const filteredMatches = useMemo(() => {
     let list = matches;

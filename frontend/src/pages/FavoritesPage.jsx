@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import LeagueGroupedList from '../components/LeagueGroupedList';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -12,24 +12,35 @@ export default function FavoritesPage() {
   const [allMatches, setAllMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const isInitialLoad = useRef(true);
 
-  useEffect(() => {
-    fetchAllMatches();
-  }, []);
-
-  const fetchAllMatches = async () => {
-    try {
+  const fetchAllMatches = useCallback(async () => {
+    if (isInitialLoad.current) {
       setLoading(true);
-      setError(null);
+    }
+    setError(null);
+    try {
       const data = await apiService.getAllFootballMatches();
       setAllMatches(data.matches || []);
     } catch (err) {
       setError(err.message);
-      setAllMatches([]);
+      if (!isInitialLoad.current) {
+        setAllMatches([]);
+      }
     } finally {
-      setLoading(false);
+      if (isInitialLoad.current) {
+        setLoading(false);
+        isInitialLoad.current = false;
+      }
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchAllMatches();
+    const interval = setInterval(fetchAllMatches, 5000);
+    return () => clearInterval(interval);
+  }, [fetchAllMatches]);
 
   const favoriteMatches = useMemo(() => {
     const favSet = new Set(favoriteIds);
