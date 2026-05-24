@@ -93,6 +93,7 @@
 }
 
 .country-flag {
-  font-size: 20px;
-  line-height: 1;
+  width: 24px;
+  height: auto;
+  border-radius: 2px;
 }
