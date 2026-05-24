@@ -94,6 +94,8 @@
 
 .country-flag {
   width: 24px;
-  height: auto;
+  height: 16px;
   border-radius: 2px;
+  object-fit: contain;
+  background: #f5f5f5;
 }

@@ -77,12 +77,14 @@ def extract_football_matches(raw_data):
                 # Look up league name from top-level leagues
                 leagues_dict = raw_data.get("leagues", {})
                 country_name = None
+                country_code = None
                 if zone_id:
                     zones_dict = raw_data.get("zones", {})
                     zone_str = str(zone_id)
                     if zone_str in zones_dict:
                         zone = zones_dict[zone_str]
                         country_name = zone.get("name") or zone.get("countryName")
+                        country_code = zone.get("code")
                 if league_id:
                     league_str = str(league_id)
                     if league_str in leagues_dict:
@@ -91,10 +93,13 @@ def extract_football_matches(raw_data):
                         # If zone didn't have country name, try league
                         if not country_name:
                             country_name = league.get("countryName") or league.get("country")
+                        if not country_code:
+                            country_code = league.get("code")
                 
                 match = parse_match_event(event, league_name, raw_data)
                 if match:
                     match["country_name"] = country_name
+                    match["country_code"] = country_code
                     matches.append(match)
 
     except Exception as e:
