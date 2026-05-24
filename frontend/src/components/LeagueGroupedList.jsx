@@ -54,7 +54,7 @@ export default function LeagueGroupedList({ matches }) {
         return (
           <div key={countryName} className="country-group">
             <div className="country-header">
-              {flagUrl && <img className="country-flag" src={flagUrl} alt={`${countryName} flag`} onError={(e) => console.log('Flag failed:', flagUrl, e)} onLoad={() => console.log('Flag loaded:', flagUrl)} />}
+              {flagUrl && <img className="country-flag" src={flagUrl} alt={`${countryName} flag`} />}
               <span className="country-name">{countryName}</span>
             </div>
             {sortedLeagues.map((league) => {
