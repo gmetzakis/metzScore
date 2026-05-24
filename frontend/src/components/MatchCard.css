@@ -1,17 +1,17 @@
 .match-card {
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 16px;
   padding: 20px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
 
 .match-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   border-color: #2196f3;
 }
 
@@ -168,4 +168,22 @@
 .fav-on {
   color: #ffc107;
   filter: drop-shadow(0 0 4px rgba(255, 193, 7, 0.5));
+}
+
+.odds-toggle-btn {
+  width: 100%;
+  padding: 8px;
+  margin-top: 12px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.odds-toggle-btn:hover {
+  background: #e0e0e0;
+  color: #333;
 }

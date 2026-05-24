@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFavorites } from '../context/FavoritesContext';
 import './MatchCard.css';
@@ -6,6 +7,7 @@ import OddsDisplay from './OddsDisplay';
 export default function MatchCard({ match }) {
   const navigate = useNavigate();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const [showOdds, setShowOdds] = useState(false);
   const fav = isFavorite(match.id);
 
   const getStatusColor = (status) => {
@@ -76,7 +78,17 @@ export default function MatchCard({ match }) {
         </div>
       </div>
 
-      {match.odds && <OddsDisplay odds={match.odds} />}
+      {match.odds && (
+        <>
+          <button 
+            className="odds-toggle-btn"
+            onClick={(e) => { e.stopPropagation(); setShowOdds(!showOdds); }}
+          >
+            {showOdds ? '▼ Hide Odds' : '▶ Show Odds'}
+          </button>
+          {showOdds && <OddsDisplay odds={match.odds} />}
+        </>
+      )}
     </div>
   );
 }
