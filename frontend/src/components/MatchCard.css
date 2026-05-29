@@ -1,189 +1,209 @@
 .match-card {
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 4px 8px;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8em;
+  transition: all 0.1s ease;
   cursor: pointer;
+  min-height: 28px;
+  position: relative;
+  overflow: hidden;
 }
 
 .match-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-  border-color: #2196f3;
+  background: var(--border-light);
+  border-color: var(--accent);
 }
 
-.match-top-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-
+/* Status indicators - compact pills */
 .match-status {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: bold;
+  font-size: 0.7em;
+  font-weight: 600;
   text-transform: uppercase;
+  padding: 1px 4px;
+  border-radius: 2px;
+  min-width: 24px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+  flex-shrink: 0;
 }
 
 .match-status.live {
-  background: #ffebee;
-  color: #c62828;
-  animation: pulse 2s infinite;
+  background: var(--live-bg);
+  color: var(--live);
 }
 
 .match-status.finished {
   background: #e8f5e9;
-  color: #2e7d32;
+  color: var(--finished);
 }
 
 .match-status.upcoming {
-  background: #e3f2fd;
-  color: #1565c0;
+  background: #f3e5f5;
+  color: var(--upcoming);
 }
 
-.injury-time {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: bold;
-  background: #fff3cd;
-  color: #856404;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-}
-
-.match-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.match-league {
-  font-size: 14px;
-  color: #666;
-  font-weight: 500;
-}
-
-.match-time {
-  font-size: 14px;
-  color: #666;
-  font-weight: 600;
-}
-
-.live-clock {
-  color: #c62828;
-  font-size: 16px;
-  font-weight: bold;
-  font-family: 'Courier New', monospace;
-  background: #ffebee;
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.match-body {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 20px;
-  align-items: center;
-}
-
-.match-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.live-indicator {
-  font-size: 12px;
-  font-weight: bold;
-  color: #c62828;
-  animation: pulse 2s infinite;
-}
-
-.team {
-  flex: 1;
-  text-align: center;
-}
-
-.team h3 {
-  margin: 0 0 10px 0;
-  font-size: 16px;
-  color: #333;
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-.score {
-  font-size: 36px;
-  font-weight: bold;
-  color: #2196f3;
-}
-
-.match-divider {
-  text-align: center;
-  color: #999;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-/* ── Favorite toggle ─────────────────────────────────────── */
+/* Favorite button */
 .fav-btn {
-  margin-left: auto;
   background: none;
   border: none;
-  font-size: 22px;
-  cursor: pointer;
-  line-height: 1;
-  padding: 4px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  transition: transform 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  font-size: 0.8em;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  margin-left: auto; /* Push to right */
 }
 
 .fav-btn:hover {
-  transform: scale(1.2);
+  background: var(--border-light);
+  color: var(--accent);
 }
 
-.fav-off {
-  color: #bbb;
+.fav-btn.fav-on {
+  color: #ff9800;
 }
 
-.fav-on {
-  color: #ffc107;
-  filter: drop-shadow(0 0 4px rgba(255, 193, 7, 0.5));
+.fav-btn.fav-on:hover {
+  background: #fff3e0;
 }
 
-.odds-toggle-btn {
-  width: 100%;
-  padding: 8px;
-  margin-top: 12px;
-  background: #f5f5f5;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 12px;
-  color: #666;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+/* League/Competition - left side */
+.match-league {
+  font-size: 0.75em;
+  color: var(--text);
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
 }
 
-.odds-toggle-btn:hover {
-  background: #e0e0e0;
-  color: #333;
+/* Time - center area */
+.match-time {
+  font-size: 0.75em;
+  color: var(--text);
+  font-weight: 500;
+  white-space: nowrap;
+  min-width: 35px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.match-time.live {
+  color: var(--live);
+  font-weight: 600;
+}
+
+.match-time.finished {
+  color: var(--finished);
+}
+
+/* Live indicator dot */
+.live-indicator {
+  width: 4px;
+  height: 4px;
+  background: var(--live);
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Teams and score container - center area */
+.teams-score {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1 1 0px;
+  min-width: 0;
+}
+
+/* Team names */
+.team-name {
+  font-size: 0.8em;
+  font-weight: 600;
+  color: var(--text-h);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+  flex-shrink: 0;
+}
+
+/* Score display */
+.score {
+  font-family: var(--font-family-mono);
+  font-size: 0.9em;
+  font-weight: bold;
+  color: var(--accent);
+  min-width: 14px;
+  text-align: center;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.score-divider {
+  font-size: 0.9em;
+  font-weight: 300;
+  color: var(--border);
+  margin: 0 1px;
+  width: 8px;
+  text-align: center;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Hide unnecessary elements in compact view */
+.match-card .odds-toggle-btn,
+.match-card .match-divider.vs-text,
+.match-card .live-indicator.text {
+  display: none;
+}
+
+/* Ensure proper alignment */
+.match-card > * {
+  flex-shrink: 0;
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+  .match-card {
+    padding: 3px 6px;
+    gap: 4px;
+  }
+  
+  .team-name {
+    font-size: 0.75em;
+    max-width: 70px;
+  }
+  
+  .score {
+    font-size: 0.8em;
+    min-width: 12px;
+  }
+  
+  .match-time, .match-league {
+    font-size: 0.7em;
+  }
 }

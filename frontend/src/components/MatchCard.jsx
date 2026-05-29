@@ -31,64 +31,44 @@ export default function MatchCard({ match }) {
 
   return (
     <div className="match-card" onClick={() => navigate(`/match/${match.id}`)}>
-      <div className="match-top-row">
-        <div className={`match-status ${getStatusColor(match.status)}`}>
-          {match.status}
-        </div>
+      {/* Status indicator */}
+      <span className={`match-status ${getStatusColor(match.status)}`}>
+        {match.status}
+      </span>
 
-        {isLive && match.injury_time > 0 && (
-          <div className="injury-time">+{match.injury_time}' added time</div>
+      {/* Favorite button */}
+      <button
+        className={`fav-btn ${fav ? 'fav-on' : 'fav-off'}`}
+        onClick={(e) => { e.stopPropagation(); toggleFavorite(match.id); }}
+        title={fav ? 'Remove from favorites' : 'Add to favorites'}
+        aria-label={fav ? 'Remove from favorites' : 'Add to favorites'}
+      >
+        {fav ? '★' : '☆'}
+      </button>
+
+      {/* League/Competition */}
+      <span className="match-league">{match.league}</span>
+
+      {/* Time */}
+      <span className="match-time">
+        {isLive ? (
+          <>
+            <span className="live-indicator" aria-label="Live"></span>
+            {match.match_time}
+          </>
+        ) : (
+          formatTime(match.start_time)
         )}
+      </span>
 
-        <button
-          className={`fav-btn ${fav ? 'fav-on' : 'fav-off'}`}
-          onClick={(e) => { e.stopPropagation(); toggleFavorite(match.id); }}
-          title={fav ? 'Remove from favorites' : 'Add to favorites'}
-          aria-label={fav ? 'Remove from favorites' : 'Add to favorites'}
-        >
-          {fav ? '★' : '☆'}
-        </button>
+      {/* Teams and Score */}
+      <div className="teams-score">
+        <span className="team-name home-team">{match.home_team}</span>
+        <span className="score">{match.home_score}</span>
+        <span className="score-divider">–</span>
+        <span className="score">{match.away_score}</span>
+        <span className="team-name away-team">{match.away_team}</span>
       </div>
-
-      <div className="match-header">
-        <span className="match-league">{match.league}</span>
-        <span className="match-time">
-          {isLive ? (
-            <span className="live-clock">{match.match_time}</span>
-          ) : (
-            formatTime(match.start_time)
-          )}
-        </span>
-      </div>
-
-      <div className="match-body">
-        <div className="team home-team">
-          <h3>{match.home_team}</h3>
-          <div className="score">{match.home_score}</div>
-        </div>
-
-        <div className="match-center">
-          <div className="match-divider">vs</div>
-          {isLive && <div className="live-indicator">● LIVE</div>}
-        </div>
-
-        <div className="team away-team">
-          <h3>{match.away_team}</h3>
-          <div className="score">{match.away_score}</div>
-        </div>
-      </div>
-
-      {match.odds && (
-        <>
-          <button 
-            className="odds-toggle-btn"
-            onClick={(e) => { e.stopPropagation(); setShowOdds(!showOdds); }}
-          >
-            {showOdds ? '▼ Hide Odds' : '▶ Show Odds'}
-          </button>
-          {showOdds && <OddsDisplay odds={match.odds} />}
-        </>
-      )}
     </div>
   );
 }
