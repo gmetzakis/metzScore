@@ -2,17 +2,16 @@
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 3px;
-  padding: 4px 8px;
+  padding: 6px 10px;
   margin-bottom: 2px;
   display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8em;
+  align-items: stretch;
+  height: 36px;
   transition: all 0.1s ease;
   cursor: pointer;
-  min-height: 28px;
   position: relative;
   overflow: hidden;
+  font-size: 0.8rem;
 }
 
 .match-card:hover {
@@ -20,52 +19,102 @@
   border-color: var(--accent);
 }
 
-/* Status indicators - compact pills */
-.match-status {
-  font-size: 0.7em;
+/* Time with seconds - leftmost */
+.match-time {
+  font-family: var(--font-family-mono);
+  font-size: 0.85rem;
   font-weight: 600;
-  text-transform: uppercase;
-  padding: 1px 4px;
-  border-radius: 2px;
-  min-width: 24px;
-  text-align: center;
-  display: inline-flex;
+  color: var(--text-h);
+  white-space: nowrap;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  line-height: 1.2;
+  min-width: 40px;
+  padding-right: 8px;
+}
+
+/* Vertical separator */
+.match-separator {
+  width: 1px;
+  background-color: #eee;
+  margin: 0 4px;
   flex-shrink: 0;
 }
 
-.match-status.live {
-  background: var(--live-bg);
-  color: var(--live);
+/* Teams container - stacked vertically */
+.match-teams {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
 }
 
-.match-status.finished {
-  background: #e8f5e9;
-  color: var(--finished);
+.match-team {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-h);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
-.match-status.upcoming {
-  background: #f3e5f5;
-  color: var(--upcoming);
+.match-team.home {
+  margin-bottom: 2px;
+}
+
+.match-team.away {
+  margin-top: 2px;
+}
+
+/* Score and favorite container - rightmost */
+.match-score-fav {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.match-score {
+  font-family: var(--font-family-mono);
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--accent);
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  margin-bottom: 2px;
+}
+
+.home-score,
+.away-score {
+  min-width: 14px;
+  text-align: center;
+}
+
+.score-divider {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--border);
+  margin: 0;
+  line-height: 1;
 }
 
 /* Favorite button */
 .fav-btn {
   background: none;
   border: none;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text);
-  font-size: 0.8em;
+  font-size: 0.9rem;
   transition: all 0.15s ease;
-  flex-shrink: 0;
-  margin-left: auto; /* Push to right */
+  margin-top: 2px;
 }
 
 .fav-btn:hover {
@@ -81,129 +130,30 @@
   background: #fff3e0;
 }
 
-/* League/Competition - left side */
-.match-league {
-  font-size: 0.75em;
-  color: var(--text);
-  flex-shrink: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100px;
-}
-
-/* Time - center area */
-.match-time {
-  font-size: 0.75em;
-  color: var(--text);
-  font-weight: 500;
-  white-space: nowrap;
-  min-width: 35px;
-  text-align: center;
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  flex-shrink: 0;
-}
-
-.match-time.live {
-  color: var(--live);
-  font-weight: 600;
-}
-
-.match-time.finished {
-  color: var(--finished);
-}
-
-/* Live indicator dot */
-.live-indicator {
-  width: 4px;
-  height: 4px;
-  background: var(--live);
-  border-radius: 50%;
-  display: inline-block;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
-/* Teams and score container - center area */
-.teams-score {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  flex: 1 1 0px;
-  min-width: 0;
-}
-
-/* Team names */
-.team-name {
-  font-size: 0.8em;
-  font-weight: 600;
-  color: var(--text-h);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 80px;
-  flex-shrink: 0;
-}
-
-/* Score display */
-.score {
-  font-family: var(--font-family-mono);
-  font-size: 0.9em;
-  font-weight: bold;
-  color: var(--accent);
-  min-width: 14px;
-  text-align: center;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.score-divider {
-  font-size: 0.9em;
-  font-weight: 300;
-  color: var(--border);
-  margin: 0 1px;
-  width: 8px;
-  text-align: center;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-/* Hide unnecessary elements in compact view */
-.match-card .odds-toggle-btn,
-.match-card .match-divider.vs-text,
-.match-card .live-indicator.text {
-  display: none;
-}
-
-/* Ensure proper alignment */
-.match-card > * {
-  flex-shrink: 0;
-}
-
-/* Responsive tweaks */
+/* Responsive adjustments */
 @media (max-width: 480px) {
   .match-card {
-    padding: 3px 6px;
-    gap: 4px;
+    padding: 4px 8px;
+    height: 32px;
+    font-size: 0.75rem;
   }
   
-  .team-name {
-    font-size: 0.75em;
-    max-width: 70px;
+  .match-time {
+    font-size: 0.75rem;
+    min-width: 35px;
   }
   
-  .score {
-    font-size: 0.8em;
-    min-width: 12px;
+  .match-team {
+    font-size: 0.75rem;
   }
   
-  .match-time, .match-league {
-    font-size: 0.7em;
+  .match-score {
+    font-size: 0.8rem;
+  }
+  
+  .fav-btn {
+    width: 18px;
+    height: 18px;
+    font-size: 0.8rem;
   }
 }
