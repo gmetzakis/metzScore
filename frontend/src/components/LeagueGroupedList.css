@@ -1,97 +1,36 @@
-/* ── League Grouped List ────────────────────────────────────────────────── */
+/* ── League Grouped List - Compact & Continuous ───────────────────────────────────── */
 
 .league-grouped-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
-.league-group {
-  border: 1px solid #e5e5e5;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #fafafa;
-  margin: 8px 12px;
-}
-
-.league-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  background: #f0f0f0;
-  cursor: pointer;
-  font-weight: 600;
-  color: #444;
-  transition: background 0.2s;
-}
-
-.league-header:hover {
-  background: #e0e0e0;
-}
-
-.league-flag {
-  font-size: 16px;
-  line-height: 1;
-}
-
-.league-name {
-  flex: 1;
-  font-size: 14px;
-}
-
-.league-country {
-  font-size: 12px;
-  color: #666;
-  background: #e0e0e0;
-  padding: 2px 8px;
-  border-radius: 10px;
-}
-
-.country-flag-inline {
-  margin-right: 4px;
-  font-size: 14px;
-}
-
-.league-count {
-  font-size: 12px;
-  color: #666;
-  background: #e0e0e0;
-  padding: 2px 8px;
-  border-radius: 10px;
-}
-
-.league-toggle {
-  font-size: 12px;
-  color: #999;
-}
-
-.league-matches {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  background: #fff;
-}
-
+/* Country Group */
 .country-group {
-  border: 1px solid #d5d5d5;
-  border-radius: 14px;
-  overflow: hidden;
-  background: #f5f5f5;
   margin-bottom: 12px;
+  padding: 8px 0;
+  border-top: 1px solid #eee;
+}
+.country-group:first-child {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .country-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 14px 18px;
-  background: #e5e5e5;
-  font-weight: 700;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: 600;
   color: #222;
-  font-size: 16px;
+  font-size: 1rem;
+  transition: background-color 0.15s;
 }
-
+.country-header:hover {
+  background-color: #fafafa;
+}
 .country-flag {
   width: 24px;
   height: 16px;
@@ -99,99 +38,96 @@
   object-fit: contain;
   background: transparent;
 }
+.country-name {
+  flex: 1;
+  font-size: 1rem;
+}
+.country-toggle {
+  font-size: 0.8rem;
+  color: #999;
+  transition: transform 0.2s;
+}
+.country-toggle.open {
+  transform: rotate(180deg);
+}
 
+/* League Group */
 .league-group {
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  overflow: hidden;
-  background: #fafafa;
-  margin: 8px 12px;
+  margin: 8px 0;
+  padding: 4px 0;
+  border-top: 1px solid #f5f5f5;
+}
+.league-group:first-child {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .league-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 14px;
-  background: #f5f5f5;
+  padding: 6px 12px;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 500;
   color: #333;
-  transition: background 0.2s;
+  font-size: 0.95rem;
+  transition: background-color 0.15s;
 }
-
 .league-header:hover {
-  background: #e8e8e8;
+  background-color: #fafafa;
 }
-
-.league-flag {
-  font-size: 16px;
-  line-height: 1;
-}
-
 .league-name {
   flex: 1;
-  font-size: 14px;
+  font-size: 0.95rem;
 }
-
-.league-country {
-  font-size: 12px;
-  color: #666;
-  background: #e0e0e0;
-  padding: 2px 8px;
-  border-radius: 10px;
-}
-
-.country-flag-inline {
-  margin-right: 4px;
-  font-size: 14px;
-}
-
 .league-count {
-  font-size: 12px;
+  font-size: 0.85rem;
   color: #666;
-  background: #e0e0e0;
-  padding: 2px 8px;
-  border-radius: 10px;
+  background: #e9e9e9;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
-
 .league-toggle {
-  font-size: 12px;
+  font-size: 0.85rem;
   color: #999;
+  transition: transform 0.2s;
+}
+.league-toggle.open {
+  transform: rotate(180deg);
 }
 
+/* League Matches */
 .league-matches {
   display: flex;
   flex-direction: column;
   gap: 1px;
   background: #fff;
+  margin-top: 4px;
+  padding: 4px 0;
 }
 
-.country-group {
-  border: 1px solid #d0d0d0;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #f0f0f0;
-  margin-bottom: 12px;
+/* Ensure MatchCard uses full width */
+.league-matches .match-card {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
 }
 
-.country-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 18px;
-  background: #e0e0e0;
-  font-weight: 700;
-  color: #222;
-  font-size: 16px;
-}
-
-.country-flag {
-  width: 24px;
-  height: 16px;
-  border-radius: 2px;
-  object-fit: contain;
-  background: transparent;
-  /* Make flag background transparent */
-  filter: brightness(1.1) contrast(1.1);
+/* Responsive tweaks */
+@media (max-width: 480px) {
+  .country-header {
+    font-size: 0.95rem;
+    padding: 4px 8px;
+  }
+  .country-name {
+    font-size: 0.95rem;
+  }
+  .league-header {
+    font-size: 0.9rem;
+    padding: 4px 8px;
+  }
+  .league-name {
+    font-size: 0.9rem;
+  }
 }

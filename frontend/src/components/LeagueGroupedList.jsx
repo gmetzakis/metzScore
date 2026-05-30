@@ -25,8 +25,9 @@ export default function LeagueGroupedList({ matches }) {
     groupedByCountry[countryName].leagues[league].push(match);
   }
 
-  // All leagues collapsed by default
-  const [expanded, setExpanded] = useState({});
+  // State for expanded countries and leagues
+  const [expandedCountries, setExpandedCountries] = useState({});
+  const [expandedLeagues, setExpandedLeagues] = useState({});
 
   if (matches.length === 0) {
     return (
@@ -36,8 +37,13 @@ export default function LeagueGroupedList({ matches }) {
     );
   }
 
-  const toggleLeague = (key) => {
-    setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
+  const toggleCountry = (countryName) => {
+    setExpandedCountries(prev => ({ ...prev, [countryName]: !prev[countryName] }));
+  };
+
+  const toggleLeague = (countryName, league) => {
+    const key = `${countryName}-${league}`;
+    setExpandedLeagues(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
   // Sort countries alphabetically
@@ -50,27 +56,32 @@ export default function LeagueGroupedList({ matches }) {
         const countryLeagues = countryData.leagues;
         const flagUrl = getFlagUrl(countryData.countryCode);
         const sortedLeagues = Object.keys(countryLeagues).sort((a, b) => a.localeCompare(b));
+        const isCountryOpen = expandedCountries[countryName];
         
         return (
           <div key={countryName} className="country-group">
-            <div className="country-header">
+            <div 
+              className={`country-header ${isCountryOpen ? 'open' : ''}`}
+              onClick={() => toggleCountry(countryName)}
+            >
               {flagUrl && <img className="country-flag" src={flagUrl} alt={`${countryName} flag`} />}
               <span className="country-name">{countryName}</span>
+              <span className="country-toggle">{isCountryOpen ? '▲' : '▼'}</span>
             </div>
-            {sortedLeagues.map((league) => {
+            {isCountryOpen && sortedLeagues.map((league) => {
               const leagueMatches = countryLeagues[league];
-              const isOpen = expanded[`${countryName}-${league}`];
+              const isLeagueOpen = expandedLeagues[`${countryName}-${league}`];
               return (
                 <div key={league} className="league-group">
                   <div
-                    className="league-header"
-                    onClick={() => toggleLeague(`${countryName}-${league}`)}
+                    className={`league-header ${isLeagueOpen ? 'open' : ''}`}
+                    onClick={() => toggleLeague(countryName, league)}
                   >
                     <span className="league-name">{league}</span>
                     <span className="league-count">{leagueMatches.length} match{leagueMatches.length !== 1 ? 'es' : ''}</span>
-                    <span className="league-toggle">{isOpen ? '▲' : '▼'}</span>
+                    <span className="league-toggle">{isLeagueOpen ? '▲' : '▼'}</span>
                   </div>
-                  {isOpen && (
+                  {isLeagueOpen && (
                     <div className="league-matches">
                       {leagueMatches.map((match) => (
                         <MatchCard key={match.id} match={match} />
