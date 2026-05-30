@@ -30,15 +30,16 @@
   align-items: center;
   justify-content: center;
   min-width: 40px;
-  padding: 0 6px;
+  width: 40px;
   flex-shrink: 0;
+  padding: 0 6px;
 }
 
 /* Vertical separator */
 .match-separator {
   width: 1px;
   background-color: #eee;
-  margin: 0;
+  margin: 0 8px;
   flex-shrink: 0;
 }
 
@@ -138,7 +139,12 @@
   .match-time {
     font-size: 0.75rem;
     min-width: 35px;
+    width: 35px;
     padding: 0 4px;
+  }
+  
+  .match-separator {
+    margin: 0 6px;
   }
   
   .match-team {
