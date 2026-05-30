@@ -31,21 +31,21 @@ export default function MatchCard({ match }) {
         <div className="match-team away">{match.away_team}</div>
       </div>
       
-      {/* Score stacked vertically */}
-      <div className="match-score-column">
-        <div className="match-score home">{match.home_score}</div>
-        <div className="match-score away">{match.away_score}</div>
+      {/* Score container with scores stacked and button to the right */}
+      <div className="score-container">
+        <div className="score-column">
+          <div className="match-score home">{match.home_score}</div>
+          <div className="match-score away">{match.away_score}</div>
+        </div>
+        <button 
+          className={`fav-btn ${fav ? 'fav-on' : 'fav-off'}`}
+          onClick={(e) => { e.stopPropagation(); toggleFavorite(match.id); }}
+          title={fav ? 'Remove from favorites' : 'Add to favorites'}
+          aria-label={fav ? 'Remove from favorites' : 'Add to favorites'}
+        >
+          {fav ? '★' : '☆'}
+        </button>
       </div>
-      
-      {/* Favorite button to the right of score */}
-      <button 
-        className={`fav-btn ${fav ? 'fav-on' : 'fav-off'}`}
-        onClick={(e) => { e.stopPropagation(); toggleFavorite(match.id); }}
-        title={fav ? 'Remove from favorites' : 'Add to favorites'}
-        aria-label={fav ? 'Remove from favorites' : 'Add to favorites'}
-      >
-        {fav ? '★' : '☆'}
-      </button>
     </div>
   );
 }

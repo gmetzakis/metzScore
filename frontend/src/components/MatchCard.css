@@ -33,6 +33,7 @@
   width: 40px;
   flex-shrink: 0;
   padding: 0 6px;
+  align-self: center; /* vertically center within card */
 }
 
 /* Vertical separator */
@@ -41,6 +42,7 @@
   background-color: #eee;
   margin: 0 8px;
   flex-shrink: 0;
+  align-self: stretch; /* stretch to full card height */
 }
 
 /* Teams container - stacked vertically */
@@ -51,6 +53,7 @@
   flex: 1 1 0px;
   min-width: 0;
   padding: 0 4px;
+  align-self: center;
 }
 
 .match-team {
@@ -71,8 +74,16 @@
   margin-top: 2px;
 }
 
+/* Score container - holds score column and button side by side */
+.score-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  align-self: center;
+}
+
 /* Score column - stacked vertically */
-.match-score-column {
+.score-column {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -112,8 +123,7 @@
   color: var(--text);
   font-size: 0.9rem;
   transition: all 0.15s ease;
-  margin: 0 6px;
-  flex-shrink: 0;
+  /* No absolute positioning; uses natural flow */
 }
 
 .fav-btn:hover {
@@ -151,6 +161,10 @@
     font-size: 0.75rem;
   }
   
+  .score-column {
+    padding: 0 3px;
+  }
+  
   .match-score {
     font-size: 0.8rem;
   }
@@ -159,6 +173,5 @@
     width: 18px;
     height: 18px;
     font-size: 0.8rem;
-    margin: 0 4px;
   }
 }
