@@ -112,39 +112,26 @@
   background: #fff;
 }
 
-/* Ensure cards are edge-to-edge and override MatchCard defaults */
+/* Ensure cards are edge-to-edge full width, no margins */
 .league-matches .match-card {
   width: 100%;
   margin: 0;
+}
+
+/* Remove default borders from MatchCard (we'll add our own separators) */
+.league-matches .match-card {
   border: none !important;
   border-radius: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
 }
 
 /* Add bottom separator to all but last card */
 .league-matches .match-card:not(:last-child) {
   border-bottom: 1px solid #eee !important;
-  margin-bottom: 0 !important;
 }
 
 /* Hover state for cards */
 .league-matches .match-card:hover {
   background-color: #fafafa !important;
-}
-
-/* Ensure inner elements still work */
-.league-matches .match-card {
-  background: var(--bg) !important;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8em;
-  transition: all 0.1s ease;
-  cursor: pointer;
-  min-height: 28px;
-  position: relative;
-  overflow: hidden;
 }
 
 /* Responsive */
@@ -160,24 +147,5 @@
   }
   .league-name {
     font-size: 0.8rem;
-  }
-  
-  .league-matches .match-card {
-    min-height: 24px;
-    gap: 4px;
-  }
-  
-  .team-name {
-    font-size: 0.75em;
-    max-width: 60px;
-  }
-  
-  .score {
-    font-size: 0.75em;
-    min-width: 10px;
-  }
-  
-  .match-time, .match-league {
-    font-size: 0.7em;
   }
 }

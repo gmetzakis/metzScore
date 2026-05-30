@@ -2,7 +2,7 @@
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 3px;
-  padding: 6px 10px;
+  padding: 0;
   margin-bottom: 2px;
   display: flex;
   align-items: stretch;
@@ -28,15 +28,17 @@
   white-space: nowrap;
   display: flex;
   align-items: center;
+  justify-content: center;
   min-width: 40px;
-  padding-right: 8px;
+  padding: 0 6px;
+  flex-shrink: 0;
 }
 
 /* Vertical separator */
 .match-separator {
   width: 1px;
   background-color: #eee;
-  margin: 0 4px;
+  margin: 0;
   flex-shrink: 0;
 }
 
@@ -45,8 +47,9 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  flex: 1;
+  flex: 1 1 0px;
   min-width: 0;
+  padding: 0 4px;
 }
 
 .match-team {
@@ -67,13 +70,14 @@
   margin-top: 2px;
 }
 
-/* Score and favorite container - rightmost */
-.match-score-fav {
+/* Score column - stacked vertically */
+.match-score-column {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-end;
-  flex-shrink: 0;
+  flex: 0 0 auto;
+  min-width: 0;
+  padding: 0 4px;
 }
 
 .match-score {
@@ -81,24 +85,17 @@
   font-size: 0.9rem;
   font-weight: bold;
   color: var(--accent);
-  display: flex;
-  align-items: baseline;
-  gap: 2px;
+  text-align: center;
+  min-width: 14px;
+  line-height: 1.2;
+}
+
+.match-score.home {
   margin-bottom: 2px;
 }
 
-.home-score,
-.away-score {
-  min-width: 14px;
-  text-align: center;
-}
-
-.score-divider {
-  font-size: 0.9rem;
-  font-weight: 300;
-  color: var(--border);
-  margin: 0;
-  line-height: 1;
+.match-score.away {
+  margin-top: 2px;
 }
 
 /* Favorite button */
@@ -114,7 +111,8 @@
   color: var(--text);
   font-size: 0.9rem;
   transition: all 0.15s ease;
-  margin-top: 2px;
+  margin: 0 6px;
+  flex-shrink: 0;
 }
 
 .fav-btn:hover {
@@ -133,7 +131,6 @@
 /* Responsive adjustments */
 @media (max-width: 480px) {
   .match-card {
-    padding: 4px 8px;
     height: 32px;
     font-size: 0.75rem;
   }
@@ -141,6 +138,7 @@
   .match-time {
     font-size: 0.75rem;
     min-width: 35px;
+    padding: 0 4px;
   }
   
   .match-team {
@@ -155,5 +153,6 @@
     width: 18px;
     height: 18px;
     font-size: 0.8rem;
+    margin: 0 4px;
   }
 }
