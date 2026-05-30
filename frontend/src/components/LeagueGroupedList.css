@@ -1,27 +1,29 @@
-/* ── League Grouped List - Ultra Compact & Continuous ───────────────────── */
+/* ── League Grouped List - Final Design ─────────────────────────────────── */
 
-/* Base list - no extra spacing */
+/* Base container */
 .league-grouped-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
 }
 
 /* Country Section */
 .country-group {
-  /* No borders or background - just spacing */
-  margin: 16px 0 12px 0;
-  padding: 0;
+  /* Separator line between countries (top border) */
+  border-top: 1px solid #eee;
+  /* No margin, we'll use padding for internal spacing */
+  padding: 12px 0 8px 0; /* top padding for space after line, bottom for space before league */
 }
 .country-group:first-child {
-  margin-top: 0;
+  border-top: none;
+  padding-top: 0; /* no top line for first country */
 }
 
 .country-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 0;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.9rem;
@@ -38,8 +40,20 @@
   object-fit: contain;
 }
 .country-name {
-  flex: 1;
+  flex: 1 1 0px;
   font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.country-count {
+  font-size: 0.85rem;
+  color: #666;
+  background: #f8f9fa;
+  padding: 2px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  margin-left: 8px;
 }
 .country-toggle {
   font-size: 0.75rem;
@@ -53,20 +67,21 @@
 
 /* League Section */
 .league-group {
-  margin: 12px 0 8px 0;
-  padding: 0;
-  border-top: 1px solid #f0f0f0;
+  /* Separator line between leagues (bottom border) */
+  border-bottom: 1px solid #eee;
+  padding: 8px 0 4px 0; /* top padding for space after country, bottom for space before next */
 }
-.league-group:first-child {
-  border-top: none;
-  margin-top: 0;
+.league-group:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
 .league-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 3px 0;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0 2px 0; /* more top padding to center text between lines */
   cursor: pointer;
   font-weight: 500;
   font-size: 0.85rem;
@@ -77,20 +92,21 @@
   opacity: 0.8;
 }
 .league-name {
-  flex: 1;
-  min-width: 0;
+  flex: 1 1 0px;
   font-size: 0.85rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: 1.2;
 }
 .league-count {
   font-size: 0.75rem;
   color: #666;
   background: #f8f9fa;
-  padding: 1px 4px;
+  padding: 2px 6px;
   border-radius: 3px;
   flex-shrink: 0;
+  margin-left: 8px;
 }
 .league-toggle {
   font-size: 0.75rem;
@@ -106,10 +122,10 @@
 .league-matches {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  margin: 8px 0 0 0;
-  padding: 0;
-  background: #fff;
+  /* No extra gap; separators handled by MatchCard */
+}
+.league-matches:empty {
+  display: none;
 }
 
 /* Ensure cards are edge-to-edge full width, no margins */
@@ -147,5 +163,16 @@
   }
   .league-name {
     font-size: 0.8rem;
+  }
+  
+  .country-group {
+    padding: 10px 0 6px 0;
+  }
+  .league-group {
+    padding: 6px 0 3px 0;
+  }
+  
+  .league-header {
+    padding: 4px 0 1px 0;
   }
 }

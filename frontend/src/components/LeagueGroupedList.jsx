@@ -58,6 +58,9 @@ export default function LeagueGroupedList({ matches }) {
         const sortedLeagues = Object.keys(countryLeagues).sort((a, b) => a.localeCompare(b));
         const isCountryOpen = expandedCountries[countryName];
         
+        // Calculate total matches for this country
+        const totalMatches = sortedLeagues.reduce((sum, league) => sum + countryLeagues[league].length, 0);
+        
         return (
           <div key={countryName} className="country-group">
             <div 
@@ -66,6 +69,7 @@ export default function LeagueGroupedList({ matches }) {
             >
               {flagUrl && <img className="country-flag" src={flagUrl} alt={`${countryName} flag`} />}
               <span className="country-name">{countryName}</span>
+              <span className="country-count">{totalMatches}</span>
               <span className="country-toggle">{isCountryOpen ? '▲' : '▼'}</span>
             </div>
             {isCountryOpen && sortedLeagues.map((league) => {
@@ -78,7 +82,7 @@ export default function LeagueGroupedList({ matches }) {
                     onClick={() => toggleLeague(countryName, league)}
                   >
                     <span className="league-name">{league}</span>
-                    <span className="league-count">{leagueMatches.length} match{leagueMatches.length !== 1 ? 'es' : ''}</span>
+                    <span className="league-count">{leagueMatches.length}</span>
                     <span className="league-toggle">{isLeagueOpen ? '▲' : '▼'}</span>
                   </div>
                   {isLeagueOpen && (
