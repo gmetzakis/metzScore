@@ -6,7 +6,7 @@ import './LeagueGroupedList.css';
 const getFlagUrl = (countryCode) => {
   if (!countryCode) return null;
   // Use Stoiximan SVG flags
-  if (countryCode === 'international') {
+  if (countryCode === 'international' || countryCode === 'zimbabwe' || countryCode === 'zanzibar') {
     return 'https://www.stoiximan.gr/assets/icons/flags/default.svg?v=2.0.0';
   }
   return `https://www.stoiximan.gr/assets/icons/flags/${countryCode}.svg?v=2.0.0`;
