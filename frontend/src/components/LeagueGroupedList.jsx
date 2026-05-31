@@ -65,8 +65,10 @@ export default function LeagueGroupedList({ matches }) {
           <div key={countryName} className={`country-group ${isCountryOpen ? 'expanded' : ''}`}>
             <div className="country-header" onClick={() => toggleCountry(countryName)}>
               {flagUrl && <img className="country-flag" src={flagUrl} alt={`${countryName} flag`} />}
-              <span className="country-name">{countryName}</span>
-              <span className="country-count">{sortedLeagues.reduce((sum, league) => sum + countryLeagues[league].length, 0)}</span>
+              <span className="country-name-wrapper">
+                <span className="country-name">{countryName}</span>
+                <span className="country-count">{sortedLeagues.reduce((sum, league) => sum + countryLeagues[league].length, 0)}</span>
+              </span>
               <span className={`country-toggle ${isCountryOpen ? 'open' : ''}`}>{isCountryOpen ? '▼' : '▼'}</span>
             </div>
 {isCountryOpen && (
@@ -77,10 +79,12 @@ export default function LeagueGroupedList({ matches }) {
       return (
         <div key={league} className="league-group">
           <div className="league-header" onClick={() => toggleLeague(countryName, league)}>
-            <span className="league-name">{league}</span>
-            <span className="league-count">{leagueMatches.length}</span>
-            <span className={`league-toggle ${isLeagueOpen ? 'open' : ''}`}>{isLeagueOpen ? '▼' : '▼'}</span>
-          </div>
+              <span className="league-name-wrapper">
+                <span className="league-name">{league}</span>
+                <span className="league-count">{leagueMatches.length}</span>
+              </span>
+              <span className={`league-toggle ${isLeagueOpen ? 'open' : ''}`}>{isLeagueOpen ? '▼' : '▼'}</span>
+            </div>
           {isLeagueOpen && (
             <div className="league-matches">
               {leagueMatches.map((match) => (
