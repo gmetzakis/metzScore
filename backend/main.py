@@ -59,7 +59,7 @@ def get_live_football():
 
 @app.get("/api/football/matches/all")
 def get_all_football():
-    """Get all football matches (live and upcoming)."""
+    """Get upcoming football matches (live and upcoming)."""
     try:
         matches = get_all_football_matches()
         print(matches)

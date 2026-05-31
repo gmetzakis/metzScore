@@ -35,7 +35,7 @@ export const apiService = {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error("Error fetching all matches:", error);
+      console.error("Error fetching upcoming matches:", error);
       throw error;
     }
   },

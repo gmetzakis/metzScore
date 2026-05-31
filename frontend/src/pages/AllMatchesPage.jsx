@@ -57,7 +57,7 @@ export default function AllMatchesPage() {
 
 
   return (
-    <div className="all-matches-page">
+    <div className="upcoming-matches-page">
       <div className="page-header">
         <h1>⚽ Upcoming Football Matches</h1>
         <p>Browse all upcoming matches</p>
@@ -67,8 +67,8 @@ export default function AllMatchesPage() {
         <Link to="/" className="nav-link">
           Live Matches
         </Link>
-        <Link to="/all-matches" className="nav-link active">
-          All Matches
+        <Link to="/upcoming-matches" className="nav-link active">
+          Upcoming Matches
         </Link>
         <Link to="/favorites" className="nav-link">
           ☆ Favorites

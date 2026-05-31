@@ -471,7 +471,7 @@ export default function MatchDetailPage() {
     return (
       <div className="detail-page">
         <div className="detail-back-header">
-          <Link to="/" className="back-link">← All Matches</Link>
+          <Link to="/" className="back-link">← Upcoming Matches</Link>
         </div>
         <ErrorDisplay error={error} />
       </div>
@@ -485,7 +485,7 @@ export default function MatchDetailPage() {
   return (
     <div className="detail-page">
       <div className="detail-nav">
-        <Link to="/" className="back-link">← Back to All Matches</Link>
+        <Link to="/" className="back-link">← Back to Upcoming Matches</Link>
         <Link to="/" className="back-link-mobile">← Back</Link>
       </div>
 

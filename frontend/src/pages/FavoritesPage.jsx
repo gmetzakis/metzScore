@@ -62,8 +62,8 @@ export default function FavoritesPage() {
         <Link to="/" className="nav-link">
           Live Matches
         </Link>
-        <Link to="/all-matches" className="nav-link">
-          All Matches
+        <Link to="/upcoming-matches" className="nav-link">
+          Upcoming Matches
         </Link>
         <Link to="/favorites" className="nav-link active">
           ☆ Favorites

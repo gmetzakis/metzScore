@@ -62,8 +62,8 @@ export default function HomePage() {
         <Link to="/" className="nav-link active">
           Live Matches
         </Link>
-        <Link to="/all-matches" className="nav-link">
-          All Matches
+        <Link to="/upcoming-matches" className="nav-link">
+          Upcoming Matches
         </Link>
         <Link to="/favorites" className="nav-link">
           ☆ Favorites
