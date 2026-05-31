@@ -8,14 +8,12 @@
 
 /* Country Section */
 .country-group {
-  /* Separator line between countries (top border) */
-  border-top: 1px solid #eee;
-  /* No margin, we'll use padding for internal spacing */
-  padding: 12px 0 12px 0; /* top padding for space after line, bottom for space before league */
+  /* Separator line between countries (bottom border) */
+  border-bottom: 1px solid #eee;
+  padding: 12px 0; /* top and bottom padding */
 }
 .country-group:first-child {
-  border-top: none;
-  padding-top: 0; /* no top line for first country */
+  padding-top: 0; /* no extra top padding for first country */
 }
 
 .country-header {
@@ -64,15 +62,28 @@
   transform: rotate(180deg);
 }
 
+/* League Container - holds leagues when country expanded */
+.league-container {
+  display: none; /* hidden when collapsed */
+  margin-top: 12px; /* space from header to league container */
+}
+.country-group.expanded .league-container {
+  display: block;
+}
+
 /* League Section */
 .league-group {
-  /* Separator line between leagues (bottom border) */
-  border-bottom: 1px solid #eee;
-  padding: 8px 0 8px 0; /* top padding for space after country, bottom for space before next */
+  /* Indent leagues like a paragraph */
+  margin-left: 16px;
 }
-.league-group:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
+.league-group + .league-group {
+  /* Separator line between leagues */
+  border-top: 1px solid #eee;
+  margin-top: 12px;
+}
+.league-group:first-child {
+  /* Space from league container to first league */
+  margin-top: 12px;
 }
 
 .league-header {
@@ -80,7 +91,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 2px 0 2px 0; /* more top padding to center text between lines */
+  padding: 10px 0 2px 0; /* more top padding to center text between lines */
   cursor: pointer;
   font-weight: 500;
   font-size: 0.85rem;
@@ -166,8 +177,17 @@
   .country-group {
     padding: 10px 0 6px 0;
   }
+  .league-container {
+    margin-top: 8px;
+  }
   .league-group {
-    padding: 6px 0 3px 0;
+    margin-left: 8px;
+  }
+  .league-group + .league-group {
+    margin-top: 6px;
+  }
+  .league-group:first-child {
+    margin-top: 8px;
   }
   
   .league-header {

@@ -58,43 +58,38 @@ export default function LeagueGroupedList({ matches }) {
         const sortedLeagues = Object.keys(countryLeagues).sort((a, b) => a.localeCompare(b));
         const isCountryOpen = expandedCountries[countryName];
         
-        // Calculate total matches for this country
-        const totalMatches = sortedLeagues.reduce((sum, league) => sum + countryLeagues[league].length, 0);
-        
         return (
-          <div key={countryName} className="country-group">
-            <div 
-              className={`country-header ${isCountryOpen ? 'open' : ''}`}
-              onClick={() => toggleCountry(countryName)}
-            >
+          <div key={countryName} className={`country-group ${isCountryOpen ? 'expanded' : ''}`}>
+            <div className="country-header" onClick={() => toggleCountry(countryName)}>
               {flagUrl && <img className="country-flag" src={flagUrl} alt={`${countryName} flag`} />}
               <span className="country-name">{countryName}</span>
-              <span className="country-count">{totalMatches}</span>
-              <span className="country-toggle">{isCountryOpen ? '▲' : '▼'}</span>
+              <span className="country-count">{sortedLeagues.reduce((sum, league) => sum + countryLeagues[league].length, 0)}</span>
+              <span className={`country-toggle ${isCountryOpen ? 'open' : ''}`}>{isCountryOpen ? '▲' : '▼'}</span>
             </div>
-            {isCountryOpen && sortedLeagues.map((league) => {
-              const leagueMatches = countryLeagues[league];
-              const isLeagueOpen = expandedLeagues[`${countryName}-${league}`];
-              return (
-                <div key={league} className="league-group">
-                  <div
-                    className={`league-header ${isLeagueOpen ? 'open' : ''}`}
-                    onClick={() => toggleLeague(countryName, league)}
-                  >
-                    <span className="league-name">{league}</span>
-                    <span className="league-count">{leagueMatches.length}</span>
-                    <span className="league-toggle">{isLeagueOpen ? '▲' : '▼'}</span>
-                  </div>
-                  {isLeagueOpen && (
-                    <div className="league-matches">
-                      {leagueMatches.map((match) => (
-                        <MatchCard key={match.id} match={match} />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+{isCountryOpen && (
+  <div className="league-container">
+    {sortedLeagues.map((league) => {
+      const leagueMatches = countryLeagues[league];
+      const isLeagueOpen = expandedLeagues[`${countryName}-${league}`];
+      return (
+        <div key={league} className="league-group">
+          <div className="league-header" onClick={() => toggleLeague(countryName, league)}>
+            <span className="league-name">{league}</span>
+            <span className="league-count">{leagueMatches.length}</span>
+            <span className={`league-toggle ${isLeagueOpen ? 'open' : ''}`}>{isLeagueOpen ? '▲' : '▼'}</span>
+          </div>
+          {isLeagueOpen && (
+            <div className="league-matches">
+              {leagueMatches.map((match) => (
+                <MatchCard key={match.id} match={match} />
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    })}
+  </div>
+)}
           </div>
         );
       })}

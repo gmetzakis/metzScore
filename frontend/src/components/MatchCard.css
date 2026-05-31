@@ -2,16 +2,20 @@
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 3px;
-  padding: 0;
+  padding: 2px 0 2px 0;
   margin-bottom: 2px;
   display: flex;
   align-items: stretch;
-  height: 32px;
   transition: all 0.1s ease;
   cursor: pointer;
   position: relative;
   overflow: hidden;
   font-size: 0.8rem;
+}
+
+.match-card:first-child {
+  /* Space from league container to first league */
+  padding: 10px 0 6px 0;
 }
 
 .match-card:hover {
