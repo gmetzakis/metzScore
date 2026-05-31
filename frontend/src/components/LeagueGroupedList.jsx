@@ -6,6 +6,9 @@ import './LeagueGroupedList.css';
 const getFlagUrl = (countryCode) => {
   if (!countryCode) return null;
   // Use Stoiximan SVG flags
+  if (countryCode === 'international') {
+    return 'https://www.stoiximan.gr/assets/icons/flags/default.svg?v=2.0.0';
+  }
   return `https://www.stoiximan.gr/assets/icons/flags/${countryCode}.svg?v=2.0.0`;
 };
 
@@ -64,7 +67,7 @@ export default function LeagueGroupedList({ matches }) {
               {flagUrl && <img className="country-flag" src={flagUrl} alt={`${countryName} flag`} />}
               <span className="country-name">{countryName}</span>
               <span className="country-count">{sortedLeagues.reduce((sum, league) => sum + countryLeagues[league].length, 0)}</span>
-              <span className={`country-toggle ${isCountryOpen ? 'open' : ''}`}>{isCountryOpen ? '▲' : '▼'}</span>
+              <span className={`country-toggle ${isCountryOpen ? 'open' : ''}`}>{isCountryOpen ? '▼' : '▼'}</span>
             </div>
 {isCountryOpen && (
   <div className="league-container">
@@ -76,7 +79,7 @@ export default function LeagueGroupedList({ matches }) {
           <div className="league-header" onClick={() => toggleLeague(countryName, league)}>
             <span className="league-name">{league}</span>
             <span className="league-count">{leagueMatches.length}</span>
-            <span className={`league-toggle ${isLeagueOpen ? 'open' : ''}`}>{isLeagueOpen ? '▲' : '▼'}</span>
+            <span className={`league-toggle ${isLeagueOpen ? 'open' : ''}`}>{isLeagueOpen ? '▼' : '▼'}</span>
           </div>
           {isLeagueOpen && (
             <div className="league-matches">
