@@ -5,10 +5,6 @@ import './LeagueGroupedList.css';
 // Get flag URL from country code (from Stoiximan API)
 const getFlagUrl = (countryCode) => {
   if (!countryCode) return null;
-  // Use Stoiximan SVG flags
-  if (countryCode === 'international' || countryCode === 'zimbabwe' || countryCode === 'zanzibar' || countryCode === 'angola' || countryCode === 'bosnia-and-herzegovina' || countryCode === 'cote-divoire' || countryCode === 'congo-kinshasa' || countryCode === 'congo-brazzaville' || countryCode === 'gambia' || countryCode === 'guinea-bissau' || countryCode === 'guinea' || countryCode === 'liberia' || countryCode === 'mali' || countryCode === 'niger' || countryCode === 'senegal' || countryCode === 'sierra-leone' || countryCode === 'togo' || countryCode === 'luxembourg' || countryCode === 'burkina-faso' ) {
-    return 'https://www.stoiximan.gr/assets/icons/flags/default.svg?v=2.0.0';
-  }
   return `https://www.stoiximan.gr/assets/icons/flags/${countryCode}.svg?v=2.0.0`;
 };
 
@@ -58,13 +54,14 @@ export default function LeagueGroupedList({ matches }) {
         const countryData = groupedByCountry[countryName];
         const countryLeagues = countryData.leagues;
         const flagUrl = getFlagUrl(countryData.countryCode);
+        const fallbackUrl = 'https://www.stoiximan.gr/assets/icons/flags/default.svg?v=2.0.0';
         const sortedLeagues = Object.keys(countryLeagues).sort((a, b) => a.localeCompare(b));
         const isCountryOpen = expandedCountries[countryName];
         
         return (
           <div key={countryName} className={`country-group ${isCountryOpen ? 'expanded' : ''}`}>
             <div className="country-header" onClick={() => toggleCountry(countryName)}>
-              {flagUrl && <img className="country-flag" src={flagUrl} alt={`${countryName} flag`} />}
+              {flagUrl && <img className="country-flag" src={flagUrl} onError={(e) => { e.currentTarget.src = fallbackUrl}} alt={`${countryName} flag`} />}
               <span className="country-name-wrapper">
                 <span className="country-name">{countryName}</span>
                 <span className="country-count">{sortedLeagues.reduce((sum, league) => sum + countryLeagues[league].length, 0)}</span>
