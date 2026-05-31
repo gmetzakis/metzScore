@@ -6,7 +6,7 @@
   margin-bottom: 2px;
   display: flex;
   align-items: stretch;
-  height: 36px;
+  height: 32px;
   transition: all 0.1s ease;
   cursor: pointer;
   position: relative;
@@ -78,7 +78,6 @@
 .score-container {
   display: flex;
   align-items: center;
-  gap: 8px;
   align-self: center;
 }
 
@@ -89,7 +88,6 @@
   justify-content: center;
   flex: 0 0 auto;
   min-width: 0;
-  padding: 0 4px;
 }
 
 .match-score {
@@ -127,16 +125,15 @@
 }
 
 .fav-btn:hover {
-  background: var(--border-light);
-  color: var(--accent);
+  color: #f0c400;
 }
 
 .fav-btn.fav-on {
-  color: #ff9800;
+  color: #f0c400;
 }
 
 .fav-btn.fav-on:hover {
-  background: #fff3e0;
+  color: var(--text);
 }
 
 /* Responsive adjustments */
