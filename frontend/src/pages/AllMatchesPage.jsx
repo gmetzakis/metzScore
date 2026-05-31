@@ -10,7 +10,6 @@ export default function AllMatchesPage() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
   const isInitialLoad = useRef(true);
 
@@ -43,11 +42,7 @@ export default function AllMatchesPage() {
   }, [fetchAllMatches]);
 
   const filteredMatches = useMemo(() => {
-    let list = matches;
-    if (filter === 'Live') list = list.filter(m => m.status === 'Live');
-    else if (filter === 'Not Started') list = list.filter(m => m.status === 'Not Started');
-    else if (filter === 'Finished') list = list.filter(m => m.status === 'Finished');
-
+    let list = matches.filter(m => m.status === 'Not Started');
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(m =>
@@ -57,17 +52,15 @@ export default function AllMatchesPage() {
       );
     }
     return list;
-  }, [matches, filter, search]);
+  }, [matches, search]);
 
-  const liveCount = matches.filter(m => m.status === 'Live').length;
-  const upcomingCount = matches.filter(m => m.status === 'Not Started').length;
-  const finishedCount = matches.filter(m => m.status === 'Finished').length;
+
 
   return (
     <div className="all-matches-page">
       <div className="page-header">
-        <h1>⚽ All Football Matches</h1>
-        <p>Browse all available matches</p>
+        <h1>⚽ Upcoming Football Matches</h1>
+        <p>Browse all upcoming matches</p>
       </div>
 
       <div className="page-navigation">
@@ -97,33 +90,6 @@ export default function AllMatchesPage() {
         )}
       </div>
 
-      <div className="filter-tabs">
-        <button
-          className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-          onClick={() => setFilter('all')}
-        >
-          All ({matches.length})
-        </button>
-        <button
-          className={`filter-btn ${filter === 'Live' ? 'active' : ''}`}
-          onClick={() => setFilter('Live')}
-        >
-          Live ({liveCount})
-        </button>
-        <button
-          className={`filter-btn ${filter === 'Not Started' ? 'active' : ''}`}
-          onClick={() => setFilter('Not Started')}
-        >
-          Upcoming ({upcomingCount})
-        </button>
-        <button
-          className={`filter-btn ${filter === 'Finished' ? 'active' : ''}`}
-          onClick={() => setFilter('Finished')}
-        >
-          Finished ({finishedCount})
-        </button>
-      </div>
-
       <div className="page-content">
         {loading && <LoadingSpinner />}
         {error && <ErrorDisplay error={error} />}
@@ -132,7 +98,6 @@ export default function AllMatchesPage() {
             <div className="matches-info">
               <span>
                 {filteredMatches.length} match{filteredMatches.length !== 1 ? 'es' : ''} found
-                {filter !== 'all' && ` (${filter})`}
                 {search && ` matching "${search}"`}
               </span>
             </div>

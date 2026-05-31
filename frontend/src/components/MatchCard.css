@@ -26,7 +26,7 @@
 /* Time with seconds - leftmost */
 .match-time {
   font-family: var(--font-family-mono);
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-h);
   white-space: nowrap;
@@ -36,7 +36,7 @@
   min-width: 40px;
   width: 40px;
   flex-shrink: 0;
-  padding: 0 6px;
+  padding: 0 24px;
   align-self: center; /* vertically center within card */
 }
 
@@ -92,6 +92,10 @@
   justify-content: center;
   flex: 0 0 auto;
   min-width: 0;
+}
+
+.score-column.hidden {
+  display: none;
 }
 
 .match-score {
