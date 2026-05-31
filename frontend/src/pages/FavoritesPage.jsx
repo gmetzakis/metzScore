@@ -54,8 +54,7 @@ export default function FavoritesPage() {
   return (
     <div className="favorites-page">
       <div className="page-header">
-        <h1>⭐ Favorite Matches</h1>
-        <p>Matches you've bookmarked</p>
+        <h1>MetzScore</h1>
       </div>
 
       <div className="page-navigation">

@@ -54,8 +54,7 @@ export default function HomePage() {
   return (
     <div className="home-page">
       <div className="page-header">
-        <h1>⚽ Live Football Matches</h1>
-        <p>Real-time updates from matches in progress</p>
+        <h1>MetzScore</h1>
       </div>
 
       <div className="page-navigation">

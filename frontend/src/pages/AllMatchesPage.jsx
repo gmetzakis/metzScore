@@ -59,8 +59,7 @@ export default function AllMatchesPage() {
   return (
     <div className="upcoming-matches-page">
       <div className="page-header">
-        <h1>⚽ Upcoming Football Matches</h1>
-        <p>Browse all upcoming matches</p>
+        <h1>MetzScore</h1>
       </div>
 
       <div className="page-navigation">
