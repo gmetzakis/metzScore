@@ -10,7 +10,7 @@
 .country-group {
   /* Separator line between countries (bottom border) */
   border-bottom: 1px solid #eee;
-  padding: 12px 0; /* top and bottom padding */
+  padding: 16px 0; /* top and bottom padding */
 }
 .country-group:first-child {
   padding-top: 0; /* no extra top padding for first country */

@@ -42,6 +42,7 @@ export default function MatchCard({ match }) {
           <div className="match-score home">{match.home_score}</div>
           <div className="match-score away">{match.away_score}</div>
         </div>
+        <div className="match-separator"></div>
         <button 
           className={`fav-btn ${fav ? 'fav-on' : 'fav-off'}`}
           onClick={(e) => { e.stopPropagation(); toggleFavorite(match.id); }}
