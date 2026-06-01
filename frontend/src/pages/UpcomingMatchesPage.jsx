@@ -4,9 +4,9 @@ import LeagueGroupedList from '../components/LeagueGroupedList';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorDisplay from '../components/ErrorDisplay';
 import { apiService } from '../services/api';
-import './AllMatchesPage.css';
+import './UpcomingMatchesPage.css';
 
-export default function AllMatchesPage() {
+export default function UpcomingMatchesPage() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
