@@ -1,7 +1,7 @@
 /* ── Layout ─────────────────────────────────────────────────────────────────── */
 .detail-page {
-  padding: 12px;
-  background-color: var(--bg);
+   padding: 16px;
+   background-color: var(--bg);
 }
 
 .detail-loading {
@@ -41,8 +41,8 @@
 
 /* ── Header ─────────────────────────────────────────────────────────────────── */
 .detail-header {
-  text-align: center;
-  margin-bottom: 20px;
+   text-align: center;
+   margin-bottom: 16px;
 }
 
 .detail-top-row {
@@ -54,9 +54,16 @@
 }
 
 .detail-league {
-  font-size: 14px;
-  color: #666;
-  font-weight: 500;
+   font-size: 14px;
+   color: #666;
+   font-weight: 500;
+}
+.detail-kickoff {
+   font-size: 14px;
+   color: #666;
+   font-weight: 500;
+   margin-left: 12px;
+   margin-right: 12px;
 }
 
 .detail-status {
@@ -159,25 +166,25 @@
 
 /* ── Shared section ─────────────────────────────────────────────────────────── */
 .detail-section {
-  margin-bottom: 28px;
+   margin-bottom: 24px;
 }
 
 .section-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #333;
-  margin: 0 0 14px 0;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #e0e0e0;
+   font-size: 14px;
+   font-weight: 600;
+   color: #222;
+   margin: 0 0 14px 0;
+   padding-bottom: 8px;
+   border-bottom: 2px solid #e0e0e0;
 }
 
 .section-empty {
-  text-align: center;
-  padding: 40px 20px;
-  color: #999;
-  background: #fafafa;
-  border-radius: 10px;
-  font-size: 14px;
+   text-align: center;
+   padding: 24px 12px;
+   color: #999;
+   background: #fafafa;
+   border-radius: 10px;
+   font-size: 13px;
 }
 
 /* ── Incident Timeline ───────────────────────────────────────────────────────── */
@@ -261,7 +268,7 @@
 
 /* ── Statistics ─────────────────────────────────────────────────────────────── */
 .stats-section {
-  margin-bottom: 28px;
+   margin-bottom: 20px;
 }
 
 .stats-table {
@@ -277,13 +284,13 @@
 }
 
 .stats-table th {
-  padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #555;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  text-align: center;
+   padding: 8px 12px;
+   font-size: 12px;
+   font-weight: 600;
+   color: #555;
+   text-transform: uppercase;
+   letter-spacing: 0.4px;
+   text-align: center;
 }
 
 .stats-table th:first-child  { text-align: left;  width: 40%; }
@@ -291,11 +298,11 @@
 .stats-table th.stat-away   { color: #b71c1c; }
 
 .stats-table td {
-  padding: 9px 14px;
-  border-top: 1px solid #eee;
-  font-size: 14px;
-  color: #333;
-  text-align: center;
+   padding: 7px 12px;
+   border-top: 1px solid #eee;
+   font-size: 13px;
+   color: #333;
+   text-align: center;
 }
 
 .stats-table td:first-child {
@@ -313,72 +320,7 @@
   color: #1a237e;
 }
 
-/* ── Match Info ──────────────────────────────────────────────────────────────── */
-.match-info-section {
-  margin-bottom: 28px;
-}
 
-.info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  font-size: 13px;
-}
-
-.info-label {
-  color: #888;
-  font-weight: 500;
-}
-
-.info-value {
-  font-weight: 600;
-  color: #333;
-}
-
-.info-value.info-yes {
-  color: #2e7d32;
-  background: #e8f5e9;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 12px;
-}
-
-.info-value.info-no {
-  color: #999;
-  background: #f5f5f5;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 12px;
-}
-
-.info-link {
-  color: #2196f3;
-  text-decoration: none;
-  font-size: 12px;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.info-link:hover {
-  text-decoration: underline;
-}
-
-@media (max-width: 480px) {
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-}
 
 /* ── Sub-section within Stats ────────────────────────────────────────────────── */
 .sub-section {
@@ -390,22 +332,22 @@
 }
 
 .sub-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #555;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  margin-bottom: 10px;
+   font-size: 12px;
+   font-weight: 600;
+   color: #555;
+   text-transform: uppercase;
+   letter-spacing: 0.4px;
+   margin-bottom: 8px;
 }
 
 .sub-hint {
-  color: #999;
-  font-size: 13px;
-  font-style: italic;
-  text-align: center;
-  padding: 20px;
-  background: #fafafa;
-  border-radius: 8px;
+   color: #999;
+   font-size: 12px;
+   font-style: italic;
+   text-align: center;
+   padding: 16px;
+   background: #fafafa;
+   border-radius: 8px;
 }
 
 /* ── Odds detail override ───────────────────────────────────────────────────── */

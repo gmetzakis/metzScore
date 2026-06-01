@@ -134,16 +134,7 @@ function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isPi
 
   const sections = [];
 
-  if (isPitchAvailable && sbStats.some(s => ['Goals', 'Corners', 'Yellow Cards'].includes(s.label))) {
-    if (isStatsAvailable) {
-      sections.push(
-        <div key="tech" className="sub-section">
-          <h3 className="sub-title">Technical Statistics</h3>
-          <p className="sub-hint">Detailed in-play stats and pitch positioning are available for this match.</p>
-        </div>
-      );
-    }
-  }
+
 
   if (sbStats.length > 0) {
     sections.push((
@@ -480,7 +471,7 @@ export default function MatchDetailPage() {
 
   if (!data) return null;
 
-  const { league, home_team, away_team, score, results, odds, incident_filters, statistics, is_live, status, is_pitch_available, is_stats_available, roster } = data;
+   const { league, home_team, away_team, score, results, odds, incident_filters, statistics, is_live, status, is_pitch_available, is_stats_available, roster, start_time } = data;
 
   return (
     <div className="detail-page">
@@ -491,11 +482,12 @@ export default function MatchDetailPage() {
 
       <div className="detail-header">
         <div className="detail-top-row">
-          <span className="detail-league">{league?.name || 'Unknown League'}</span>
-          <span className={`detail-status status-${String(status).toLowerCase().replace(' ', '-')}`}>
-            {status}
-          </span>
-        </div>
+           <span className="detail-league">{league?.name || 'Unknown League'}</span>
+           <span className="detail-kickoff">{formatEpochTime(start_time)}</span>
+           <span className={`detail-status status-${String(status).toLowerCase().replace(' ', '-')}`}>
+             {status}
+           </span>
+         </div>
       </div>
 
       <div className="scoreboard">
@@ -529,7 +521,8 @@ export default function MatchDetailPage() {
         </div>
       </div>
 
-      <MatchInfoSection matchData={data} />
+
+
 
       {odds && Object.keys(odds).length > 0 && (
         <div className="detail-section">

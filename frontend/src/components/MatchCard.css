@@ -1,21 +1,20 @@
 .match-card {
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 2px 0 2px 0;
-  margin-bottom: 2px;
+  border-radius: 4px;
+  padding: 4px 0 4px 0;
+  margin-bottom: 3px;
   display: flex;
   align-items: stretch;
   transition: all 0.1s ease;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
 }
 
 .match-card:first-child {
-  /* Space from league container to first league */
-  padding: 10px 0 6px 0;
+  padding: 8px 0 8px 0;
 }
 
 .match-card:hover {
@@ -23,21 +22,20 @@
   border-color: var(--accent);
 }
 
-/* Time with seconds - leftmost */
 .match-time {
   font-family: var(--font-family-mono);
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: var(--text-h);
   white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
-  width: 40px;
+  min-width: 50px;
+  width: 50px;
   flex-shrink: 0;
-  padding: 0 24px;
-  align-self: center; /* vertically center within card */
+  padding: 0 30.5px;
+  align-self: center;
 }
 
 /* Vertical separator */
@@ -49,25 +47,24 @@
   align-self: stretch; /* stretch to full card height */
 }
 
-/* Teams container - stacked vertically */
 .match-teams {
   display: flex;
   flex-direction: column;
   justify-content: center;
   flex: 1 1 0px;
   min-width: 0;
-  padding: 0 4px;
+  padding: 0 3px;
   align-self: center;
 }
 
 .match-team {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: var(--text-h);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.2;
+  line-height: 1.3;
 }
 
 .match-team.home {
@@ -85,7 +82,6 @@
   align-self: center;
 }
 
-/* Score column - stacked vertically */
 .score-column {
   display: flex;
   flex-direction: column;
@@ -104,8 +100,8 @@
   font-weight: bold;
   color: var(--accent);
   text-align: center;
-  min-width: 14px;
-  line-height: 1.2;
+  min-width: 18px;
+  line-height: 1.3;
 }
 
 .match-score.home {
@@ -116,20 +112,18 @@
   margin-top: 2px;
 }
 
-/* Favorite button */
 .fav-btn {
   background: none;
   border: none;
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   transition: all 0.15s ease;
-  /* No absolute positioning; uses natural flow */
 }
 
 .fav-btn:hover {
@@ -144,39 +138,38 @@
   color: var(--text);
 }
 
-/* Responsive adjustments */
 @media (max-width: 480px) {
   .match-card {
-    height: 32px;
-    font-size: 0.75rem;
+    height: 42px;
+    font-size: 0.9rem;
   }
   
   .match-time {
-    font-size: 0.75rem;
-    min-width: 35px;
-    width: 35px;
-    padding: 0 4px;
+    font-size: 0.9rem;
+    min-width: 42px;
+    width: 42px;
+    padding: 0 6px;
   }
   
   .match-separator {
-    margin: 0 6px;
+    margin: 0 8px;
   }
   
   .match-team {
-    font-size: 0.75rem;
+    font-size: 0.9rem;
   }
   
   .score-column {
-    padding: 0 3px;
+    padding: 0 4px;
   }
   
   .match-score {
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
   
   .fav-btn {
-    width: 18px;
-    height: 18px;
-    font-size: 0.8rem;
+    width: 24px;
+    height: 24px;
+    font-size: 1rem;
   }
 }
