@@ -198,9 +198,10 @@
 }
 
 /* Add bottom separator to all but last card */
-.league-matches .match-card:not(:last-child) {
+/*Bottom border seperator (horizontal not vertical)*/
+/* .league-matches .match-card:not(:last-child) {
   border-bottom: 1px solid #eee !important;
-}
+} */
 
 /* Hover state for cards */
 .league-matches .match-card:hover {
