@@ -38,6 +38,11 @@
   align-self: center;
 }
 
+
+.match-time.not-started {
+  color: black;
+}
+
 /* Vertical separator */
 .match-separator {
   width: 1.5px;

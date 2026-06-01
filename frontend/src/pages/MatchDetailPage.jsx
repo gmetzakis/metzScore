@@ -8,7 +8,7 @@ import './MatchDetailPage.css';
 
 function formatEpochTime(epochMs) {
   if (!epochMs) return 'TBD';
-  return new Date(epochMs).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  return new Date(epochMs).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
 function formatClock(seconds) {

@@ -5,7 +5,7 @@ import './MatchCard.css';
 
 function formatEpochTime(epochMs) {
   if (!epochMs) return 'TBD';
-  return new Date(epochMs).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  return new Date(epochMs).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
 export default function MatchCard({ match }) {
@@ -25,7 +25,7 @@ export default function MatchCard({ match }) {
   return (
     <div className="match-card" onClick={() => navigate(`/match/${match.id}`)}>
       {/* Time with seconds on the left or kickoff time for upcoming */}
-      <div className="match-time">{getTimeDisplay()}</div>
+      <div className={`match-time ${!isLive ? 'not-started' : ''}`}>{getTimeDisplay()}</div>
       
       {/* Vertical separator */}
       <div className="match-separator"></div>
