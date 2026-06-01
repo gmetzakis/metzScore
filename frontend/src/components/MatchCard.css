@@ -23,9 +23,9 @@
 }
 
 .match-time {
-  font-family: var(--font-family-mono);
+  font-family: 'MetzScoreSans', var(--font-family-sans);
+  font-weight: 400;
   font-size: 0.78rem;
-  font-weight: 600;
   color: #cb1515;
   white-space: nowrap;
   display: flex;
