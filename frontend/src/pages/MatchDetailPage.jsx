@@ -410,6 +410,7 @@ export default function MatchDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const isInitialLoad = useRef(true);
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -441,6 +442,16 @@ export default function MatchDetailPage() {
     const interval = setInterval(load, 5000);
     return () => { cancelled = true; clearInterval(interval); };
   }, [matchId]);
+
+  useEffect(() => {
+        const ws = new WebSocket(`ws://localhost:8765?matchId=${matchId}`);
+
+        ws.onmessage = (event) => {
+            setMessages(prev => [...prev, event.data]);
+        };
+
+        return () => ws.close();
+    }, [matchId]);
 
   const [activeFilter, setActiveFilter] = useState(null);
 
@@ -478,6 +489,20 @@ export default function MatchDetailPage() {
       <div className="detail-nav">
         <Link to="/" className="back-link">← Back to Upcoming Matches</Link>
         <Link to="/" className="back-link-mobile">← Back</Link>
+      </div>
+
+      <div style={{
+          background: "#111",
+          color: "#0f0",
+          padding: "10px",
+          height: "400px",
+          overflowY: "scroll",
+          fontFamily: "monospace",
+          borderRadius: "6px"
+      }}>
+          {messages.map((msg, i) => (
+              <pre key={i}>{msg}</pre>
+          ))}
       </div>
 
       <div className="detail-header">
