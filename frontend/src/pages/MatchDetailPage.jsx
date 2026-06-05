@@ -4,6 +4,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorDisplay from '../components/ErrorDisplay';
 import OddsDisplay from '../components/OddsDisplay';
 import { apiService } from '../services/api';
+import LivePitch from '../components/LivePitch';
 import './MatchDetailPage.css';
 
 function formatEpochTime(epochMs) {
@@ -443,11 +444,20 @@ export default function MatchDetailPage() {
     return () => { cancelled = true; clearInterval(interval); };
   }, [matchId]);
 
+
+  const [lastEvent, setLastEvent] = useState(null);
+
   useEffect(() => {
         const ws = new WebSocket(`ws://localhost:8765?matchId=${matchId}`);
 
         ws.onmessage = (event) => {
             setMessages(prev => [...prev, event.data]);
+
+            try {
+                setLastEvent(JSON.parse(event.data));
+            } catch (err) {
+                console.error(err);
+            }
         };
 
         return () => ws.close();
@@ -504,6 +514,12 @@ export default function MatchDetailPage() {
               <pre key={i}>{msg}</pre>
           ))}
       </div>
+
+      <LivePitch
+          event={lastEvent}
+          homeTeamId="5327"
+          awayTeamId="10946"
+      />
 
       <div className="detail-header">
         <div className="detail-top-row">

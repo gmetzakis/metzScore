@@ -1,0 +1,171 @@
+.pitch {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  aspect-ratio: 105 / 68;
+  overflow: hidden;
+  border-radius: 12px;
+
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #2f7d32 0px,
+      #2f7d32 80px,
+      #388e3c 80px,
+      #388e3c 160px
+    );
+}
+
+.half-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: white;
+  transform: translateX(-50%);
+}
+
+.center-circle {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+
+  border: 2px solid white;
+  border-radius: 50%;
+
+  left: 50%;
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.possession.home {
+  background:
+    linear-gradient(
+      to right,
+      rgba(255,255,255,.18),
+      transparent
+    );
+}
+
+.possession.away {
+  background:
+    linear-gradient(
+      to left,
+      rgba(255,255,255,.18),
+      transparent
+    );
+}
+
+.attack.home {
+  background:
+    linear-gradient(
+      to right,
+      transparent,
+      rgba(255,255,255,.2)
+    );
+}
+
+.attack.away {
+  background:
+    linear-gradient(
+      to left,
+      transparent,
+      rgba(255,255,255,.2)
+    );
+}
+
+.arrows {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  color: white;
+  font-size: 30px;
+  font-weight: bold;
+
+  animation: move 1s infinite;
+}
+
+@keyframes move {
+  0% {
+    transform:
+      translate(-60%, -50%);
+  }
+
+  50% {
+    transform:
+      translate(-40%, -50%);
+  }
+
+  100% {
+    transform:
+      translate(-60%, -50%);
+  }
+}
+
+.dangerous.home {
+  background:
+    radial-gradient(
+      circle at 85% 50%,
+      rgba(255,0,0,.55),
+      transparent 45%
+    );
+
+  animation: pulse 1s infinite;
+}
+
+.dangerous.away {
+  background:
+    radial-gradient(
+      circle at 15% 50%,
+      rgba(255,0,0,.55),
+      transparent 45%
+    );
+
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: .4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: .4;
+  }
+}
+
+.ball {
+  position: absolute;
+
+  width: 14px;
+  height: 14px;
+
+  background: white;
+  border-radius: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  transition:
+    left .4s linear,
+    top .4s linear;
+
+  box-shadow:
+    0 0 12px white;
+}
