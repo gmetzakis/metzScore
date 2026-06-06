@@ -39,10 +39,12 @@ async def broadcast(match_id, message):
     if match_id not in match_clients:
         return
 
+    cleaned = message.rstrip("\x1e")
+
     dead = []
     for ws in match_clients[match_id]:
         try:
-            await ws.send(message)
+            await ws.send(cleaned)
         except:
             dead.append(ws)
 

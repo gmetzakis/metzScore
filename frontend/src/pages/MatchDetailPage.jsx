@@ -516,9 +516,9 @@ export default function MatchDetailPage() {
       </div>
 
       <LivePitch
-          event={lastEvent}
-          homeTeamId="5327"
-          awayTeamId="10946"
+          messages={messages}
+          homeTeamId={home_team?.id}
+          awayTeamId={away_team?.id}
       />
 
       <div className="detail-header">
