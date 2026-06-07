@@ -5,11 +5,20 @@ import ErrorDisplay from '../components/ErrorDisplay';
 import OddsDisplay from '../components/OddsDisplay';
 import { apiService } from '../services/api';
 import LivePitch from '../components/LivePitch';
+import useBetradarPitch from '../hooks/useBetradarPitch';
 import './MatchDetailPage.css';
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 function formatEpochTime(epochMs) {
   if (!epochMs) return 'TBD';
-  return new Date(epochMs).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return new Date(epochMs).toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
 }
 
 function formatClock(seconds) {
@@ -19,16 +28,20 @@ function formatClock(seconds) {
   return `${mins}:${String(secs).padStart(2, '0')}`;
 }
 
+// ---------------------------------------------------------------------------
+// Incident row
+// ---------------------------------------------------------------------------
+
 const INCIDENT_ICONS = {
-  GOAL:   '⚽',
-  YELL:   '🟨',
-  SUBS:   '🔄',
-  OFFS:   '📐',
-  PENL:   '🎯',
-  CRNR:   '🚩',
-  EBEG:   '▶',
-  PEND:   '⏸',
-  PBEG:   '▶',
+  GOAL: '⚽',
+  YELL: '🟨',
+  SUBS: '🔄',
+  OFFS: '📐',
+  PENL: '🎯',
+  CRNR: '🚩',
+  EBEG: '▶',
+  PEND: '⏸',
+  PBEG: '▶',
   Aggregated: '📊',
 };
 
@@ -54,40 +67,35 @@ function IncidentRow({ incident, homeName, awayName }) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Stats section
+// ---------------------------------------------------------------------------
+
 const RESULTS_LABEL_MAP = {
-  yellow: 'Yellow Cards',
-  corners: 'Corners',
-  penalties: 'Penalties',
-  xGoals: 'Expected Goals',
-  shots: 'Shots',
-  shotsOnTarget: 'Shots on Target',
-  attacks: 'Attacks',
+  yellow:           'Yellow Cards',
+  corners:          'Corners',
+  penalties:        'Penalties',
+  xGoals:           'Expected Goals',
+  shots:            'Shots',
+  shotsOnTarget:    'Shots on Target',
+  attacks:          'Attacks',
   dangerousAttacks: 'Dangerous Attacks',
-  possession: 'Possession %',
-  fouls: 'Fouls',
-  offsides: 'Offsides',
+  possession:       'Possession %',
+  fouls:            'Fouls',
+  offsides:         'Offsides',
 };
 
-const STATS_PRIORITY = ['Goals', 'Expected Goals', 'Shots', 'Shots on Target', 'Corners', 'Yellow Cards', 'Fouls', 'Offsides', 'Possession %', 'Penalties'];
+const STATS_PRIORITY = [
+  'Goals', 'Expected Goals', 'Shots', 'Shots on Target',
+  'Corners', 'Yellow Cards', 'Fouls', 'Offsides', 'Possession %', 'Penalties',
+];
 
-function getSideBySideStats(
-  statsTeams,
-  homeTeamId,
-  awayTeamId,
-  eventStats,
-  liveResults,
-  score,
-) {
+function getSideBySideStats(statsTeams, homeTeamId, awayTeamId, eventStats, liveResults, score) {
   const result = [];
   const seenLabels = new Set();
 
   if (score?.home != null && score?.away != null) {
-    result.push({
-      label: 'Goals',
-      home: score.home,
-      away: score.away,
-      kind: 'live-score',
-    });
+    result.push({ label: 'Goals', home: score.home, away: score.away, kind: 'live-score' });
     seenLabels.add('Goals');
   }
 
@@ -95,19 +103,12 @@ function getSideBySideStats(
     for (const [field, sides] of Object.entries(liveResults)) {
       if (!sides || typeof sides !== 'object' || Array.isArray(sides)) continue;
       if (seenLabels.has(field)) continue;
-
       const homeVal = sides.home;
       const awayVal = sides.away;
       if (homeVal == null && awayVal == null) continue;
-
       const label = RESULTS_LABEL_MAP[field] || field;
       seenLabels.add(field);
-      result.push({
-        label,
-        home: homeVal ?? 0,
-        away: awayVal ?? 0,
-        kind: 'live-results',
-      });
+      result.push({ label, home: homeVal ?? 0, away: awayVal ?? 0, kind: 'live-results' });
     }
   }
 
@@ -123,28 +124,34 @@ function getSideBySideStats(
   return result;
 }
 
-function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isPitchAvailable, isStatsAvailable, isLive }) {
-  const teamsStats   = statistics?.teams   || {};
-  const eventStats   = statistics?.event   || {};
-  const liveResults  = results             || {};
-  const scores       = score               || {};
+function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isLive }) {
+  const teamsStats  = statistics?.teams || {};
+  const eventStats  = statistics?.event || {};
+  const liveResults = results || {};
+  const scores      = score   || {};
 
-  const sbStats = getSideBySideStats(
-    teamsStats, homeTeamId, awayTeamId, eventStats, liveResults, scores,
-  );
+  const sbStats = getSideBySideStats(teamsStats, homeTeamId, awayTeamId, eventStats, liveResults, scores);
 
-  const sections = [];
+  if (sbStats.length === 0) {
+    return (
+      <div className="section-empty">
+        <p>
+          {isLive
+            ? 'Statistics are being collected and will appear shortly.'
+            : 'Statistics are not available for this match.'}
+        </p>
+      </div>
+    );
+  }
 
-
-
-  if (sbStats.length > 0) {
-    sections.push((
-      <div key="table" className="sub-section">
+  return (
+    <div className="stats-section">
+      <div className="sub-section">
         <h3 className="sub-title">Match Statistics</h3>
         <table className="stats-table">
           <thead>
             <tr>
-              <th></th>
+              <th />
               <th className="stat-home">{homeTeamId ? 'Home' : ''}</th>
               <th className="stat-away">{awayTeamId ? 'Away' : ''}</th>
             </tr>
@@ -164,34 +171,20 @@ function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isPi
           </tbody>
         </table>
       </div>
-    ));
-  }
-
-  if (sections.length === 0) {
-    return (
-      <div className="section-empty">
-        <p>
-          {isLive
-            ? 'Statistics are being collected and will appear shortly.'
-            : 'Statistics are not available for this match.'}
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="stats-section">
-      {sections}
     </div>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Roster section
+// ---------------------------------------------------------------------------
 
 function RosterSection({ roster, results, incidents, homeName, awayName }) {
   if (!roster) return null;
 
   const homeLineup = roster.lineups?.homeLineup;
   const awayLineup = roster.lineups?.awayLineup;
-  const subs = roster.subs || {};
+  const subs       = roster.subs || {};
 
   const buildGoalCounts = () => {
     const goalCounts = new Map();
@@ -211,14 +204,13 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
     if (incidents && Array.isArray(incidents)) {
       for (const inc of incidents) {
         if (inc.type === 'GOAL' && inc.description) {
-          let desc = inc.description;
-          desc = desc.replace(/\s*\([^)]*\)\s*$/, '').trim();
-          desc = desc.replace(/^\d+-\d+\s*/, '').trim();
-          if (homeName && desc.startsWith(homeName)) {
-            desc = desc.slice(homeName.length).trim();
-          } else if (awayName && desc.startsWith(awayName)) {
-            desc = desc.slice(awayName.length).trim();
-          }
+          let desc = inc.description
+            .replace(/\s*\([^)]*\)\s*$/, '')
+            .trim()
+            .replace(/^\d+-\d+\s*/, '')
+            .trim();
+          if (homeName && desc.startsWith(homeName)) desc = desc.slice(homeName.length).trim();
+          else if (awayName && desc.startsWith(awayName)) desc = desc.slice(awayName.length).trim();
           if (desc) goalCounts.set(desc, (goalCounts.get(desc) || 0) + 1);
         }
       }
@@ -228,49 +220,35 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
   };
 
   const goalCounts = buildGoalCounts();
-
   if (!homeLineup && !awayLineup) return null;
 
   const renderTeamLineup = (lineupData, teamSide) => {
     if (!lineupData) return null;
-
     const teamSubs = teamSide === 0 ? subs.homeSubs : subs.awaySubs;
-
-    const subbedInByName = {};
+    const subbedInByName  = {};
     const subbedOutByName = {};
+
     if (teamSubs) {
       for (const sub of teamSubs) {
-        const inName = sub.playerIn?.name;
+        const inName  = sub.playerIn?.name;
         const outName = sub.playerOut?.name;
-        const minute = sub.substitutedOnMinute;
-        if (inName && minute) subbedInByName[inName] = minute;
+        const minute  = sub.substitutedOnMinute;
+        if (inName && minute)  subbedInByName[inName]   = minute;
         if (outName && minute) subbedOutByName[outName] = minute;
       }
     }
 
     const starters = [];
     if (lineupData.lineup) {
-      for (const row of lineupData.lineup) {
-        for (const p of row) {
-          starters.push({
-            id: p.playerId || p.unknownPlayerId,
-            name: p.name,
-            shirtNumber: null,
-          });
-        }
-      }
+      for (const row of lineupData.lineup)
+        for (const p of row)
+          starters.push({ id: p.playerId || p.unknownPlayerId, name: p.name });
     }
 
     const bench = [];
-    if (lineupData.benchPlayers) {
-      for (const bp of lineupData.benchPlayers) {
-        bench.push({
-          id: bp.playerId || bp.unknownPlayerId,
-          name: bp.name,
-          shirtNumber: null,
-        });
-      }
-    }
+    if (lineupData.benchPlayers)
+      for (const bp of lineupData.benchPlayers)
+        bench.push({ id: bp.playerId || bp.unknownPlayerId, name: bp.name });
 
     return (
       <div className="roster-details">
@@ -280,15 +258,11 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
             <div className="roster-players">
               {starters.map((p, i) => {
                 const outMinute = subbedOutByName[p.name];
-                const goalCount = goalCounts.get(p.name) || 0;
+                const goals     = goalCounts.get(p.name) || 0;
                 return (
                   <div key={`${p.id || p.name}-${i}`} className="roster-player">
                     <span className="player-name">{p.name}</span>
-                    {goalCount > 0 && (
-                      <span className="player-goal">
-                        {'⚽'.repeat(goalCount)}
-                      </span>
-                    )}
+                    {goals > 0 && <span className="player-goal">{'⚽'.repeat(goals)}</span>}
                     {outMinute && <span className="player-sub-out">{outMinute}'</span>}
                   </div>
                 );
@@ -302,15 +276,11 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
             <div className="roster-players">
               {bench.map((p, i) => {
                 const minuteStr = subbedInByName[p.name] || null;
-                const goalCount = goalCounts.get(p.name) || 0;
+                const goals     = goalCounts.get(p.name) || 0;
                 return (
                   <div key={`${p.id || p.name}-${i}`} className="roster-player roster-bench-player">
                     <span className="player-name">{p.name}</span>
-                    {goalCount > 0 && (
-                      <span className="player-goal">
-                        {'⚽'.repeat(goalCount)}
-                      </span>
-                    )}
+                    {goals > 0 && <span className="player-goal">{'⚽'.repeat(goals)}</span>}
                     {minuteStr && <span className="player-sub-minute">{minuteStr}'</span>}
                   </div>
                 );
@@ -338,6 +308,10 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
     </div>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Match info section
+// ---------------------------------------------------------------------------
 
 function MatchInfoSection({ matchData }) {
   const { league, zone, start_time, url, betradar_id, total_markets, is_pitch_available, is_stats_available } = matchData;
@@ -370,32 +344,15 @@ function MatchInfoSection({ matchData }) {
             <span className="info-value">{total_markets}</span>
           </div>
         )}
-        {is_pitch_available != null && (
-          <div className="info-row">
-            <span className="info-label">Pitch View</span>
-            <span className={`info-value info-${is_pitch_available ? 'yes' : 'no'}`}>
-              {is_pitch_available ? 'Available' : 'Not Available'}
-            </span>
-          </div>
-        )}
-        {is_stats_available != null && (
-          <div className="info-row">
-            <span className="info-label">Tech Stats</span>
-            <span className={`info-value info-${is_stats_available ? 'yes' : 'no'}`}>
-              {is_stats_available ? 'Available' : 'Not Available'}
-            </span>
-          </div>
-        )}
-        {betradar_id && (
-          <div className="info-row">
-            <span className="info-label">Betradar ID</span>
-            <span className="info-value">{betradar_id}</span>
-          </div>
-        )}
         {url && (
           <div className="info-row">
             <span className="info-label">URL</span>
-            <a href={`https://www.stoiximan.gr${url}`} target="_blank" rel="noopener noreferrer" className="info-link">
+            <a
+              href={`https://www.stoiximan.gr${url}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="info-link"
+            >
               {url}
             </a>
           </div>
@@ -405,32 +362,33 @@ function MatchInfoSection({ matchData }) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Main page
+// ---------------------------------------------------------------------------
+
 export default function MatchDetailPage() {
   const { matchId } = useParams();
-  const [data, setData] = useState(null);
+
+  // ── Match detail polling (score / incidents / odds …) ────────────────────
+  const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const isInitialLoad = useRef(true);
-  const [messages, setMessages] = useState([]);
+  const [error, setError]     = useState(null);
+  const isInitialLoad         = useRef(true);
 
   useEffect(() => {
     let cancelled = false;
+
     async function load() {
-      if (isInitialLoad.current) {
-        setLoading(true);
-      }
+      if (isInitialLoad.current) setLoading(true);
       setError(null);
+
       try {
         const res = await apiService.getMatchDetail(matchId);
-        if (!cancelled) {
-          setData(res);
-        }
+        if (!cancelled) setData(res);
       } catch (err) {
         if (!cancelled) {
           setError(err.message);
-          if (!isInitialLoad.current) {
-            setData(null);
-          }
+          if (!isInitialLoad.current) setData(null);
         }
       } finally {
         if (!cancelled && isInitialLoad.current) {
@@ -439,30 +397,26 @@ export default function MatchDetailPage() {
         }
       }
     }
+
     load();
     const interval = setInterval(load, 5000);
     return () => { cancelled = true; clearInterval(interval); };
   }, [matchId]);
 
+  // ── Betradar pitch hook ───────────────────────────────────────────────────
+  // Only activate when the match is live — saves unnecessary polling for
+  // finished/not-started matches.  Remove the `data?.is_live` guard if you
+  // always want to attempt the Betradar connection.
+  const betradarActive = data?.is_live ?? false;
 
-  const [lastEvent, setLastEvent] = useState(null);
+  const {
+    pitchState,
+    isAvailable: pitchAvailable,
+    isLoading: pitchLoading,
+    betradarMatchId,
+  } = useBetradarPitch(betradarActive ? matchId : null);
 
-  useEffect(() => {
-        const ws = new WebSocket(`ws://localhost:8765?matchId=${matchId}`);
-
-        ws.onmessage = (event) => {
-            setMessages(prev => [...prev, event.data]);
-
-            try {
-                setLastEvent(JSON.parse(event.data));
-            } catch (err) {
-                console.error(err);
-            }
-        };
-
-        return () => ws.close();
-    }, [matchId]);
-
+  // ── Incident filters ──────────────────────────────────────────────────────
   const [activeFilter, setActiveFilter] = useState(null);
 
   const filteredIncidents = data?.incidents
@@ -471,6 +425,7 @@ export default function MatchDetailPage() {
         : data.incidents)
     : [];
 
+  // ── Render ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="detail-page">
@@ -482,7 +437,7 @@ export default function MatchDetailPage() {
   if (error) {
     return (
       <div className="detail-page">
-        <div className="detail-back-header">
+        <div className="detail-nav">
           <Link to="/" className="back-link">← Upcoming Matches</Link>
         </div>
         <ErrorDisplay error={error} />
@@ -492,45 +447,33 @@ export default function MatchDetailPage() {
 
   if (!data) return null;
 
-   const { league, home_team, away_team, score, results, odds, incident_filters, statistics, is_live, status, is_pitch_available, is_stats_available, roster, start_time } = data;
+  const {
+    league, home_team, away_team, score, results, odds,
+    incident_filters, statistics, is_live, status,
+    roster, start_time,
+  } = data;
 
   return (
     <div className="detail-page">
+
+      {/* ── Navigation ── */}
       <div className="detail-nav">
         <Link to="/" className="back-link">← Back to Upcoming Matches</Link>
         <Link to="/" className="back-link-mobile">← Back</Link>
       </div>
 
-      <div style={{
-          background: "#111",
-          color: "#0f0",
-          padding: "10px",
-          height: "400px",
-          overflowY: "scroll",
-          fontFamily: "monospace",
-          borderRadius: "6px"
-      }}>
-          {messages.map((msg, i) => (
-              <pre key={i}>{msg}</pre>
-          ))}
-      </div>
-
-      <LivePitch
-          messages={messages}
-          homeTeamId={home_team?.id}
-          awayTeamId={away_team?.id}
-      />
-
+      {/* ── Header ── */}
       <div className="detail-header">
         <div className="detail-top-row">
-           <span className="detail-league">{league?.name || 'Unknown League'}</span>
-           <span className="detail-kickoff">{formatEpochTime(start_time)}</span>
-           <span className={`detail-status status-${String(status).toLowerCase().replace(' ', '-')}`}>
-             {status}
-           </span>
-         </div>
+          <span className="detail-league">{league?.name || 'Unknown League'}</span>
+          <span className="detail-kickoff">{formatEpochTime(start_time)}</span>
+          <span className={`detail-status status-${String(status).toLowerCase().replace(' ', '-')}`}>
+            {status}
+          </span>
+        </div>
       </div>
 
+      {/* ── Scoreboard ── */}
       <div className="scoreboard">
         <div className="scoreboard-team">
           <span className="team-name">{home_team?.name || 'Home'}</span>
@@ -547,8 +490,6 @@ export default function MatchDetailPage() {
           )}
           {(results?.yellow?.home != null || results?.corners?.home != null) && (
             <div className="scoreboard-meta">
-              {results.yellow?.home != null && Number(results.yellow.home) > 0 && <span className="meta-yellow">🟨</span>}
-              {results.corners?.home != null && Number(results.corners.home) > 0 && <span className="meta-corners">🚩</span>}
               <span className="meta-text">
                 {results.yellow?.home != null && `${results.yellow.home}Y `}
                 {results.corners?.home != null && `${results.corners.home} Corners`}
@@ -562,9 +503,34 @@ export default function MatchDetailPage() {
         </div>
       </div>
 
+      {/* ── Live Pitch ── */}
+      {is_live && (
+        <div className="detail-section">
+          <h2 className="section-title">
+            Live Pitch
+            {betradarMatchId && (
+              <span className="section-badge section-badge--live">LIVE</span>
+            )}
+            {pitchLoading && !pitchAvailable && (
+              <span className="section-badge section-badge--connecting">Connecting…</span>
+            )}
+          </h2>
 
+          <LivePitch
+            situation={pitchState.situation}
+            situationTeam={pitchState.situationTeam}
+            ballPos={pitchState.ballPos}
+            ballEnd={pitchState.ballEnd}
+            isAvailable={pitchAvailable}
+            homeName={home_team?.name}
+            awayName={away_team?.name}
+            homeTeamId={home_team?.id}
+            awayTeamId={away_team?.id}
+          />
+        </div>
+      )}
 
-
+      {/* ── Odds ── */}
       {odds && Object.keys(odds).length > 0 && (
         <div className="detail-section">
           <h2 className="section-title">Odds &amp; Markets</h2>
@@ -572,6 +538,7 @@ export default function MatchDetailPage() {
         </div>
       )}
 
+      {/* ── Incidents ── */}
       <div className="detail-section">
         <h2 className="section-title">Match Events</h2>
 
@@ -610,24 +577,34 @@ export default function MatchDetailPage() {
           </div>
         ) : (
           <div className="section-empty">
-            <p>No match events recorded yet. {is_live ? 'Check back during the match.' : 'The match has ended.'}</p>
+            <p>
+              No match events recorded yet.{' '}
+              {is_live ? 'Check back during the match.' : 'The match has ended.'}
+            </p>
           </div>
         )}
       </div>
 
+      {/* ── Statistics ── */}
       <div className="detail-section">
         <StatsSection
           statistics={statistics}
           homeTeamId={home_team?.id}
           awayTeamId={away_team?.id}
           results={results}
-          isPitchAvailable={is_pitch_available}
-          isStatsAvailable={is_stats_available}
+          score={score}
           isLive={is_live}
         />
       </div>
 
-      <RosterSection roster={roster} results={results} incidents={data.incidents} homeName={home_team?.name} awayName={away_team?.name} />
+      {/* ── Lineups ── */}
+      <RosterSection
+        roster={roster}
+        results={results}
+        incidents={data.incidents}
+        homeName={home_team?.name}
+        awayName={away_team?.name}
+      />
     </div>
   );
 }

@@ -1,173 +1,322 @@
+/* ── Wrapper ─────────────────────────────────────────────────────────────── */
+.pitch-wrapper {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Pitch canvas ────────────────────────────────────────────────────────── */
 .pitch {
   position: relative;
   width: 100%;
-  max-width: 900px;
   aspect-ratio: 105 / 68;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 10px;
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,0.08),
+    0 8px 32px rgba(0,0,0,0.45);
 
+  /* Alternating grass stripes — inspired by Sportradar colours */
   background:
     repeating-linear-gradient(
       90deg,
-      #2f7d32 0px,
-      #2f7d32 80px,
-      #388e3c 80px,
-      #388e3c 160px
-    );
+      /* darker stripe */
+      rgba(0,0,0,0.06) 0px,
+      rgba(0,0,0,0.06) 68px,
+      /* lighter stripe */
+      transparent 68px,
+      transparent 136px
+    ),
+    /* base field colour */
+    #1d7a3c;
 }
 
+/* ── Pitch markings ──────────────────────────────────────────────────────── */
 .half-line {
   position: absolute;
   left: 50%;
   top: 0;
   bottom: 0;
   width: 2px;
-  background: white;
+  background: rgba(255,255,255,0.65);
   transform: translateX(-50%);
 }
 
 .center-circle {
   position: absolute;
-  width: 120px;
-  height: 120px;
-
-  border: 2px solid white;
+  width: 18%;         /* ~19 m on a 105 m pitch */
+  aspect-ratio: 1;
+  border: 2px solid rgba(255,255,255,0.65);
   border-radius: 50%;
-
   left: 50%;
   top: 50%;
-
-  transform:
-    translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 }
 
+.center-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: rgba(255,255,255,0.8);
+  border-radius: 50%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Penalty areas */
+.penalty-area {
+  position: absolute;
+  width: 15%;          /* ~16 m */
+  height: 57%;         /* ~40 m  */
+  border: 2px solid rgba(255,255,255,0.65);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.penalty-area--left  { left: 0;   border-left: none; }
+.penalty-area--right { right: 0;  border-right: none; }
+
+/* Goal areas (6-yard boxes) */
+.goal-area {
+  position: absolute;
+  width: 5.5%;
+  height: 26%;
+  border: 2px solid rgba(255,255,255,0.65);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.goal-area--left  { left: 0;   border-left: none; }
+.goal-area--right { right: 0;  border-right: none; }
+
+/* ── Situation overlays ──────────────────────────────────────────────────── */
 .overlay {
   position: absolute;
   inset: 0;
+  pointer-events: none;
 }
 
-.possession.home {
-  background:
-    linear-gradient(
-      to right,
-      rgba(255,255,255,.18),
-      transparent
-    );
+/* Possession — subtle half-glow */
+.overlay.possession.home {
+  background: linear-gradient(
+    to right,
+    rgba(255,255,255,0.13) 0%,
+    transparent 55%
+  );
+}
+.overlay.possession.away {
+  background: linear-gradient(
+    to left,
+    rgba(255,255,255,0.13) 0%,
+    transparent 55%
+  );
 }
 
-.possession.away {
-  background:
-    linear-gradient(
-      to left,
-      rgba(255,255,255,.18),
-      transparent
-    );
+/* Attack — stronger gradient + arrow animation */
+.overlay.attack.home {
+  background: linear-gradient(
+    to right,
+    transparent 30%,
+    rgba(255,210,80,0.18) 100%
+  );
+}
+.overlay.attack.away {
+  background: linear-gradient(
+    to left,
+    transparent 30%,
+    rgba(255,210,80,0.18) 100%
+  );
 }
 
-.attack.home {
-  background:
-    linear-gradient(
-      to right,
-      transparent,
-      rgba(255,255,255,.2)
-    );
+/* Dangerous attack — pulsing red radial */
+.overlay.dangerous.home {
+  background: radial-gradient(
+    ellipse 35% 55% at 88% 50%,
+    rgba(255,60,60,0.6) 0%,
+    rgba(255,60,60,0.25) 50%,
+    transparent 100%
+  );
+  animation: dangerPulse 1.1s ease-in-out infinite;
+}
+.overlay.dangerous.away {
+  background: radial-gradient(
+    ellipse 35% 55% at 12% 50%,
+    rgba(255,60,60,0.6) 0%,
+    rgba(255,60,60,0.25) 50%,
+    transparent 100%
+  );
+  animation: dangerPulse 1.1s ease-in-out infinite;
 }
 
-.attack.away {
-  background:
-    linear-gradient(
-      to left,
-      transparent,
-      rgba(255,255,255,.2)
-    );
+@keyframes dangerPulse {
+  0%   { opacity: 0.45; }
+  50%  { opacity: 1;    }
+  100% { opacity: 0.45; }
 }
 
+/* ── Attack arrows ───────────────────────────────────────────────────────── */
 .arrows {
   position: absolute;
   top: 50%;
   left: 50%;
-
-  transform:
-    translate(-50%, -50%);
-
-  color: white;
-  font-size: 30px;
-  font-weight: bold;
-
-  animation: move 1s infinite;
+  transform: translate(-50%, -50%);
+  color: rgba(255,220,100,0.9);
+  font-size: clamp(14px, 3vw, 26px);
+  font-weight: 700;
+  letter-spacing: 6px;
+  text-shadow: 0 0 12px rgba(255,200,50,0.7);
+  animation: arrowFloat 0.9s ease-in-out infinite;
+  white-space: nowrap;
 }
 
-@keyframes move {
-  0% {
-    transform:
-      translate(-60%, -50%);
-  }
-
-  50% {
-    transform:
-      translate(-40%, -50%);
-  }
-
-  100% {
-    transform:
-      translate(-60%, -50%);
-  }
+@keyframes arrowFloat {
+  0%   { transform: translate(-58%, -50%); opacity: 0.7; }
+  50%  { transform: translate(-42%, -50%); opacity: 1;   }
+  100% { transform: translate(-58%, -50%); opacity: 0.7; }
 }
 
-.dangerous.home {
-  background:
-    radial-gradient(
-      circle at 85% 50%,
-      rgba(255,0,0,.55),
-      transparent 45%
-    );
-
-  animation: pulse 1s infinite;
+.overlay.attack.away .arrows {
+  animation: arrowFloatAway 0.9s ease-in-out infinite;
 }
 
-.dangerous.away {
-  background:
-    radial-gradient(
-      circle at 15% 50%,
-      rgba(255,0,0,.55),
-      transparent 45%
-    );
-
-  animation: pulse 1s infinite;
+@keyframes arrowFloatAway {
+  0%   { transform: translate(-42%, -50%); opacity: 0.7; }
+  50%  { transform: translate(-58%, -50%); opacity: 1;   }
+  100% { transform: translate(-42%, -50%); opacity: 0.7; }
 }
 
-@keyframes pulse {
-  0% {
-    opacity: .4;
-  }
-
-  50% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: .4;
-  }
-}
-
+/* ── Ball ────────────────────────────────────────────────────────────────── */
 .ball {
   position: absolute;
-  width: 18px;
-  height: 18px;
-  background: white;
+  width: clamp(12px, 2.2%, 20px);
+  height: clamp(12px, 2.2%, 20px);
+  background:
+    radial-gradient(circle at 35% 35%, #ffffff 0%, #ddd 55%, #aaa 100%);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  transition: left .15s linear, top .15s linear;
-  box-shadow: 0 0 18px 6px rgba(255, 255, 255, 0.9);
+  transition: left 0.12s linear, top 0.12s linear;
+  box-shadow:
+    0 0 0 1.5px rgba(0,0,0,0.25),
+    0 0 14px 5px rgba(255,255,255,0.75),
+    0 2px 4px rgba(0,0,0,0.5);
   z-index: 10;
 }
 
+/* Target ghost */
 .ball-end {
   position: absolute;
-  width: 10px;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.5);
+  width: 8px;
+  height: 8px;
+  background: rgba(255,255,255,0.4);
+  border: 1px solid rgba(255,255,255,0.6);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   z-index: 9;
+  animation: ballEndPulse 1s ease-in-out infinite;
+}
+
+@keyframes ballEndPulse {
+  0%   { transform: translate(-50%, -50%) scale(1);   opacity: 0.6; }
+  50%  { transform: translate(-50%, -50%) scale(1.4); opacity: 1;   }
+  100% { transform: translate(-50%, -50%) scale(1);   opacity: 0.6; }
+}
+
+/* ── Team labels on pitch ────────────────────────────────────────────────── */
+.pitch-team-label {
+  position: absolute;
+  top: 6px;
+  font-size: clamp(9px, 1.4vw, 13px);
+  font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 45%;
+  text-overflow: ellipsis;
+}
+
+.pitch-team-label--home { left: 12px; }
+.pitch-team-label--away { right: 12px; text-align: right; }
+
+/* ── Status overlay messages ─────────────────────────────────────────────── */
+.pitch-overlay-message {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(0,0,0,0.45);
+  z-index: 20;
+}
+
+.pitch-overlay-message--idle {
+  background: transparent;
+}
+
+.pitch-msg-icon {
+  font-size: clamp(22px, 4vw, 36px);
+  opacity: 0.8;
+}
+
+.pitch-msg-text {
+  color: rgba(255,255,255,0.75);
+  font-size: clamp(11px, 1.8vw, 14px);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* ── Legend bar beneath the pitch ────────────────────────────────────────── */
+.pitch-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(0,0,0,0.15);
+  color: #fff;
+  transition: background 0.3s;
+}
+
+.pitch-legend--dangerous {
+  background: rgba(220,40,40,0.25);
+}
+.pitch-legend--attack {
+  background: rgba(220,160,20,0.2);
+}
+.pitch-legend--possession {
+  background: rgba(255,255,255,0.1);
+}
+
+.pitch-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.pitch-legend--dangerous .pitch-legend-dot {
+  background: #e53e3e;
+  box-shadow: 0 0 6px #e53e3e;
+  animation: dangerPulse 1.1s ease-in-out infinite;
+}
+.pitch-legend--attack .pitch-legend-dot {
+  background: #f6c02f;
+  box-shadow: 0 0 6px #f6c02f;
+}
+.pitch-legend--possession .pitch-legend-dot {
+  background: rgba(255,255,255,0.6);
+}
+
+.pitch-legend-text {
+  letter-spacing: 0.02em;
+  color: rgba(255,255,255,0.9);
 }

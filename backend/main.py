@@ -85,3 +85,72 @@ def get_match_detail_endpoint(
         return {"status": "success", **data}
     except Exception as e:
         return {"status": "error", "message": str(e)}, 500
+
+
+
+def get_player_stats(match_id: int):
+    url = (f"https://www.stoiximan.gr/api/liveevent/statsplayer?id={match_id}")
+
+    headers = {
+        "User-Agent": "PostmanRuntime/7.51.1",
+        "Accept": "*/*"
+    }
+
+    resp = requests.get(
+        url,
+        headers=headers,
+        timeout=15
+    )
+    resp.raise_for_status()
+    return resp.json()
+
+@app.get("/api/football/statsplayer/{match_id}")
+def get_statsplayer_endpoint(
+    match_id: int = Path(..., description="Stoiximan match id")
+):
+    try:
+        data = get_player_stats(match_id)
+
+        return data
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
+    
+
+def get_match_events_betradar(secondary_id: int):
+    url = (f"https://widgets.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/match_timelinedelta/{secondary_id}?T=exp=1780945091~acl=/*~data=eyJvIjoiaHR0cHM6Ly93d3cuc3RvaXhpbWFuLmdyIiwiYSI6IjUwMWEwMjAyMTkzZTA0NTU2OWQwOTAyOWU1NWM4OTNjIiwiYWN0Ijoib3JpZ2luY2hlY2siLCJvc3JjIjoib3JpZ2luIn0~hmac=18cb84ded5e324bfc98e35646640f5981c1d2df773589c861b0519f30a05a74a")
+
+    headers = {
+        "User-Agent": "PostmanRuntime/7.51.1",
+        "Accept": "*/*",
+        "referer": "https://www.stoiximan.gr/",
+        "origin": "https://www.stoiximan.gr"
+    }
+
+    resp = requests.get(
+        url,
+        headers=headers,
+        timeout=15
+    )
+    resp.raise_for_status()
+    print(resp.json())
+    return resp.json()
+
+
+@app.get("/api/football/matchstats/betradar/{secondary_id}")
+def get_statsplayer_endpoint(
+    secondary_id: int = Path(..., description="Stoiximan match id")
+):
+    try:
+        data = get_match_events_betradar(secondary_id)
+
+        return data
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
