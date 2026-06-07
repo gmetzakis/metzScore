@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 
+const POLL_INTERVAL_MS = 1000;
+const MAX_ERRORS       = 5;
+
 function parseEvent(event) {
   if (!event || event.disabled) return null;
 
