@@ -320,3 +320,98 @@
   letter-spacing: 0.02em;
   color: rgba(255,255,255,0.9);
 }
+
+.penaltyBox {
+  position: absolute;
+  top: 25%;
+  width: 12%;
+  height: 50%;
+  border: 2px solid white;
+}
+
+.penaltyBox.left {
+  left: 0;
+  border-left: none;
+}
+
+.penaltyBox.right {
+  right: 0;
+  border-right: none;
+}
+
+.ball {
+  position: absolute;
+
+  width: 16px;
+  height: 16px;
+
+  border-radius: 50%;
+
+  background: white;
+
+  transform: translate(-50%, -50%);
+
+  transition:
+    left .4s linear,
+    top .4s linear;
+
+  box-shadow:
+    0 0 12px white,
+    0 0 20px white;
+}
+
+.eventMarker {
+  position: absolute;
+
+  transform: translate(-50%, -50%);
+
+  font-size: 22px;
+
+  z-index: 100;
+
+  animation:
+    markerPulse 1s infinite;
+}
+
+@keyframes markerPulse {
+
+  0% {
+    transform:
+      translate(-50%, -50%)
+      scale(1);
+  }
+
+  50% {
+    transform:
+      translate(-50%, -50%)
+      scale(1.25);
+  }
+
+  100% {
+    transform:
+      translate(-50%, -50%)
+      scale(1);
+  }
+}
+
+.dangerous.home {
+  background:
+    radial-gradient(
+      circle at 85% 50%,
+      rgba(255,0,0,.55),
+      transparent 40%
+    );
+
+  animation: pulse .8s infinite;
+}
+
+.dangerous.away {
+  background:
+    radial-gradient(
+      circle at 15% 50%,
+      rgba(255,0,0,.55),
+      transparent 40%
+    );
+
+  animation: pulse .8s infinite;
+}

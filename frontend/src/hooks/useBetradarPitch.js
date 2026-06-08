@@ -31,49 +31,132 @@ function parseEvent(event) {
  * Convert a Sportradar events array into the pitch state we care about.
  * We scan from newest to oldest so we always reflect the most recent state.
  */
-function parseBetradarEvents(events) {
-  if (!Array.isArray(events) || events.length === 0) return null;
-
-  let possession     = null; // 'home' | 'away'
-  let situation      = null; // 'dangerous' | 'attack' | 'safe'
-  let situationTeam  = null; // 'home' | 'away'
-  let ballPos        = null; // { x, y }
-  let ballEnd        = null; // { x, y } | null
-
-  // Scan newest-first (events array is oldest-first from the API)
-  for (let i = events.length - 1; i >= 0; i--) {
-    const parsed = parseEvent(events[i]);
-    if (!parsed) continue;
-
-    if (parsed.kind === 'possession' && !possession) {
-      possession = parsed.team;
-    } else if (parsed.kind === 'matchsituation' && !situation) {
-      situation     = parsed.situation;
-      situationTeam = parsed.team;
-    } else if (parsed.kind === 'ballcoordinates' && !ballPos) {
-      ballPos = parsed.ballPos;
-      ballEnd = parsed.ballEnd;
-    }
-
-    // Early exit once we have everything
-    if (possession && situation && ballPos) break;
+function parseBetradarEvents(events = []) {
+  if (!Array.isArray(events) || !events.length) {
+    return null;
   }
 
-  // Map the raw Sportradar situation to the three-tier mode our pitch uses
-  const pitchSituation =
-    situation === 'dangerous' ? 'dangerous'
-    : situation === 'attack'  ? 'attack'
-    : possession              ? 'possession'
-    : null;
+  let situation = null;
+  let situationTeam = null;
 
-  // The team driving the current situation (or the team in possession)
-  const pitchTeam = situationTeam || possession || null;
+  let ballPos = null;
+  let ballEnd = null;
+
+  let attackPath = [];
+
+  let latestMarker = null;
+
+  const markers = [];
+
+  for (let i = events.length - 1; i >= 0; i--) {
+    const e = events[i];
+
+    //
+    // MATCH SITUATION
+    //
+    if (
+      !situation &&
+      e.type === "matchsituation"
+    ) {
+      situation = e.situation || null;
+      situationTeam = e.team || null;
+
+      if (
+        typeof e.X === "number" &&
+        typeof e.Y === "number"
+      ) {
+        ballPos = {
+          x: e.X,
+          y: e.Y,
+        };
+      }
+    }
+
+    //
+    // BALL COORDINATES
+    //
+    if (
+      attackPath.length === 0 &&
+      e.type === "ballcoordinates"
+    ) {
+      attackPath =
+        e.coordinates?.map(c => ({
+          x: c.X,
+          y: c.Y,
+          team: c.team,
+        })) || [];
+
+      if (
+        attackPath.length &&
+        !ballPos
+      ) {
+        ballPos = {
+          x: attackPath[0].x,
+          y: attackPath[0].y,
+        };
+      }
+
+      if (attackPath.length > 1) {
+        ballEnd =
+          attackPath[
+            attackPath.length - 1
+          ];
+      }
+    }
+
+    //
+    // EVENT MARKERS
+    //
+    if (
+      [
+        "corner",
+        "throwin",
+        "freekick",
+        "shoton",
+        "shotoff",
+        "goalkick",
+        "penalty",
+        "goal",
+        "yellowcard",
+        "redcard",
+      ].includes(e.type)
+    ) {
+      const marker = {
+        id: e._id,
+        type: e.type,
+        team: e.team,
+        time: e.time,
+        seconds: e.seconds,
+        x:
+          typeof e.X === "number"
+            ? e.X
+            : null,
+        y:
+          typeof e.Y === "number"
+            ? e.Y
+            : null,
+        name: e.name,
+      };
+
+      markers.push(marker);
+
+      if (!latestMarker) {
+        latestMarker = marker;
+      }
+    }
+  }
 
   return {
-    situation:     pitchSituation,
-    situationTeam: pitchTeam,
+    situation,
+    situationTeam,
+
     ballPos,
     ballEnd,
+
+    attackPath,
+
+    latestMarker,
+    markers,
   };
 }
 
