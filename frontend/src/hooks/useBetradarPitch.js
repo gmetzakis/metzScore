@@ -220,7 +220,7 @@ export default function useBetradarPitch(matchId) {
 
         if (cancelledRef.current) return;
 
-        const secondaryId = data?.data?.statPlayerModels?.[0]?.matchId;
+        const secondaryId = data?.data?.statPlayerModels?.[0]?.matchId ?? data?.data?.statPlayerModels?.[1]?.matchId ?? null;
         if (secondaryId) {
           setBetradarMatchId(String(secondaryId));
           setIsAvailable(true);
