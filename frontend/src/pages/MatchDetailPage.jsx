@@ -535,7 +535,7 @@ export default function MatchDetailPage() {
   if (!data) return null;
 
   const {
-    league, home_team, away_team, score, results, odds,
+    league, zone, home_team, away_team, score, results, odds,
     incident_filters, statistics, is_live, status,
     roster, start_time,
   } = data;
