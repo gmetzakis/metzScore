@@ -3,158 +3,94 @@ import { useState, useEffect, useRef } from 'react';
 const POLL_INTERVAL_MS = 1000;
 const MAX_ERRORS       = 5;
 
-function parseEvent(event) {
-  if (!event || event.disabled) return null;
+// Notable event types that should trigger a toast on the pitch.
+// Uses _doctype / type values actually observed in the API.
+const NOTABLE_TYPES = new Set([
+  'corner',
+  'throwin',
+  'freekick',
+  'goalkick',
+  'shotontarget',
+  'shotofftarget',
+  'goalkeepersave',
+  'card',
+  'possibleevent',   // VAR / possible goal review
+  'penalty',
+  'goal',
+]);
 
-  switch (event.type) {
-    case 'possession':
-      return { kind: 'possession', team: event.team };
-
-    case 'matchsituation':
-      return { kind: 'matchsituation', situation: event.situation, team: event.team };
-
-    case 'ballcoordinates': {
-      const coords = event.coordinates;
-      if (!Array.isArray(coords) || coords.length < 2) return null;
-      // coords format: [x, y] or [x1, y1, x2, y2] — all values 0–100
-      const ballPos = { x: coords[0], y: coords[1] };
-      const ballEnd = coords.length >= 4 ? { x: coords[2], y: coords[3] } : null;
-      return { kind: 'ballcoordinates', ballPos, ballEnd };
-    }
-
-    default:
-      return null;
-  }
-}
-
-/**
- * Convert a Sportradar events array into the pitch state we care about.
- * We scan from newest to oldest so we always reflect the most recent state.
- */
 function parseBetradarEvents(events = []) {
-  if (!Array.isArray(events) || !events.length) {
-    return null;
-  }
+  if (!Array.isArray(events) || !events.length) return null;
 
-  let situation = null;
+  let situation     = null;
   let situationTeam = null;
-
-  let ballPos = null;
-  let ballEnd = null;
-
-  let attackPath = [];
-
-  let latestMarker = null;
-
-  const markers = [];
+  let ballPos       = null;
+  let ballEnd       = null;
+  let attackPath    = [];
+  let latestMarker  = null;
+  const markers     = [];
 
   for (let i = events.length - 1; i >= 0; i--) {
     const e = events[i];
+    if (!e || e.disabled) continue;
 
-    //
-    // MATCH SITUATION
-    //
-    if (
-      !situation &&
-      e.type === "matchsituation"
-    ) {
-      situation = e.situation || null;
-      situationTeam = e.team || null;
+    // Use _doctype as authoritative type; fall back to type field.
+    const doctype = e._doctype || e.type;
 
-      if (
-        typeof e.X === "number" &&
-        typeof e.Y === "number"
-      ) {
-        ballPos = {
-          x: e.X,
-          y: e.Y,
-        };
+    // ── Match situation (primary source of ball pos + game state) ────────
+    if (!situation && doctype === 'matchsituation') {
+      situation     = e.situation || null;   // 'dangerous' | 'attack' | 'safe'
+      situationTeam = e.team      || null;
+
+      if (typeof e.X === 'number' && typeof e.Y === 'number') {
+        ballPos = { x: e.X, y: e.Y };
       }
     }
 
-    //
-    // BALL COORDINATES
-    //
-    if (
-      attackPath.length === 0 &&
-      e.type === "ballcoordinates"
-    ) {
-      attackPath =
-        e.coordinates?.map(c => ({
-          x: c.X,
-          y: c.Y,
-          team: c.team,
-        })) || [];
-
-      if (
-        attackPath.length &&
-        !ballPos
-      ) {
-        ballPos = {
-          x: attackPath[0].x,
-          y: attackPath[0].y,
-        };
+    // ── Ball coordinates (companion events — coords[] is always empty,
+    //    but X/Y may still be present on some implementations) ──────────
+    if (!ballPos && doctype === 'ballcoordinates') {
+      const coords = e.coordinates;
+      if (Array.isArray(coords) && coords.length >= 2) {
+        ballPos = { x: coords[0], y: coords[1] };
+        if (coords.length >= 4) ballEnd = { x: coords[2], y: coords[3] };}
+      else if (typeof e.X === 'number' && typeof e.Y === 'number') {
+        ballPos = { x: e.X, y: e.Y };
       }
 
-      if (attackPath.length > 1) {
-        ballEnd =
-          attackPath[
-            attackPath.length - 1
-          ];
+      if (Array.isArray(e.coordinates)) {
+        attackPath = e.coordinates.map(c => ({ x: c.X, y: c.Y, team: c.team })).filter(c => c.x != null);
+        if (attackPath.length > 1) ballEnd = attackPath[attackPath.length - 1];
       }
     }
 
-    //
-    // EVENT MARKERS
-    //
-    if (
-      [
-        "corner",
-        "throwin",
-        "freekick",
-        "shoton",
-        "shotoff",
-        "goalkick",
-        "penalty",
-        "goal",
-        "yellowcard",
-        "redcard",
-      ].includes(e.type)
-    ) {
+    // ── Notable events (corner, freekick, card, shot, save, etc.) ────────
+    if (NOTABLE_TYPES.has(doctype)) {
       const marker = {
-        id: e._id,
-        type: e.type,
-        team: e.team,
-        time: e.time,
-        seconds: e.seconds,
-        x:
-          typeof e.X === "number"
-            ? e.X
-            : null,
-        y:
-          typeof e.Y === "number"
-            ? e.Y
-            : null,
-        name: e.name,
+        id:         e._id,
+        type:       doctype,
+        team:       e.team  || null,
+        time:       e.time  ?? null,
+        seconds:    e.seconds ?? null,
+        x:          typeof e.X === 'number' ? e.X : null,
+        y:          typeof e.Y === 'number' ? e.Y : null,
+        name:       e.name  || null,
+        // Card-specific
+        card:       e.card  || null,          // 'yellow' | 'red'
+        playerName: e.player?.name || null,
       };
 
       markers.push(marker);
-
-      if (!latestMarker) {
-        latestMarker = marker;
-      }
+      if (!latestMarker) latestMarker = marker;  // newest = last in reversed loop
     }
   }
 
   return {
     situation,
     situationTeam,
-
     ballPos,
     ballEnd,
-
     attackPath,
-
     latestMarker,
     markers,
   };
@@ -164,27 +100,6 @@ function parseBetradarEvents(events = []) {
 // Hook
 // ---------------------------------------------------------------------------
 
-/**
- * useBetradarPitch(matchId)
- *
- * Phase 1 – fetches the Sportradar secondary match ID from the stoiximan stats endpoint.
- * Phase 2 – polls the Sportradar timeline-delta endpoint every second and exposes
- *            a normalised pitch state ready to be passed directly to <LivePitch />.
- *
- * @param {string|number} matchId  The primary match ID used in your app.
- * @returns {{
- *   betradarMatchId: string | null,
- *   pitchState: {
- *     situation:     'dangerous' | 'attack' | 'possession' | null,
- *     situationTeam: 'home' | 'away' | null,
- *     ballPos:       { x: number, y: number } | null,
- *     ballEnd:       { x: number, y: number } | null,
- *   },
- *   isAvailable: boolean,
- *   isLoading:   boolean,
- *   error:       string | null,
- * }}
- */
 export default function useBetradarPitch(matchId) {
   const [betradarMatchId, setBetradarMatchId] = useState(null);
   const [pitchState, setPitchState] = useState({
@@ -192,13 +107,16 @@ export default function useBetradarPitch(matchId) {
     situationTeam: null,
     ballPos:       null,
     ballEnd:       null,
+    attackPath:    [],
+    latestMarker:  null,
+    markers:       [],
   });
   const [isAvailable, setIsAvailable] = useState(false);
   const [isLoading, setIsLoading]     = useState(false);
   const [error, setError]             = useState(null);
 
-  const pollRef     = useRef(null);
-  const errorCount  = useRef(0);
+  const pollRef      = useRef(null);
+  const errorCount   = useRef(0);
   const cancelledRef = useRef(false);
 
   // ── Phase 1: resolve secondary Sportradar match ID ────────────────────────
@@ -215,12 +133,18 @@ export default function useBetradarPitch(matchId) {
 
     (async () => {
       try {
-        const res = await fetch(`http://localhost:8000/api/football/statsplayer/${matchId}`);
+        console.log(`[useBetradarPitch] Fetching secondary ID for match ${matchId}...`);
+        const res  = await fetch(`http://localhost:8000/api/football/statsplayer/${matchId}`, { signal: controller.signal });
         const data = await res.json();
 
         if (cancelledRef.current) return;
 
-        const secondaryId = data?.data?.statPlayerModels?.[0]?.matchId ?? data?.data?.statPlayerModels?.[1]?.matchId ?? null;
+        const secondaryId =
+          data?.data?.statPlayerModels?.[0]?.matchId ??
+          data?.data?.statPlayerModels?.[1]?.matchId ?? null;
+
+        console.log(`[useBetradarPitch] Got secondary ID: ${secondaryId}`);
+
         if (secondaryId) {
           setBetradarMatchId(String(secondaryId));
           setIsAvailable(true);
@@ -242,7 +166,7 @@ export default function useBetradarPitch(matchId) {
     };
   }, [matchId]);
 
-  // ── Phase 2: poll the timeline delta once we have the secondary ID ─────────
+  // ── Phase 2: poll the timeline delta ─────────────────────────────────────
   useEffect(() => {
     if (!betradarMatchId) return;
 
@@ -259,31 +183,40 @@ export default function useBetradarPitch(matchId) {
         if (cancelledRef.current) return;
 
         const events = data?.doc?.[0]?.data?.events;
-        console.log(events);
         const parsed = parseBetradarEvents(events);
 
-        if (parsed) setPitchState(parsed);
+        if (parsed) {
+          // MERGE new parsed state with previous — prevents a delta that contains
+          // only card/freekick events (no matchsituation) from wiping out the
+          // last known ball position and situation.
+          setPitchState(prev => ({
+            situation:     parsed.situation     ?? prev.situation,
+            situationTeam: parsed.situationTeam ?? prev.situationTeam,
+            ballPos:       parsed.ballPos       ?? prev.ballPos,
+            ballEnd:       parsed.ballEnd       ?? prev.ballEnd,
+            attackPath:    parsed.attackPath?.length ? parsed.attackPath : prev.attackPath,
+            // Always take the newer marker when one exists
+            latestMarker:  parsed.latestMarker  ?? prev.latestMarker,
+            markers:       parsed.markers?.length ? parsed.markers : prev.markers,
+          }));
+        }
 
         errorCount.current = 0;
         setError(null);
       } catch (err) {
         if (cancelledRef.current) return;
-
         errorCount.current++;
         const msg = err.message || 'Sportradar timeline fetch failed';
         setError(msg);
-
         if (errorCount.current >= MAX_ERRORS) {
-          console.warn('[useBetradarPitch] Too many errors, stopping poll.', msg);
+          console.warn('[useBetradarPitch] Stopping poll after repeated errors:', msg);
           clearInterval(pollRef.current);
-          return;
         }
       } finally {
         if (!cancelledRef.current) setIsLoading(false);
       }
     };
 
-    // Fire immediately, then on the interval
     poll();
     pollRef.current = setInterval(poll, POLL_INTERVAL_MS);
 
@@ -295,4 +228,3 @@ export default function useBetradarPitch(matchId) {
 
   return { betradarMatchId, pitchState, isAvailable, isLoading, error };
 }
-
