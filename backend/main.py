@@ -121,7 +121,7 @@ def get_statsplayer_endpoint(
     
 
 def get_match_events_betradar(secondary_id: int):
-    url = (f"https://widgets.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/match_timelinedelta/{secondary_id}?T=exp=1780945091~acl=/*~data=eyJvIjoiaHR0cHM6Ly93d3cuc3RvaXhpbWFuLmdyIiwiYSI6IjUwMWEwMjAyMTkzZTA0NTU2OWQwOTAyOWU1NWM4OTNjIiwiYWN0Ijoib3JpZ2luY2hlY2siLCJvc3JjIjoib3JpZ2luIn0~hmac=18cb84ded5e324bfc98e35646640f5981c1d2df773589c861b0519f30a05a74a")
+    url = (f"https://widgets.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/match_timelinedelta/{secondary_id}?T=exp=1782033731~acl=/*~data=eyJvIjoiaHR0cHM6Ly93d3cuc3RvaXhpbWFuLmdyIiwiYSI6IjUwMWEwMjAyMTkzZTA0NTU2OWQwOTAyOWU1NWM4OTNjIiwiYWN0Ijoib3JpZ2luY2hlY2siLCJvc3JjIjoib3JpZ2luIn0~hmac=c8574d0447f9ac3829aea17ece8377810338fb310ac16cabdb461f8c992ceafc")
 
     headers = {
         "User-Agent": "PostmanRuntime/7.51.1",
