@@ -521,6 +521,9 @@ export default function MatchDetailPage() {
             situationTeam={pitchState.situationTeam}
             ballPos={pitchState.ballPos}
             ballEnd={pitchState.ballEnd}
+            markers={pitchState.markers}
+            attackPath={pitchState.attackPath}
+            latestMarker={pitchState.latestMarker}
             isAvailable={pitchAvailable}
             homeName={home_team?.name}
             awayName={away_team?.name}
