@@ -28,6 +28,55 @@ function formatClock(seconds) {
   return `${mins}:${String(secs).padStart(2, '0')}`;
 }
 
+function formatCompactTime(epochMs) {
+  if (!epochMs) return 'TBD';
+  return new Date(epochMs).toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+function getTeamInitials(name) {
+  if (!name) return '?';
+  const parts = String(name).trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  return parts.slice(0, 2).map(part => part[0]).join('').toUpperCase();
+}
+
+function getMomentumValue(results) {
+  const attacks = Number(results?.attacks?.home || 0) + Number(results?.dangerousAttacks?.home || 0);
+  const awayAttacks = Number(results?.attacks?.away || 0) + Number(results?.dangerousAttacks?.away || 0);
+  if (!attacks && !awayAttacks) return null;
+  return attacks >= awayAttacks ? 'home' : 'away';
+}
+
+function buildQuickStats(score, results) {
+  return [
+    {
+      label: 'Goals',
+      home: score?.home ?? '-',
+      away: score?.away ?? '-',
+    },
+    {
+      label: 'Corners',
+      home: results?.corners?.home ?? '-',
+      away: results?.corners?.away ?? '-',
+    },
+    {
+      label: 'Shots',
+      home: results?.shots?.home ?? '-',
+      away: results?.shots?.away ?? '-',
+    },
+    {
+      label: 'Possession',
+      home: results?.possession?.home != null ? `${results.possession.home}%` : '-',
+      away: results?.possession?.away != null ? `${results.possession.away}%` : '-',
+    },
+  ];
+}
+
 // ---------------------------------------------------------------------------
 // Incident row
 // ---------------------------------------------------------------------------
@@ -146,31 +195,28 @@ function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isLi
 
   return (
     <div className="stats-section">
-      <div className="sub-section">
-        <h3 className="sub-title">Match Statistics</h3>
-        <table className="stats-table">
-          <thead>
-            <tr>
-              <th />
-              <th className="stat-home">{homeTeamId ? 'Home' : ''}</th>
-              <th className="stat-away">{awayTeamId ? 'Away' : ''}</th>
+      <table className="stats-table">
+        <thead>
+          <tr>
+            <th />
+            <th className="stat-home">{homeTeamId ? 'Home' : ''}</th>
+            <th className="stat-away">{awayTeamId ? 'Away' : ''}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sbStats.map(stat => (
+            <tr key={stat.label}>
+              <td className="stat-label">{stat.label}</td>
+              <td className={parseInt(stat.home) > parseInt(stat.away) ? 'stat-highlight' : ''}>
+                {stat.home}
+              </td>
+              <td className={parseInt(stat.away) > parseInt(stat.home) ? 'stat-highlight' : ''}>
+                {stat.away}
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {sbStats.map(stat => (
-              <tr key={stat.label}>
-                <td className="stat-label">{stat.label}</td>
-                <td className={parseInt(stat.home) > parseInt(stat.away) ? 'stat-highlight' : ''}>
-                  {stat.home}
-                </td>
-                <td className={parseInt(stat.away) > parseInt(stat.home) ? 'stat-highlight' : ''}>
-                  {stat.away}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -293,17 +339,14 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
   };
 
   return (
-    <div className="detail-section">
-      <h2 className="section-title">Lineups</h2>
-      <div className="roster-container">
-        <div className="roster-team">
-          <h3 className="roster-team-name">Home</h3>
-          {renderTeamLineup(homeLineup, 0)}
-        </div>
-        <div className="roster-team">
-          <h3 className="roster-team-name">Away</h3>
-          {renderTeamLineup(awayLineup, 1)}
-        </div>
+    <div className="roster-container">
+      <div className="roster-team">
+        <h3 className="roster-team-name">Home</h3>
+        {renderTeamLineup(homeLineup, 0)}
+      </div>
+      <div className="roster-team">
+        <h3 className="roster-team-name">Away</h3>
+        {renderTeamLineup(awayLineup, 1)}
       </div>
     </div>
   );
@@ -357,6 +400,31 @@ function MatchInfoSection({ matchData }) {
             </a>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function SummaryStrip({ score, results, isLive }) {
+  const quickStats = buildQuickStats(score, results);
+  const momentum = getMomentumValue(results);
+
+  return (
+    <div className="summary-strip">
+      {quickStats.map(item => (
+        <div key={item.label} className="summary-stat-card">
+          <span className="summary-stat-label">{item.label}</span>
+          <div className="summary-stat-values">
+            <span className="summary-stat-value">{item.home}</span>
+            <span className="summary-stat-divider">-</span>
+            <span className="summary-stat-value">{item.away}</span>
+          </div>
+        </div>
+      ))}
+      <div className={`summary-status-pill ${isLive ? 'is-live' : ''}`}>
+        <span className="summary-status-dot" />
+        {isLive ? 'Live' : 'Pre-match'}
+        {momentum && <span className="summary-status-note"> · Momentum {momentum === 'home' ? 'Home' : 'Away'}</span>}
       </div>
     </div>
   );
@@ -418,6 +486,25 @@ export default function MatchDetailPage() {
 
   // ── Incident filters ──────────────────────────────────────────────────────
   const [activeFilter, setActiveFilter] = useState(null);
+  const summaryRef = useRef(null);
+  const pitchRef = useRef(null);
+  const eventsRef = useRef(null);
+  const statsRef = useRef(null);
+  const lineupRef = useRef(null);
+  const infoRef = useRef(null);
+
+  const sectionRefs = {
+    summary: summaryRef,
+    pitch: pitchRef,
+    events: eventsRef,
+    stats: statsRef,
+    lineups: lineupRef,
+    info: infoRef,
+  };
+
+  const scrollToSection = (section) => {
+    sectionRefs[section]?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const filteredIncidents = data?.incidents
     ? (activeFilter
@@ -456,158 +543,211 @@ export default function MatchDetailPage() {
   return (
     <div className="detail-page">
 
-      {/* ── Navigation ── */}
-      <div className="detail-nav">
-        <Link to="/" className="back-link">← Back to Upcoming Matches</Link>
-        <Link to="/" className="back-link-mobile">← Back</Link>
-      </div>
-
-      {/* ── Header ── */}
-      <div className="detail-header">
-        <div className="detail-top-row">
-          <span className="detail-league">{league?.name || 'Unknown League'}</span>
-          <span className="detail-kickoff">{formatEpochTime(start_time)}</span>
-          <span className={`detail-status status-${String(status).toLowerCase().replace(' ', '-')}`}>
-            {status}
-          </span>
-        </div>
-      </div>
-
-      {/* ── Scoreboard ── */}
-      <div className="scoreboard">
-        <div className="scoreboard-team">
-          <span className="team-name">{home_team?.name || 'Home'}</span>
+      <div className="detail-shell">
+        {/* ── Top bar ── */}
+        <div className="detail-nav">
+          <Link to="/" className="back-link">← Back to Matches</Link>
+          <Link to="/" className="back-link-mobile">← Back</Link>
         </div>
 
-        <div className="scoreboard-center">
-          <div className="scoreboard-score">
-            <span className="score-num">{score?.home ?? '-'}</span>
-            <span className="score-divider">:</span>
-            <span className="score-num">{score?.away ?? '-'}</span>
-          </div>
-          {is_live && (
-            <span className="scoreboard-clock">{formatClock(score?.seconds_since_start)}</span>
-          )}
-          {(results?.yellow?.home != null || results?.corners?.home != null) && (
-            <div className="scoreboard-meta">
-              <span className="meta-text">
-                {results.yellow?.home != null && `${results.yellow.home}Y `}
-                {results.corners?.home != null && `${results.corners.home} Corners`}
-              </span>
+        <section className="detail-hero" ref={summaryRef}>
+          <div className="detail-hero__meta-row">
+            <div className="detail-hero__league">
+              <span className="detail-hero__league-badge">{league?.name || 'Unknown League'}</span>
+              <span className="detail-hero__kickoff">{formatCompactTime(start_time)}</span>
             </div>
-          )}
-        </div>
-
-        <div className="scoreboard-team away">
-          <span className="team-name">{away_team?.name || 'Away'}</span>
-        </div>
-      </div>
-
-      {/* ── Live Pitch ── */}
-      {is_live && (
-        <div className="detail-section">
-          <h2 className="section-title">
-            Live Pitch
-            {betradarMatchId && (
-              <span className="section-badge section-badge--live">LIVE</span>
-            )}
-            {pitchLoading && !pitchAvailable && (
-              <span className="section-badge section-badge--connecting">Connecting…</span>
-            )}
-          </h2>
-
-          <LivePitch
-            situation={pitchState.situation}
-            situationTeam={pitchState.situationTeam}
-            ballPos={pitchState.ballPos}
-            ballEnd={pitchState.ballEnd}
-            markers={pitchState.markers}
-            attackPath={pitchState.attackPath}
-            latestMarker={pitchState.latestMarker}
-            isAvailable={pitchAvailable}
-            homeName={home_team?.name}
-            awayName={away_team?.name}
-            homeTeamId={home_team?.id}
-            awayTeamId={away_team?.id}
-          />
-        </div>
-      )}
-
-      {/* ── Odds ── */}
-      {odds && Object.keys(odds).length > 0 && (
-        <div className="detail-section">
-          <h2 className="section-title">Odds &amp; Markets</h2>
-          <OddsDisplay odds={odds} />
-        </div>
-      )}
-
-      {/* ── Incidents ── */}
-      <div className="detail-section">
-        <h2 className="section-title">Match Events</h2>
-
-        {Array.isArray(incident_filters) && incident_filters.length > 1 && (
-          <div className="inc-filter-pills">
-            <button
-              className={`inc-pill ${activeFilter === null ? 'active' : ''}`}
-              onClick={() => setActiveFilter(null)}
-            >
-              {incident_filters.find(f => f.id === 5)?.name || 'All'}
-            </button>
-            {incident_filters
-              .filter(f => f.id !== 5)
-              .map(f => (
-                <button
-                  key={f.id}
-                  className={`inc-pill ${activeFilter === f.id ? 'active' : ''}`}
-                  onClick={() => setActiveFilter(activeFilter === f.id ? null : f.id)}
-                >
-                  {f.name}
-                </button>
-              ))}
+            <div className={`detail-hero__status detail-hero__status--${String(status).toLowerCase().replace(' ', '-')}`}>
+              <span className="detail-hero__status-dot" />
+              {status}
+            </div>
           </div>
-        )}
 
-        {filteredIncidents.length > 0 ? (
-          <div className="incident-list">
-            {filteredIncidents.map((inc, i) => (
-              <IncidentRow
-                key={`${inc.type}-${i}`}
-                incident={inc}
+          <div className="detail-hero__teams">
+            <div className="hero-team hero-team--home">
+              <div className="hero-team__badge hero-team__badge--home">{getTeamInitials(home_team?.name)}</div>
+              <div className="hero-team__name">{home_team?.name || 'Home'}</div>
+            </div>
+
+            <div className="hero-score">
+              <div className="hero-score__value">{score?.home ?? '-'}</div>
+              <div className="hero-score__separator">:</div>
+              <div className="hero-score__value">{score?.away ?? '-'}</div>
+            </div>
+
+            <div className="hero-team hero-team--away">
+              <div className="hero-team__badge hero-team__badge--away">{getTeamInitials(away_team?.name)}</div>
+              <div className="hero-team__name">{away_team?.name || 'Away'}</div>
+            </div>
+          </div>
+
+          <div className="detail-hero__facts">
+            <div className="hero-fact hero-fact--clock">
+              <span className="hero-fact__label">Clock</span>
+              <span className="hero-fact__value">{is_live ? formatClock(score?.seconds_since_start) : '—'}</span>
+            </div>
+            <div className="hero-fact">
+              <span className="hero-fact__label">Venue</span>
+              <span className="hero-fact__value">{zone?.name || 'Unknown zone'}</span>
+            </div>
+            <div className="hero-fact">
+              <span className="hero-fact__label">Markets</span>
+              <span className="hero-fact__value">{typeof data?.total_markets === 'number' ? data.total_markets : '—'}</span>
+            </div>
+          </div>
+
+          <SummaryStrip score={score} results={results} isLive={is_live} />
+
+          <div className="detail-tabs">
+            <button className="detail-tab" onClick={() => scrollToSection('pitch')}>Pitch</button>
+            <button className="detail-tab" onClick={() => scrollToSection('events')}>Events</button>
+            <button className="detail-tab" onClick={() => scrollToSection('stats')}>Stats</button>
+            <button className="detail-tab" onClick={() => scrollToSection('lineups')}>Lineups</button>
+            <button className="detail-tab" onClick={() => scrollToSection('info')}>Info</button>
+          </div>
+        </section>
+
+        <div className="detail-main">
+          <div className="detail-column detail-column--primary">
+            {is_live && (
+              <section className="detail-card" ref={pitchRef}>
+                <div className="section-head">
+                  <div>
+                    <div className="section-kicker">Live match</div>
+                    <h2 className="section-title">Pitch view</h2>
+                  </div>
+                  <div className="section-badges">
+                    {betradarMatchId && <span className="section-badge section-badge--live">LIVE</span>}
+                    {pitchLoading && !pitchAvailable && <span className="section-badge section-badge--connecting">Connecting…</span>}
+                  </div>
+                </div>
+
+                <LivePitch
+                  situation={pitchState.situation}
+                  situationTeam={pitchState.situationTeam}
+                  ballPos={pitchState.ballPos}
+                  ballEnd={pitchState.ballEnd}
+                  markers={pitchState.markers}
+                  attackPath={pitchState.attackPath}
+                  latestMarker={pitchState.latestMarker}
+                  isAvailable={pitchAvailable}
+                  homeName={home_team?.name}
+                  awayName={away_team?.name}
+                  homeTeamId={home_team?.id}
+                  awayTeamId={away_team?.id}
+                />
+              </section>
+            )}
+
+            <section className="detail-card detail-card--events" ref={eventsRef}>
+              <div className="section-head">
+                <div>
+                  <div className="section-kicker">Timeline</div>
+                  <h2 className="section-title">Match events</h2>
+                </div>
+              </div>
+
+              {Array.isArray(incident_filters) && incident_filters.length > 1 && (
+                <div className="inc-filter-pills inc-filter-pills--soft">
+                  <button
+                    className={`inc-pill ${activeFilter === null ? 'active' : ''}`}
+                    onClick={() => setActiveFilter(null)}
+                  >
+                    {incident_filters.find(f => f.id === 5)?.name || 'All'}
+                  </button>
+                  {incident_filters
+                    .filter(f => f.id !== 5)
+                    .map(f => (
+                      <button
+                        key={f.id}
+                        className={`inc-pill ${activeFilter === f.id ? 'active' : ''}`}
+                        onClick={() => setActiveFilter(activeFilter === f.id ? null : f.id)}
+                      >
+                        {f.name}
+                      </button>
+                    ))}
+                </div>
+              )}
+
+              {filteredIncidents.length > 0 ? (
+                <div className="incident-list incident-list--dense">
+                  {filteredIncidents.map((inc, i) => (
+                    <IncidentRow
+                      key={`${inc.type}-${i}`}
+                      incident={inc}
+                      homeName={home_team?.name}
+                      awayName={away_team?.name}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="section-empty">
+                  <p>
+                    No match events recorded yet.{' '}
+                    {is_live ? 'Check back during the match.' : 'The match has ended.'}
+                  </p>
+                </div>
+              )}
+            </section>
+
+            <section className="detail-card" ref={statsRef}>
+              <div className="section-head">
+                <div>
+                  <div className="section-kicker">Match data</div>
+                  <h2 className="section-title">Statistics</h2>
+                </div>
+              </div>
+              <StatsSection
+                statistics={statistics}
+                homeTeamId={home_team?.id}
+                awayTeamId={away_team?.id}
+                results={results}
+                score={score}
+                isLive={is_live}
+              />
+            </section>
+          </div>
+
+          <div className="detail-column detail-column--side">
+            {odds && Object.keys(odds).length > 0 && (
+              <section className="detail-card detail-card--soft">
+                <div className="section-head">
+                  <div>
+                    <div className="section-kicker">Markets</div>
+                    <h2 className="section-title">Odds &amp; markets</h2>
+                  </div>
+                </div>
+                <OddsDisplay odds={odds} />
+              </section>
+            )}
+
+            <section className="detail-card" ref={lineupRef}>
+              <div className="section-head">
+                <div>
+                  <div className="section-kicker">Squads</div>
+                  <h2 className="section-title">Lineups</h2>
+                </div>
+              </div>
+              <RosterSection
+                roster={roster}
+                results={results}
+                incidents={data.incidents}
                 homeName={home_team?.name}
                 awayName={away_team?.name}
               />
-            ))}
-          </div>
-        ) : (
-          <div className="section-empty">
-            <p>
-              No match events recorded yet.{' '}
-              {is_live ? 'Check back during the match.' : 'The match has ended.'}
-            </p>
-          </div>
-        )}
-      </div>
+            </section>
 
-      {/* ── Statistics ── */}
-      <div className="detail-section">
-        <StatsSection
-          statistics={statistics}
-          homeTeamId={home_team?.id}
-          awayTeamId={away_team?.id}
-          results={results}
-          score={score}
-          isLive={is_live}
-        />
+            <section className="detail-card detail-card--soft" ref={infoRef}>
+              <div className="section-head">
+                <div>
+                  <div className="section-kicker">Match metadata</div>
+                  <h2 className="section-title">Info</h2>
+                </div>
+              </div>
+              <MatchInfoSection matchData={data} />
+            </section>
+          </div>
+        </div>
       </div>
-
-      {/* ── Lineups ── */}
-      <RosterSection
-        roster={roster}
-        results={results}
-        incidents={data.incidents}
-        homeName={home_team?.name}
-        awayName={away_team?.name}
-      />
     </div>
   );
 }
