@@ -10,14 +10,83 @@ const NOTABLE_TYPES = new Set([
   'throwin',
   'freekick',
   'goalkick',
+  'shot',
   'shotontarget',
   'shotofftarget',
   'goalkeepersave',
+  'save',
   'card',
-  'possibleevent',   // VAR / possible goal review
+  'possibleevent',
+  'var',
   'penalty',
   'goal',
+  'substitution',
+  'foul',
+  'attack',
+  'dangerousattack',
+  'possession',
 ]);
+
+function normalizeType(value) {
+  return String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function readPoint(value) {
+  if (!value) return null;
+
+  if (Array.isArray(value) && value.length >= 2) {
+    const [x, y] = value;
+    if (typeof x === 'number' && typeof y === 'number') {
+      return { x, y };
+    }
+  }
+
+  if (typeof value === 'object') {
+    const x = typeof value.X === 'number' ? value.X : value.x;
+    const y = typeof value.Y === 'number' ? value.Y : value.y;
+    if (typeof x === 'number' && typeof y === 'number') {
+      return { x, y };
+    }
+  }
+
+  return null;
+}
+
+function readPath(coords) {
+  if (!Array.isArray(coords)) return [];
+
+  if (
+    coords.length >= 4 &&
+    typeof coords[0] === 'number' &&
+    typeof coords[1] === 'number' &&
+    typeof coords[2] === 'number' &&
+    typeof coords[3] === 'number'
+  ) {
+    return [
+      { x: coords[0], y: coords[1] },
+      { x: coords[2], y: coords[3] },
+    ];
+  }
+
+  return coords.map(readPoint).filter(Boolean);
+}
+
+function extractEventText(event) {
+  return event?.description || event?.name || event?.title || event?.player?.name || null;
+}
+
+function buildMarkerKey(marker) {
+  return [
+    marker.id || '',
+    marker.type || '',
+    marker.time || '',
+    marker.seconds || '',
+    marker.x ?? '',
+    marker.y ?? '',
+    marker.playerName || '',
+    marker.name || '',
+  ].join('|');
+}
 
 function parseBetradarEvents(events = []) {
   if (!Array.isArray(events) || !events.length) return null;
@@ -30,16 +99,15 @@ function parseBetradarEvents(events = []) {
   let latestMarker  = null;
   const markers     = [];
 
-  for (let i = events.length - 1; i >= 0; i--) {
-    const e = events[i];
+  for (const e of events) {
     if (!e || e.disabled) continue;
 
     // Use _doctype as authoritative type; fall back to type field.
-    const doctype = e._doctype || e.type;
+    const doctype = normalizeType(e._doctype || e.type);
 
     // ── Match situation (primary source of ball pos + game state) ────────
-    if (!situation && doctype === 'matchsituation') {
-      situation     = e.situation || null;   // 'dangerous' | 'attack' | 'safe'
+    if (doctype === 'matchsituation') {
+      situation     = e.situation || situation;   // 'dangerous' | 'attack' | 'safe'
       situationTeam = e.team      || null;
 
       if (typeof e.X === 'number' && typeof e.Y === 'number') {
@@ -49,18 +117,21 @@ function parseBetradarEvents(events = []) {
 
     // ── Ball coordinates (companion events — coords[] is always empty,
     //    but X/Y may still be present on some implementations) ──────────
-    if (!ballPos && doctype === 'ballcoordinates') {
-      const coords = e.coordinates;
-      if (Array.isArray(coords) && coords.length >= 2) {
-        ballPos = { x: coords[0], y: coords[1] };
-        if (coords.length >= 4) ballEnd = { x: coords[2], y: coords[3] };}
-      else if (typeof e.X === 'number' && typeof e.Y === 'number') {
+    if (doctype === 'ballcoordinates') {
+      const path = readPath(e.coordinates);
+
+      if (path.length > 0) {
+        ballPos = path[0];
+        if (path.length > 1) {
+          ballEnd = path[path.length - 1];
+        }
+        attackPath = path;
+      } else if (typeof e.X === 'number' && typeof e.Y === 'number') {
         ballPos = { x: e.X, y: e.Y };
       }
 
-      if (Array.isArray(e.coordinates)) {
-        attackPath = e.coordinates.map(c => ({ x: c.X, y: c.Y, team: c.team })).filter(c => c.x != null);
-        if (attackPath.length > 1) ballEnd = attackPath[attackPath.length - 1];
+      if (!ballEnd && typeof e.endX === 'number' && typeof e.endY === 'number') {
+        ballEnd = { x: e.endX, y: e.endY };
       }
     }
 
@@ -70,6 +141,7 @@ function parseBetradarEvents(events = []) {
         id:         e._id,
         type:       doctype,
         team:       e.team  || null,
+        description: extractEventText(e),
         time:       e.time  ?? null,
         seconds:    e.seconds ?? null,
         x:          typeof e.X === 'number' ? e.X : null,
@@ -80,8 +152,9 @@ function parseBetradarEvents(events = []) {
         playerName: e.player?.name || null,
       };
 
+      marker.key = buildMarkerKey(marker);
       markers.push(marker);
-      if (!latestMarker) latestMarker = marker;  // newest = last in reversed loop
+      latestMarker = marker;
     }
   }
 
@@ -118,6 +191,7 @@ export default function useBetradarPitch(matchId) {
   const pollRef      = useRef(null);
   const errorCount   = useRef(0);
   const cancelledRef = useRef(false);
+  const seenMarkersRef = useRef(new Set());
 
   // ── Phase 1: resolve secondary Sportradar match ID ────────────────────────
   useEffect(() => {
@@ -128,6 +202,7 @@ export default function useBetradarPitch(matchId) {
     setError(null);
     setBetradarMatchId(null);
     setIsAvailable(false);
+    seenMarkersRef.current = new Set();
 
     const controller = new AbortController();
 
@@ -182,22 +257,30 @@ export default function useBetradarPitch(matchId) {
 
         if (cancelledRef.current) return;
 
-        const events = data?.doc?.[0]?.data?.events;
+        const events =
+          data?.doc?.[0]?.data?.events ||
+          data?.data?.events ||
+          data?.events ||
+          data?.result?.events ||
+          [];
         const parsed = parseBetradarEvents(events);
 
         if (parsed) {
-          // MERGE new parsed state with previous — prevents a delta that contains
-          // only card/freekick events (no matchsituation) from wiping out the
-          // last known ball position and situation.
+          const freshMarkers = (parsed.markers || []).filter(marker => {
+            const key = marker.key || buildMarkerKey(marker);
+            if (seenMarkersRef.current.has(key)) return false;
+            seenMarkersRef.current.add(key);
+            return true;
+          });
+
           setPitchState(prev => ({
             situation:     parsed.situation     ?? prev.situation,
             situationTeam: parsed.situationTeam ?? prev.situationTeam,
             ballPos:       parsed.ballPos       ?? prev.ballPos,
             ballEnd:       parsed.ballEnd       ?? prev.ballEnd,
             attackPath:    parsed.attackPath?.length ? parsed.attackPath : prev.attackPath,
-            // Always take the newer marker when one exists
             latestMarker:  parsed.latestMarker  ?? prev.latestMarker,
-            markers:       parsed.markers?.length ? parsed.markers : prev.markers,
+            markers:       freshMarkers.length ? [...prev.markers, ...freshMarkers].slice(-80) : prev.markers,
           }));
         }
 
