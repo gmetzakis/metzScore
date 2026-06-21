@@ -87,6 +87,66 @@
   align-self: center;
 }
 
+.alert-button-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.alert-config-toggle {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.alert-config-menu {
+  position: absolute;
+  top: 28px;
+  right: 0;
+  width: 160px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  padding: 8px;
+  z-index: 3;
+}
+
+.alert-config-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.alert-config-option {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 6px 8px;
+  font-size: 0.82rem;
+  color: var(--text);
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.alert-config-option:hover,
+.alert-config-option.active {
+  background: var(--border-light);
+}
+
 .score-column {
   display: flex;
   flex-direction: column;

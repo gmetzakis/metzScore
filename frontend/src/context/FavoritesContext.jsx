@@ -4,6 +4,7 @@ const FavoritesContext = createContext(null);
 
 const STORAGE_KEY = 'metzScore-favorites';
 const ALERTS_STORAGE_KEY = 'metzScore-alerts';
+const ALERT_MODES_STORAGE_KEY = 'metzScore-alert-modes';
 
 export function FavoritesProvider({ children }) {
   const [favoriteIds, setFavoriteIds] = useState(() => {
@@ -22,6 +23,14 @@ export function FavoritesProvider({ children }) {
       return [];
     }
   });
+  const [alertModes, setAlertModes] = useState(() => {
+    try {
+      const stored = localStorage.getItem(ALERT_MODES_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
 
   useEffect(() => {
     try {
@@ -36,6 +45,12 @@ export function FavoritesProvider({ children }) {
   }, [alertIds]);
 
   useEffect(() => {
+    try {
+      localStorage.setItem(ALERT_MODES_STORAGE_KEY, JSON.stringify(alertModes));
+    } catch { /* ignore */ }
+  }, [alertModes]);
+
+  useEffect(() => {
     if (alertIds.length === 0) return;
     setFavoriteIds(prev => {
       const missing = alertIds.filter(id => !prev.includes(id));
@@ -45,6 +60,7 @@ export function FavoritesProvider({ children }) {
 
   const isFavorite = useCallback((matchId) => favoriteIds.includes(matchId), [favoriteIds]);
   const isAlert = useCallback((matchId) => alertIds.includes(matchId), [alertIds]);
+  const getAlertMode = useCallback((matchId) => alertModes[String(matchId)] || 'all', [alertModes]);
 
   const toggleFavorite = useCallback((matchId) => {
     setFavoriteIds(prev => {
@@ -67,8 +83,12 @@ export function FavoritesProvider({ children }) {
     });
   }, []);
 
+  const setAlertMode = useCallback((matchId, mode) => {
+    setAlertModes(prev => ({ ...prev, [String(matchId)]: mode }));
+  }, []);
+
   return (
-    <FavoritesContext.Provider value={{ favoriteIds, alertIds, isFavorite, isAlert, toggleFavorite, toggleAlert }}>
+    <FavoritesContext.Provider value={{ favoriteIds, alertIds, alertModes, isFavorite, isAlert, getAlertMode, toggleFavorite, toggleAlert, setAlertMode }}>
       {children}
     </FavoritesContext.Provider>
   );
