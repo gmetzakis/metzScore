@@ -6,13 +6,13 @@ function normalizeScore(score) {
   return String(score);
 }
 
-function getNotificationTitle(match) {
-  return `Score update: ${match.home_team} ${match.home_score}-${match.away_score} ${match.away_team}`;
-}
+// function getNotificationTitle(match) {
+//   return `Score update: ${match.home_team} ${match.home_score}-${match.away_score} ${match.away_team}`;
+// }
 
-function getNotificationBody(prevScore, match) {
-  return `${match.home_team} ${prevScore.home}:${prevScore.away} → ${match.home_team} ${match.home_score}:${match.away_score}`;
-}
+// function getNotificationBody(prevScore, match) {
+//   return `${match.home_team} ${prevScore.home}:${prevScore.away} → ${match.home_team} ${match.home_score}:${match.away_score}`;
+// }
 
 function sendBrowserNotification(title, body) {
   if (typeof window === 'undefined' || !('Notification' in window)) return;
@@ -58,9 +58,24 @@ export default function useScoreAlertNotifications(matches) {
       };
 
       if (previous && (previous.home !== current.home || previous.away !== current.away)) {
-        const title = getNotificationTitle(match);
-        const body = getNotificationBody(previous, match);
-        sendBrowserNotification(title, body);
+
+        if (previous.home < current.home || previous.away < current.away) {
+          // Score has increased
+          const title = current.home > previous.home ? `Goal: ${match.home_team}` : `Goal: ${match.away_team}`;
+          const body = current.home > previous.home ? `${match.home_team} [${match.home_score}]-${match.away_score} ${match.away_team}` : `${match.home_team} ${match.home_score}-[${match.away_score}] ${match.away_team}`;
+          sendBrowserNotification(title, body);
+        }
+
+        if (previous.home > current.home || previous.away > current.away) {
+          // Score has decreased
+          const title = current.home < previous.home ? `Cancelled Goal: ${match.home_team}` : `Cancelled Goal: ${match.away_team}`;
+          const body = current.home < previous.home ? `${match.home_team} [${match.home_score}]-${match.away_score} ${match.away_team}` : `${match.home_team} ${match.home_score}-[${match.away_score}] ${match.away_team}`;
+          sendBrowserNotification(title, body);
+        }
+
+        //const title = getNotificationTitle(match);
+        //const body = getNotificationBody(previous, match);
+        //sendBrowserNotification(title, body);
       }
 
       prevScoresRef.current.set(match.id, current);
