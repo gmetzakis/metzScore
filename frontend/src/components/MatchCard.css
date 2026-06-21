@@ -117,7 +117,7 @@
   margin-top: 1px;
 }
 
-.fav-btn {
+.action-btn {
   background: none;
   border: none;
   width: 28px;
@@ -129,6 +129,12 @@
   color: var(--text);
   font-size: 1.1rem;
   transition: all 0.15s ease;
+  cursor: pointer;
+  margin-left: 4px;
+}
+
+.action-btn:hover {
+  color: #999;
 }
 
 .fav-btn:hover {
@@ -141,6 +147,18 @@
 
 .fav-btn.fav-on:hover {
   color: var(--text);
+}
+
+.alert-btn.alert-off {
+  color: #999;
+}
+
+.alert-btn.alert-on {
+  color: #2f9cff;
+}
+
+.alert-btn.alert-on:hover {
+  color: #76b7ff;
 }
 
 @media (max-width: 480px) {

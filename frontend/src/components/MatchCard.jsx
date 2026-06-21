@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFavorites } from '../context/FavoritesContext';
 import './MatchCard.css';
@@ -10,8 +9,9 @@ function formatEpochTime(epochMs) {
 
 export default function MatchCard({ match }) {
   const navigate = useNavigate();
-  const { isFavorite, toggleFavorite } = useFavorites();
+  const { isFavorite, isAlert, toggleFavorite, toggleAlert } = useFavorites();
   const fav = isFavorite(match.id);
+  const alert = isAlert(match.id);
 
   const isLive = match.is_live && match.match_time && match.match_time !== '-';
 
@@ -44,7 +44,15 @@ export default function MatchCard({ match }) {
         </div>
         <div className="match-separator"></div>
         <button 
-          className={`fav-btn ${fav ? 'fav-on' : 'fav-off'}`}
+          className={`action-btn alert-btn ${alert ? 'alert-on' : 'alert-off'}`}
+          onClick={(e) => { e.stopPropagation(); toggleAlert(match.id); }}
+          title={alert ? 'Disable alerts for this match' : 'Enable alerts for this match'}
+          aria-label={alert ? 'Disable alerts for this match' : 'Enable alerts for this match'}
+        >
+          🔔
+        </button>
+        <button 
+          className={`action-btn fav-btn ${fav ? 'fav-on' : 'fav-off'}`}
           onClick={(e) => { e.stopPropagation(); toggleFavorite(match.id); }}
           title={fav ? 'Remove from favorites' : 'Add to favorites'}
           aria-label={fav ? 'Remove from favorites' : 'Add to favorites'}
