@@ -9,7 +9,7 @@ import { useFavorites } from '../context/FavoritesContext';
 import './FavoritesPage.css';
 
 export default function FavoritesPage() {
-  const { favoriteIds, clearAllFavorites } = useFavorites();
+  const { favoriteIds, clearAllFavorites, removeFavorites } = useFavorites();
   const [allMatches, setAllMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,6 +47,15 @@ export default function FavoritesPage() {
     const favSet = new Set(favoriteIds);
     return allMatches.filter(m => favSet.has(m.id));
   }, [allMatches, favoriteIds]);
+
+  useEffect(() => {
+    if (!allMatches.length || !favoriteIds.length) return;
+    const currentIds = new Set(allMatches.map(m => m.id));
+    const missingFavoriteIds = favoriteIds.filter(id => !currentIds.has(id));
+    if (missingFavoriteIds.length) {
+      removeFavorites(missingFavoriteIds);
+    }
+  }, [allMatches, favoriteIds, removeFavorites]);
 
   useScoreAlertNotifications(favoriteMatches);
 

@@ -87,12 +87,32 @@ export function FavoritesProvider({ children }) {
     setAlertIds(prev => prev.filter(id => id !== matchId));
   }, []);
 
+  const removeAlerts = useCallback((matchIds) => {
+    if (!matchIds || !matchIds.length) return;
+    setAlertIds(prev => prev.filter(id => !matchIds.includes(id)));
+  }, []);
+
+  const removeFavorite = useCallback((matchId) => {
+    setFavoriteIds(prev => {
+      if (!prev.includes(matchId)) return prev;
+      setAlertIds(prevAlerts => prevAlerts.filter(id => id !== matchId));
+      return prev.filter(id => id !== matchId);
+    });
+  }, []);
+
+  const removeFavorites = useCallback((matchIds) => {
+    if (!matchIds || !matchIds.length) return;
+    setFavoriteIds(prev => prev.filter(id => !matchIds.includes(id)));
+    setAlertIds(prev => prev.filter(id => !matchIds.includes(id)));
+  }, []);
+
   const clearAllAlerts = useCallback(() => {
     setAlertIds([]);
   }, []);
 
   const clearAllFavorites = useCallback(() => {
     setFavoriteIds([]);
+    setAlertIds([]);
   }, []);
 
   const setAlertMode = useCallback((matchId, mode) => {
@@ -111,6 +131,8 @@ export function FavoritesProvider({ children }) {
       toggleAlert,
       setAlertMode,
       removeAlert,
+      removeAlerts,
+      removeFavorite,
       clearAllAlerts,
       clearAllFavorites,
     }}>
