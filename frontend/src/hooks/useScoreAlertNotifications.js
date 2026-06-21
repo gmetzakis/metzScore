@@ -54,7 +54,7 @@ function sendBrowserNotification(title, body) {
 }
 
 export default function useScoreAlertNotifications(matches) {
-  const { alertIds, alertModes } = useFavorites();
+  const { alertIds, alertModes, removeAlerts } = useFavorites();
   const prevScoresRef = useRef(new Map());
   const hasRequestedPermissionRef = useRef(false);
 
@@ -169,5 +169,12 @@ export default function useScoreAlertNotifications(matches) {
         prevScoresRef.current.delete(trackedId);
       }
     }
-  }, [matches, alertIds, alertModes]);
+
+    if (alertIds.length && activeAlerts.size && currentAlertMatchIds.size !== alertIds.length) {
+      const missingAlerts = alertIds.filter((id) => !currentAlertMatchIds.has(id));
+      if (missingAlerts.length) {
+        removeAlerts(missingAlerts);
+      }
+    }
+  }, [matches, alertIds, alertModes, removeAlerts]);
 }
