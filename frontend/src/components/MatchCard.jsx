@@ -44,12 +44,12 @@ export default function MatchCard({ match }) {
         </div>
         <div className="match-separator"></div>
         <button 
-          className={`action-btn alert-btn ${alert ? 'alert-on' : 'alert-off'}`}
+          className={"my-icon"}
           onClick={(e) => { e.stopPropagation(); toggleAlert(match.id); }}
           title={alert ? 'Disable alerts for this match' : 'Enable alerts for this match'}
           aria-label={alert ? 'Disable alerts for this match' : 'Enable alerts for this match'}
         >
-          🔔
+           
         </button>
         <button 
           className={`action-btn fav-btn ${fav ? 'fav-on' : 'fav-off'}`}

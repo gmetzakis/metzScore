@@ -75,3 +75,16 @@ a {
   text-decoration: none;
   color: inherit;
 }
+
+.my-icon {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  background-image: url('./static/notification.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: inline-block;
+}
