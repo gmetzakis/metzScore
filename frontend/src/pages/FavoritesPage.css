@@ -27,6 +27,8 @@
   border-bottom: 1px solid var(--border);
   padding-bottom: 8px;
   margin-bottom: 12px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .nav-link {
@@ -61,6 +63,20 @@
   font-size: 0.85em;
   color: var(--text);
   margin-bottom: 12px;
+}
+
+/* Favorites clear button */
+.favorites-clear-btn {
+  margin-left: auto;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.favorites-clear-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Status indicators */

@@ -9,7 +9,7 @@ import { useFavorites } from '../context/FavoritesContext';
 import './FavoritesPage.css';
 
 export default function FavoritesPage() {
-  const { favoriteIds } = useFavorites();
+  const { favoriteIds, clearAllFavorites } = useFavorites();
   const [allMatches, setAllMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -70,6 +70,9 @@ export default function FavoritesPage() {
         <Link to="/favorites" className="nav-link active">
           ☆ Favorites
         </Link>
+        <button className="favorites-clear-btn" onClick={clearAllFavorites} disabled={!favoriteIds.length}>
+          Clear favorites
+        </button>
       </div>
 
       <div className="page-content">

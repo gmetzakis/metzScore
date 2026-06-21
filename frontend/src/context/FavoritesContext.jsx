@@ -83,12 +83,37 @@ export function FavoritesProvider({ children }) {
     });
   }, []);
 
+  const removeAlert = useCallback((matchId) => {
+    setAlertIds(prev => prev.filter(id => id !== matchId));
+  }, []);
+
+  const clearAllAlerts = useCallback(() => {
+    setAlertIds([]);
+  }, []);
+
+  const clearAllFavorites = useCallback(() => {
+    setFavoriteIds([]);
+  }, []);
+
   const setAlertMode = useCallback((matchId, mode) => {
     setAlertModes(prev => ({ ...prev, [String(matchId)]: mode }));
   }, []);
 
   return (
-    <FavoritesContext.Provider value={{ favoriteIds, alertIds, alertModes, isFavorite, isAlert, getAlertMode, toggleFavorite, toggleAlert, setAlertMode }}>
+    <FavoritesContext.Provider value={{
+      favoriteIds,
+      alertIds,
+      alertModes,
+      isFavorite,
+      isAlert,
+      getAlertMode,
+      toggleFavorite,
+      toggleAlert,
+      setAlertMode,
+      removeAlert,
+      clearAllAlerts,
+      clearAllFavorites,
+    }}>
       {children}
     </FavoritesContext.Provider>
   );
