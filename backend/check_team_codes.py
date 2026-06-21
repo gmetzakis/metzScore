@@ -11,8 +11,8 @@ if d is None:
     sys.exit(1)
 
 teams_codes = list(d['statistics']['teams'].keys())
-print('sorted team codes:', sorted(teams_codes, key=int))
-print()
-print('statistics.event:', json.dumps(d['statistics']['event']))
-print()
-print('results:', json.dumps(d['results']))
+# print('sorted team codes:', sorted(teams_codes, key=int))
+# print()
+# print('statistics.event:', json.dumps(d['statistics']['event']))
+# print()
+# print('results:', json.dumps(d['results']))

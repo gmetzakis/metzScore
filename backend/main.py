@@ -62,7 +62,7 @@ def get_all_football():
     """Get upcoming football matches (live and upcoming)."""
     try:
         matches = get_all_football_matches()
-        print(matches)
+        #print(matches)
         return {
             "status": "success",
             "sport": "Football",
@@ -121,7 +121,7 @@ def get_statsplayer_endpoint(
     
 
 def get_match_events_betradar(secondary_id: int):
-    url = (f"https://widgets.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/match_timelinedelta/{secondary_id}?T=exp=1782033731~acl=/*~data=eyJvIjoiaHR0cHM6Ly93d3cuc3RvaXhpbWFuLmdyIiwiYSI6IjUwMWEwMjAyMTkzZTA0NTU2OWQwOTAyOWU1NWM4OTNjIiwiYWN0Ijoib3JpZ2luY2hlY2siLCJvc3JjIjoib3JpZ2luIn0~hmac=c8574d0447f9ac3829aea17ece8377810338fb310ac16cabdb461f8c992ceafc")
+    url = (f"https://widgets.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/match_timelinedelta/{secondary_id}?T=exp=1782128771~acl=/*~data=eyJvIjoiaHR0cHM6Ly93d3cuc3RvaXhpbWFuLmdyIiwiYSI6IjUwMWEwMjAyMTkzZTA0NTU2OWQwOTAyOWU1NWM4OTNjIiwiYWN0Ijoib3JpZ2luY2hlY2siLCJvc3JjIjoib3JpZ2luIn0~hmac=c4ee6ad2a35cea57ea3cf1012bbec97d6710769b4eba9e77aa1d0bc8e2410dfb")
 
     headers = {
         "User-Agent": "PostmanRuntime/7.51.1",
