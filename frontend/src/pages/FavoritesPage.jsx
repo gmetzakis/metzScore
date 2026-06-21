@@ -67,10 +67,6 @@ export default function FavoritesPage() {
 
   return (
     <div className="favorites-page">
-      <div className="page-header">
-        <h1>MetzScore</h1>
-      </div>
-
       <div className="page-navigation">
         <Link to="/" className="nav-link">
           Live Matches

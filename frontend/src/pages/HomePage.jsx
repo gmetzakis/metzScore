@@ -56,10 +56,6 @@ export default function HomePage() {
 
   return (
     <div className="home-page">
-      <div className="page-header">
-        <h1>MetzScore</h1>
-      </div>
-
       <div className="page-navigation">
         <Link to="/" className="nav-link active">
           Live Matches
