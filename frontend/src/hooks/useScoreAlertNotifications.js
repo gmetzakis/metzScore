@@ -86,19 +86,77 @@ export default function useScoreAlertNotifications(matches) {
       };
 
       if (previous && (previous.home !== current.home || previous.away !== current.away)) {
-        const homeDiff = Number(current.home) - Number(previous.home);
-        const awayDiff = Number(current.away) - Number(previous.away);
-        if (homeDiff > 0 || awayDiff > 0) {
-          const mode = alertModes[String(match.id)] || 'all';
-          const shouldNotify =
-            mode === 'all' ||
-            (mode === 'home' && homeDiff > 0) ||
-            (mode === 'away' && awayDiff > 0);
+        
+        // const homeDiff = Number(current.home) - Number(previous.home);
+        // const awayDiff = Number(current.away) - Number(previous.away);
+        // if (homeDiff > 0 || awayDiff > 0) {
+        //   const mode = alertModes[String(match.id)] || 'all';
+        //   const shouldNotify =
+        //     mode === 'all' ||
+        //     (mode === 'home' && homeDiff > 0) ||
+        //     (mode === 'away' && awayDiff > 0);
 
-          if (shouldNotify) {
-            const title = getNotificationTitle(match);
-            const body = getNotificationBody(previous, match);
-            sendBrowserNotification(title, body);
+        //   if (shouldNotify) {
+        //     const title = getNotificationTitle(match);
+        //     const body = getNotificationBody(previous, match);
+        //     sendBrowserNotification(title, body);
+        //   }
+        // }
+
+
+
+        const mode = alertModes[String(match.id)] || 'all';
+        const shouldNotify =
+          mode === 'all' ||
+          (mode === 'home' && previous.home !== current.home) ||
+          (mode === 'away' && previous.away !== current.away);
+
+        if (shouldNotify) {
+          const minute = formatGoalMinute(match.match_time);
+          if (mode === 'all') {
+            if (previous.home < current.home || previous.away < current.away) {
+              // Score has increased
+              const title = current.home > previous.home ? `Goal: ${match.home_team}` : `Goal: ${match.away_team}`;
+              const body = current.home > previous.home ? `${match.home_team} [${match.home_score}]-${match.away_score} ${match.away_team}` : `${match.home_team} ${match.home_score}-[${match.away_score}] ${match.away_team}`;
+              sendBrowserNotification(`${minute} ${title}`, body);
+            }
+
+            if (previous.home > current.home || previous.away > current.away) {
+              // Score has decreased
+              const title = current.home < previous.home ? `Cancelled Goal: ${match.home_team}` : `Cancelled Goal: ${match.away_team}`;
+              const body = current.home < previous.home ? `${match.home_team} [${match.home_score}]-${match.away_score} ${match.away_team}` : `${match.home_team} ${match.home_score}-[${match.away_score}] ${match.away_team}`;
+              sendBrowserNotification(`${minute} ${title}`, body);
+            }
+          }
+
+          else if (mode === 'home') {
+            if (previous.home < current.home) {
+              const title = `Goal: ${match.home_team}`;
+              //const body = `${match.home_team}: ${previous.home} → ${match.home_score}`;
+              const body = `Goal no. ${match.home_score} for ${match.home_team}`;
+              sendBrowserNotification(`${minute} ${title}`, body);
+            }
+            else if (previous.home > current.home) {
+              const title = `Cancelled Goal: ${match.home_team}`;
+              //const body = `${match.home_team}: ${previous.home} → ${match.home_score}`;
+              const body = `Cancelled Goal no. ${previous.home} for ${match.home_team}`;
+              sendBrowserNotification(`${minute} ${title}`, body);
+            }
+          }
+
+          else if (mode === 'away') {
+            if (previous.away < current.away) {
+              const title = `Goal: ${match.away_team}`;
+              //const body = `${match.away_team}: ${previous.away} → ${match.away_score}`;
+              const body = `Goal no. ${match.away_score} for ${match.away_team}`;
+              sendBrowserNotification(`${minute} ${title}`, body);
+            }
+            else if (previous.away > current.away) {
+              const title = `Cancelled Goal: ${match.away_team}`;
+              //const body = `${match.away_team}: ${previous.away} → ${match.away_team}`;
+              const body = `Cancelled Goal no. ${previous.away} for ${match.away_team}`;
+              sendBrowserNotification(`${minute} ${title}`, body);
+            }
           }
         }
       }

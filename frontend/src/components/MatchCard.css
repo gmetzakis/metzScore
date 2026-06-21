@@ -112,7 +112,7 @@
 }
 
 .alert-config-menu {
-  position: absolute;
+  position: relative;
   top: 28px;
   right: 0;
   width: 160px;
