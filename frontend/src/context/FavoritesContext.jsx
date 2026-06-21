@@ -6,30 +6,38 @@ const STORAGE_KEY = 'metzScore-favorites';
 const ALERTS_STORAGE_KEY = 'metzScore-alerts';
 const ALERT_MODES_STORAGE_KEY = 'metzScore-alert-modes';
 
+function parseStoredArray(value) {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function parseStoredObject(value) {
+  if (!value) return {};
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
 export function FavoritesProvider({ children }) {
   const [favoriteIds, setFavoriteIds] = useState(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return parseStoredArray(stored);
   });
   const [alertIds, setAlertIds] = useState(() => {
-    try {
-      const stored = localStorage.getItem(ALERTS_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
+    const stored = localStorage.getItem(ALERTS_STORAGE_KEY);
+    return parseStoredArray(stored);
   });
   const [alertModes, setAlertModes] = useState(() => {
-    try {
-      const stored = localStorage.getItem(ALERT_MODES_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : {};
-    } catch {
-      return {};
-    }
+    const stored = localStorage.getItem(ALERT_MODES_STORAGE_KEY);
+    return parseStoredObject(stored);
   });
 
   useEffect(() => {

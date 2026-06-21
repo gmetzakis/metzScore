@@ -43,19 +43,21 @@ export default function FavoritesPage() {
     return () => clearInterval(interval);
   }, [fetchAllMatches]);
 
+  const safeFavoriteIds = Array.isArray(favoriteIds) ? favoriteIds : [];
+
   const favoriteMatches = useMemo(() => {
-    const favSet = new Set(favoriteIds);
+    const favSet = new Set(safeFavoriteIds);
     return allMatches.filter(m => favSet.has(m.id));
-  }, [allMatches, favoriteIds]);
+  }, [allMatches, safeFavoriteIds]);
 
   useEffect(() => {
-    if (!allMatches.length || !favoriteIds.length) return;
+    if (!allMatches.length || !safeFavoriteIds.length) return;
     const currentIds = new Set(allMatches.map(m => m.id));
-    const missingFavoriteIds = favoriteIds.filter(id => !currentIds.has(id));
+    const missingFavoriteIds = safeFavoriteIds.filter(id => !currentIds.has(id));
     if (missingFavoriteIds.length) {
       removeFavorites(missingFavoriteIds);
     }
-  }, [allMatches, favoriteIds, removeFavorites]);
+  }, [allMatches, safeFavoriteIds, removeFavorites]);
 
   useScoreAlertNotifications(favoriteMatches);
 
