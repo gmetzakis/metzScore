@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { FavoritesProvider, useFavorites } from './context/FavoritesContext';
 import HomePage from './pages/HomePage';
@@ -6,11 +6,31 @@ import UpcomingMatchesPage from './pages/UpcomingMatchesPage';
 import FavoritesPage from './pages/FavoritesPage';
 import MatchDetailPage from './pages/MatchDetailPage';
 import AlertsModal from './components/AlertsModal';
+import useScoreAlertNotifications from './hooks/useScoreAlertNotifications';
+import { apiService } from './services/api';
 import './App.css';
 
 function AppContents() {
   const [alertsOpen, setAlertsOpen] = useState(false);
+  const [allMatches, setAllMatches] = useState([]);
   const { alertIds } = useFavorites();
+
+  const fetchAllMatches = useCallback(async () => {
+    try {
+      const data = await apiService.getAllFootballMatches();
+      setAllMatches(data.matches || []);
+    } catch (err) {
+      // Ignore fetch failures; the hook will retry on the next interval.
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAllMatches();
+    const interval = setInterval(fetchAllMatches, 5000);
+    return () => clearInterval(interval);
+  }, [fetchAllMatches]);
+
+  useScoreAlertNotifications(allMatches);
 
   return (
     <>
