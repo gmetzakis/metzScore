@@ -4,6 +4,7 @@ import LeagueGroupedList from '../components/LeagueGroupedList';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorDisplay from '../components/ErrorDisplay';
 import { apiService } from '../services/api';
+import useScoreAlertNotifications from '../hooks/useScoreAlertNotifications';
 import { useFavorites } from '../context/FavoritesContext';
 import './FavoritesPage.css';
 
@@ -46,6 +47,8 @@ export default function FavoritesPage() {
     const favSet = new Set(favoriteIds);
     return allMatches.filter(m => favSet.has(m.id));
   }, [allMatches, favoriteIds]);
+
+  useScoreAlertNotifications(favoriteMatches);
 
   const liveCount = favoriteMatches.filter(m => m.status === 'Live').length;
   const upcomingCount = favoriteMatches.filter(m => m.status === 'Not Started').length;

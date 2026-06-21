@@ -4,6 +4,7 @@ import LeagueGroupedList from '../components/LeagueGroupedList';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorDisplay from '../components/ErrorDisplay';
 import { apiService } from '../services/api';
+import useScoreAlertNotifications from '../hooks/useScoreAlertNotifications';
 import './HomePage.css';
 
 export default function HomePage() {
@@ -40,6 +41,8 @@ export default function HomePage() {
     const interval = setInterval(fetchLiveMatches, 5000);
     return () => clearInterval(interval);
   }, [fetchLiveMatches]);
+
+  useScoreAlertNotifications(matches);
 
   const filteredMatches = matches.filter(m => {
     if (!search.trim()) return true;
