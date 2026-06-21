@@ -513,33 +513,6 @@ export default function MatchDetailPage() {
     : [];
 
   const [activePanel, setActivePanel] = useState('lineups');
-  const hasOdds = odds && Object.keys(odds).length > 0;
-  const hasLineups = roster && (
-    Boolean(roster.lineups?.homeLineup) ||
-    Boolean(roster.lineups?.awayLineup) ||
-    Boolean(roster.benchPlayers?.length)
-  );
-  const hasStats = (statistics && Object.keys(statistics).length > 0) ||
-    (results && Object.keys(results).length > 0) ||
-    (score && (score.home != null || score.away != null));
-  const hasInfo = Boolean(league?.name || zone?.name || start_time || data?.total_markets != null || data?.url);
-  const hasEvents = Array.isArray(data.incidents) && data.incidents.length > 0;
-
-  const availablePanels = [
-    hasLineups && { id: 'lineups', label: 'Lineups' },
-    hasStats && { id: 'stats', label: 'Statistics' },
-    hasInfo && { id: 'info', label: 'Info' },
-    hasEvents && { id: 'events', label: 'Events' },
-  ].filter(Boolean);
-
-  useEffect(() => {
-    if (!availablePanels.length) return;
-    if (!availablePanels.some(panel => panel.id === activePanel)) {
-      setActivePanel(availablePanels[0].id);
-    }
-  }, [availablePanels, activePanel]);
-
-  const hasPitch = Boolean(is_live && pitchAvailable && !pitchLoading);
 
   // ── Render ────────────────────────────────────────────────────────────────
   if (loading) {
@@ -568,6 +541,27 @@ export default function MatchDetailPage() {
     incident_filters, statistics, is_live, status,
     roster, start_time,
   } = data;
+
+  const hasOdds = odds && Object.keys(odds).length > 0;
+  const hasLineups = roster && (
+    Boolean(roster.lineups?.homeLineup) ||
+    Boolean(roster.lineups?.awayLineup) ||
+    Boolean(roster.benchPlayers?.length)
+  );
+  const hasStats = (statistics && Object.keys(statistics).length > 0) ||
+    (results && Object.keys(results).length > 0) ||
+    (score && (score.home != null || score.away != null));
+  const hasInfo = Boolean(league?.name || zone?.name || start_time || data?.total_markets != null || data?.url);
+  const hasEvents = Array.isArray(data.incidents) && data.incidents.length > 0;
+
+  const availablePanels = [
+    hasLineups && { id: 'lineups', label: 'Lineups' },
+    hasStats && { id: 'stats', label: 'Statistics' },
+    hasInfo && { id: 'info', label: 'Info' },
+    hasEvents && { id: 'events', label: 'Events' },
+  ].filter(Boolean);
+
+  const hasPitch = Boolean(is_live && pitchAvailable && !pitchLoading);
 
   return (
     <div className="detail-page">
