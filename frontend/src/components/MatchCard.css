@@ -133,9 +133,12 @@
   margin-left: 4px;
 }
 
-.action-btn:hover {
-  color: #999;
-}
+.fav-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 1.4rem;
+    transform: translateY(-1.4px);
+  }
 
 .fav-btn:hover {
   color: #f0c400;
@@ -149,16 +152,33 @@
   color: var(--text);
 }
 
-.alert-btn.alert-off {
-  color: #999;
+.alert-btn {
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  /* background-image: url('./static/notification.svg'); */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.alert-btn.alert-on svg {
+  fill: currentColor;
+}
+
+
+.alert-btn:hover {
+  color: #395cfa;
 }
 
 .alert-btn.alert-on {
-  color: #2f9cff;
+  color: #4666f8;
 }
 
 .alert-btn.alert-on:hover {
-  color: #76b7ff;
+  color: grey;
 }
 
 @media (max-width: 480px) {
@@ -189,10 +209,5 @@
   .match-score {
     font-size: 1rem;
   }
-  
-  .fav-btn {
-    width: 24px;
-    height: 24px;
-    font-size: 1rem;
-  }
+
 }
