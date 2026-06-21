@@ -4,9 +4,14 @@
 }
 
 .page-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #fff;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 12px;
+  padding: 12px 0 12px;
   margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 .page-header h1 {

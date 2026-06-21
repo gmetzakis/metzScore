@@ -4,11 +4,12 @@ import LeagueGroupedList from '../components/LeagueGroupedList';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorDisplay from '../components/ErrorDisplay';
 import { apiService } from '../services/api';
+import useScoreAlertNotifications from '../hooks/useScoreAlertNotifications';
 import { useFavorites } from '../context/FavoritesContext';
 import './FavoritesPage.css';
 
 export default function FavoritesPage() {
-  const { favoriteIds } = useFavorites();
+  const { favoriteIds, clearAllFavorites, removeFavorites } = useFavorites();
   const [allMatches, setAllMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -42,10 +43,23 @@ export default function FavoritesPage() {
     return () => clearInterval(interval);
   }, [fetchAllMatches]);
 
+  const safeFavoriteIds = Array.isArray(favoriteIds) ? favoriteIds : [];
+
   const favoriteMatches = useMemo(() => {
-    const favSet = new Set(favoriteIds);
+    const favSet = new Set(safeFavoriteIds);
     return allMatches.filter(m => favSet.has(m.id));
-  }, [allMatches, favoriteIds]);
+  }, [allMatches, safeFavoriteIds]);
+
+  useEffect(() => {
+    if (!allMatches.length || !safeFavoriteIds.length) return;
+    const currentIds = new Set(allMatches.map(m => m.id));
+    const missingFavoriteIds = safeFavoriteIds.filter(id => !currentIds.has(id));
+    if (missingFavoriteIds.length) {
+      removeFavorites(missingFavoriteIds);
+    }
+  }, [allMatches, safeFavoriteIds, removeFavorites]);
+
+  useScoreAlertNotifications(favoriteMatches);
 
   const liveCount = favoriteMatches.filter(m => m.status === 'Live').length;
   const upcomingCount = favoriteMatches.filter(m => m.status === 'Not Started').length;
@@ -53,10 +67,6 @@ export default function FavoritesPage() {
 
   return (
     <div className="favorites-page">
-      <div className="page-header">
-        <h1>MetzScore</h1>
-      </div>
-
       <div className="page-navigation">
         <Link to="/" className="nav-link">
           Live Matches
@@ -67,6 +77,9 @@ export default function FavoritesPage() {
         <Link to="/favorites" className="nav-link active">
           ☆ Favorites
         </Link>
+        <button className="favorites-clear-btn" onClick={clearAllFavorites} disabled={!favoriteIds.length}>
+          Clear favorites
+        </button>
       </div>
 
       <div className="page-content">

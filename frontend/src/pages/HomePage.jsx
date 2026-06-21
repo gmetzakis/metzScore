@@ -4,6 +4,7 @@ import LeagueGroupedList from '../components/LeagueGroupedList';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorDisplay from '../components/ErrorDisplay';
 import { apiService } from '../services/api';
+import useScoreAlertNotifications from '../hooks/useScoreAlertNotifications';
 import './HomePage.css';
 
 export default function HomePage() {
@@ -41,6 +42,8 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, [fetchLiveMatches]);
 
+  useScoreAlertNotifications(matches);
+
   const filteredMatches = matches.filter(m => {
     if (!search.trim()) return true;
     const q = search.toLowerCase();
@@ -53,10 +56,6 @@ export default function HomePage() {
 
   return (
     <div className="home-page">
-      <div className="page-header">
-        <h1>MetzScore</h1>
-      </div>
-
       <div className="page-navigation">
         <Link to="/" className="nav-link active">
           Live Matches

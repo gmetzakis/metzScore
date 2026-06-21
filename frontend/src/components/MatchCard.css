@@ -9,7 +9,7 @@
   transition: all 0.1s ease;
   cursor: pointer;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   font-size: 0.85rem;
 }
 
@@ -87,6 +87,68 @@
   align-self: center;
 }
 
+.alert-button-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.alert-config-toggle {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  width: 8px;
+  height: 8px;
+  background: none;
+  color: grey;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.alert-config-toggle:hover {
+  color: black;
+}
+
+.alert-config-menu {
+  position: absolute;
+  top: 28px;
+  right: 0;
+  width: 160px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  padding: 8px;
+  z-index: 3;
+}
+
+.alert-config-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.alert-config-option {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 6px 8px;
+  font-size: 0.82rem;
+  color: var(--text);
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.alert-config-option:hover,
+.alert-config-option.active {
+  background: var(--border-light);
+}
+
 .score-column {
   display: flex;
   flex-direction: column;
@@ -117,7 +179,7 @@
   margin-top: 1px;
 }
 
-.fav-btn {
+.action-btn {
   background: none;
   border: none;
   width: 28px;
@@ -129,7 +191,16 @@
   color: var(--text);
   font-size: 1.1rem;
   transition: all 0.15s ease;
+  cursor: pointer;
+  margin-left: 4px;
 }
+
+.fav-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 1.4rem;
+    transform: translateY(-1.4px);
+  }
 
 .fav-btn:hover {
   color: #f0c400;
@@ -141,6 +212,35 @@
 
 .fav-btn.fav-on:hover {
   color: var(--text);
+}
+
+.alert-btn {
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  /* background-image: url('./static/notification.svg'); */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.alert-btn.alert-on svg {
+  fill: currentColor;
+}
+
+
+.alert-btn:hover {
+  color: #395cfa;
+}
+
+.alert-btn.alert-on {
+  color: #4666f8;
+}
+
+.alert-btn.alert-on:hover {
+  color: grey;
 }
 
 @media (max-width: 480px) {
@@ -171,10 +271,5 @@
   .match-score {
     font-size: 1rem;
   }
-  
-  .fav-btn {
-    width: 24px;
-    height: 24px;
-    font-size: 1rem;
-  }
+
 }
