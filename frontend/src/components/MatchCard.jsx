@@ -69,7 +69,7 @@ export default function MatchCard({ match }) {
               </button>
               {showAlertConfig && (
                 <div className="alert-config-menu" onClick={(e) => e.stopPropagation()}>
-                  <div className="alert-config-label">Alert type</div>
+                  <div className="alert-config-label"></div>
                   <button
                     type="button"
                     className={`alert-config-option ${alertMode === 'all' ? 'active' : ''}`}

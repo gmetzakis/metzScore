@@ -9,7 +9,7 @@
   transition: all 0.1s ease;
   cursor: pointer;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   font-size: 0.85rem;
 }
 
@@ -95,14 +95,12 @@
 
 .alert-config-toggle {
   position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1px solid rgba(0,0,0,0.12);
-  background: var(--bg);
-  color: var(--text);
+  top: -4px;
+  right: -8px;
+  width: 8px;
+  height: 8px;
+  background: none;
+  color: grey;
   font-size: 0.8rem;
   display: flex;
   align-items: center;
@@ -111,8 +109,12 @@
   z-index: 2;
 }
 
+.alert-config-toggle:hover {
+  color: black;
+}
+
 .alert-config-menu {
-  position: relative;
+  position: absolute;
   top: 28px;
   right: 0;
   width: 160px;
