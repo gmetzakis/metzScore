@@ -141,6 +141,7 @@ export function FavoritesProvider({ children }) {
       removeAlert,
       removeAlerts,
       removeFavorite,
+      removeFavorites,
       clearAllAlerts,
       clearAllFavorites,
     }}>
