@@ -53,28 +53,23 @@ function getMomentumValue(results) {
 }
 
 function buildQuickStats(score, results) {
-  return [
-    {
-      label: 'Goals',
-      home: score?.home ?? '-',
-      away: score?.away ?? '-',
-    },
-    {
-      label: 'Corners',
-      home: results?.corners?.home ?? '-',
-      away: results?.corners?.away ?? '-',
-    },
-    {
-      label: 'Shots',
-      home: results?.shots?.home ?? '-',
-      away: results?.shots?.away ?? '-',
-    },
-    {
-      label: 'Possession',
-      home: results?.possession?.home != null ? `${results.possession.home}%` : '-',
-      away: results?.possession?.away != null ? `${results.possession.away}%` : '-',
-    },
-  ];
+
+  const formatters = {
+    possession: value => value != null ? `${value}%` : '-',
+  };
+
+  return Object.entries(results || {})
+    .filter(([key]) => key.toLowerCase() !== 'sportid')
+    .filter(([key]) => key.toLowerCase() !== 'scorers')
+    .map(([key, value]) => ({
+      label: key.charAt(0).toUpperCase() + key.slice(1),
+      home: formatters[key]
+        ? formatters[key](value?.home)
+        : value?.home ?? '-',
+      away: formatters[key]
+        ? formatters[key](value?.away)
+        : value?.away ?? '-',
+    }));
 }
 
 // ---------------------------------------------------------------------------
@@ -84,6 +79,7 @@ function buildQuickStats(score, results) {
 const INCIDENT_ICONS = {
   GOAL: '⚽',
   YELL: '🟨',
+  RED: '🟥️',
   SUBS: '🔄',
   OFFS: '📐',
   PENL: '🎯',
@@ -407,7 +403,6 @@ function MatchInfoSection({ matchData }) {
 
 function SummaryStrip({ score, results, isLive }) {
   const quickStats = buildQuickStats(score, results);
-  const momentum = getMomentumValue(results);
 
   return (
     <div className="summary-strip">
@@ -421,11 +416,7 @@ function SummaryStrip({ score, results, isLive }) {
           </div>
         </div>
       ))}
-      <div className={`summary-status-pill ${isLive ? 'is-live' : ''}`}>
-        <span className="summary-status-dot" />
-        {isLive ? 'Live' : 'Pre-match'}
-        {momentum && <span className="summary-status-note"> · Momentum {momentum === 'home' ? 'Home' : 'Away'}</span>}
-      </div>
+      
     </div>
   );
 }
@@ -541,6 +532,7 @@ export default function MatchDetailPage() {
     incident_filters, statistics, is_live, status,
     roster, start_time,
   } = data;
+  console.log("ENA: ", data);
 
   const hasOdds = odds && Object.keys(odds).length > 0;
   const hasLineups = roster && (
@@ -568,26 +560,24 @@ export default function MatchDetailPage() {
 
       <div className="detail-shell">
         {/* ── Top bar ── */}
-        <div className="detail-nav">
-          <Link to="/" className="back-link">← Back to Matches</Link>
-          <Link to="/" className="back-link-mobile">← Back</Link>
-        </div>
+        
 
         <section className="detail-hero" ref={summaryRef}>
           <div className="detail-hero__meta-row">
             <div className="detail-hero__league">
-              <span className="detail-hero__league-badge">{league?.name || 'Unknown League'}</span>
-              <span className="detail-hero__kickoff">{formatCompactTime(start_time)}</span>
+              <div className="detail-nav">
+                <Link to="/" className="back-link">← Back to Matches</Link>
+                <Link to="/" className="back-link-mobile">← Back</Link>
+              </div>
             </div>
             <div className={`detail-hero__status detail-hero__status--${String(status).toLowerCase().replace(' ', '-')}`}>
-              <span className="detail-hero__status-dot" />
-              {status}
+              <span className="detail-hero__league-badge">{league?.name || 'Unknown League'}</span>
+              <span className="detail-hero__kickoff">{formatCompactTime(start_time)}</span>
             </div>
           </div>
 
           <div className="detail-hero__teams">
             <div className="hero-team hero-team--home">
-              <div className="hero-team__badge hero-team__badge--home">{getTeamInitials(home_team?.name)}</div>
               <div className="hero-team__name">{home_team?.name || 'Home'}</div>
             </div>
 
@@ -598,24 +588,17 @@ export default function MatchDetailPage() {
             </div>
 
             <div className="hero-team hero-team--away">
-              <div className="hero-team__badge hero-team__badge--away">{getTeamInitials(away_team?.name)}</div>
               <div className="hero-team__name">{away_team?.name || 'Away'}</div>
+            </div>
+
+            <div className="hero-time">
+              {is_live ? formatClock(score?.seconds_since_start) : '—'}
             </div>
           </div>
 
+
           <div className="detail-hero__facts">
-            <div className="hero-fact hero-fact--clock">
-              <span className="hero-fact__label">Clock</span>
-              <span className="hero-fact__value">{is_live ? formatClock(score?.seconds_since_start) : '—'}</span>
-            </div>
-            <div className="hero-fact">
-              <span className="hero-fact__label">Venue</span>
-              <span className="hero-fact__value">{zone?.name || 'Unknown zone'}</span>
-            </div>
-            <div className="hero-fact">
-              <span className="hero-fact__label">Markets</span>
-              <span className="hero-fact__value">{typeof data?.total_markets === 'number' ? data.total_markets : '—'}</span>
-            </div>
+            
           </div>
 
           <SummaryStrip score={score} results={results} isLive={is_live} />
