@@ -154,3 +154,41 @@ def get_statsplayer_endpoint(
             "status": "error",
             "message": str(e)
         }
+
+
+def get_statsstream_detailed(match_id: int):
+    url = f"https://www.stoiximan.gr/api/statsstream/{match_id}/stats/detailed/"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://www.stoiximan.gr/live-scores/",
+        "Origin": "https://www.stoiximan.gr",
+        "Connection": "keep-alive",
+        "Cache-Control": "no-cache",
+        "x-language": "2",
+        "x-operator": "2",
+    }
+
+    resp = requests.get(url, headers=headers, timeout=20)
+    resp.raise_for_status()
+    return resp.json()
+
+
+@app.get("/api/football/statsstream/detailed/{match_id}")
+def get_statsstream_detailed_endpoint(
+    match_id: int = Path(..., description="Stoiximan match id")
+):
+    try:
+        data = get_statsstream_detailed(match_id)
+        return {
+            "status": "success",
+            "match_id": match_id,
+            **data,
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }

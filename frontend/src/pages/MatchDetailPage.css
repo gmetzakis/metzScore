@@ -472,6 +472,10 @@
   padding: 0;
 }
 
+.section-title--small {
+  font-size: 15px;
+}
+
 .section-badges {
   display: flex;
   flex-wrap: wrap;
@@ -508,6 +512,11 @@
   border-radius: 18px;
   font-size: 13px;
   border: 1px dashed rgba(148, 163, 184, 0.24);
+}
+
+.section-empty--tight {
+  padding: 16px 12px;
+  margin-bottom: 12px;
 }
 
 /* Incident timeline */
@@ -612,6 +621,10 @@
   background: #fff;
 }
 
+.stats-table--compact {
+  margin-bottom: 14px;
+}
+
 .stats-table thead {
   background: #f8fafc;
 }
@@ -651,6 +664,36 @@
 .stat-highlight {
   font-weight: 800;
   color: #0f172a;
+}
+
+.statsstream-block {
+  margin-bottom: 16px;
+  padding: 14px;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.stats-json {
+  margin-top: 12px;
+}
+
+.stats-json summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  color: #2563eb;
+}
+
+.stats-json pre {
+  margin: 10px 0 0;
+  padding: 12px;
+  border-radius: 14px;
+  background: #0f172a;
+  color: #e2e8f0;
+  overflow: auto;
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 .sub-section {

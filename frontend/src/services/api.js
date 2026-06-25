@@ -57,4 +57,21 @@ export const apiService = {
       throw error;
     }
   },
+
+  /**
+   * Get the detailed Stoiximan statsstream payload for a single match.
+   */
+  getStatsstreamDetailed: async (matchId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/football/statsstream/detailed/${matchId}`);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.statusText}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching statsstream detailed data:", error);
+      throw error;
+    }
+  },
 };

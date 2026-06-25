@@ -61,6 +61,7 @@ function buildQuickStats(score, results) {
   return Object.entries(results || {})
     .filter(([key]) => key.toLowerCase() !== 'sportid')
     .filter(([key]) => key.toLowerCase() !== 'scorers')
+    .filter(([key]) => key.toLowerCase() !== 'injurytime')
     .map(([key, value]) => ({
       label: key.charAt(0).toUpperCase() + key.slice(1),
       home: formatters[key]
@@ -169,7 +170,7 @@ function getSideBySideStats(statsTeams, homeTeamId, awayTeamId, eventStats, live
   return result;
 }
 
-function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isLive }) {
+function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isLive, statsStreamDetailed, statsStreamLoading, statsStreamError }) {
   const teamsStats  = statistics?.teams || {};
   const eventStats  = statistics?.event || {};
   const liveResults = results || {};
@@ -191,6 +192,22 @@ function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isLi
 
   return (
     <div className="stats-section">
+      {statsStreamLoading && (
+        <div className="section-empty section-empty--tight">
+          <p>Loading Stoiximan statsstream details...</p>
+        </div>
+      )}
+
+      {statsStreamError && (
+        <div className="section-empty section-empty--tight">
+          <p>Statsstream fetch failed: {statsStreamError}</p>
+        </div>
+      )}
+
+      {statsStreamDetailed && (
+        <StatsstreamDetailedSection statsStreamDetailed={statsStreamDetailed} />
+      )}
+
       <table className="stats-table">
         <thead>
           <tr>
@@ -213,6 +230,60 @@ function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isLi
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function StatsstreamDetailedSection({ statsStreamDetailed }) {
+  const homeTotals = statsStreamDetailed?.data?.home?.total || {};
+  const awayTotals = statsStreamDetailed?.data?.away?.total || {};
+
+  const rows = [
+    ['Goals', homeTotals.goals, awayTotals.goals],
+    ['Shots', homeTotals.total_shots, awayTotals.total_shots],
+    ['Shots on Target', homeTotals.shots_on_target, awayTotals.shots_on_target],
+    ['Shots Off Target', homeTotals.shots_off_target, awayTotals.shots_off_target],
+    ['Shots Blocked', homeTotals.shots_blocked, awayTotals.shots_blocked],
+    ['Corners', homeTotals.corners, awayTotals.corners],
+    ['Attacks', homeTotals.attacks, awayTotals.attacks],
+    ['Dangerous Attacks', homeTotals.dangerous_attacks, awayTotals.dangerous_attacks],
+    ['Fouls', homeTotals.fouls, awayTotals.fouls],
+    ['Yellow Cards', homeTotals.yellow_cards, awayTotals.yellow_cards],
+    ['Possession %', homeTotals.possession, awayTotals.possession],
+  ];
+
+  return (
+    <div className="statsstream-block">
+      <div className="section-head section-head--compact">
+        <div>
+          <div className="section-kicker">Stoiximan</div>
+          <h3 className="section-title section-title--small">Statsstream detailed</h3>
+        </div>
+      </div>
+
+      <table className="stats-table stats-table--compact">
+        <thead>
+          <tr>
+            <th />
+            <th className="stat-home">Home</th>
+            <th className="stat-away">Away</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(([label, home, away]) => (
+            <tr key={label}>
+              <td className="stat-label">{label}</td>
+              <td>{home ?? '-'}</td>
+              <td>{away ?? '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <details className="stats-json">
+        <summary>Raw statsstream JSON</summary>
+        <pre>{JSON.stringify(statsStreamDetailed, null, 2)}</pre>
+      </details>
     </div>
   );
 }
@@ -505,6 +576,39 @@ export default function MatchDetailPage() {
   const displayedIncidents = [...filteredIncidents].reverse();
 
   const [activePanel, setActivePanel] = useState('odds');
+  const [statsStreamDetailed, setStatsStreamDetailed] = useState(null);
+  const [statsStreamLoading, setStatsStreamLoading] = useState(false);
+  const [statsStreamError, setStatsStreamError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadStatsStream() {
+      if (!matchId) return;
+      setStatsStreamLoading(true);
+      setStatsStreamError(null);
+
+      try {
+        const payload = await apiService.getStatsstreamDetailed(matchId);
+        if (cancelled) return;
+        setStatsStreamDetailed(payload);
+        console.log('[statsstream/detailed]', payload);
+      } catch (err) {
+        if (cancelled) return;
+        setStatsStreamError(err.message || 'Failed to fetch statsstream details');
+        setStatsStreamDetailed(null);
+        console.error('[statsstream/detailed] error', err);
+      } finally {
+        if (!cancelled) setStatsStreamLoading(false);
+      }
+    }
+
+    loadStatsStream();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [matchId]);
 
   // ── Render ────────────────────────────────────────────────────────────────
   if (loading) {
@@ -650,6 +754,9 @@ export default function MatchDetailPage() {
                         results={results}
                         score={score}
                         isLive={is_live}
+                        statsStreamDetailed={statsStreamDetailed}
+                        statsStreamLoading={statsStreamLoading}
+                        statsStreamError={statsStreamError}
                       />
                     )}
 
