@@ -170,26 +170,7 @@ function getSideBySideStats(statsTeams, homeTeamId, awayTeamId, eventStats, live
   return result;
 }
 
-function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isLive, statsStreamDetailed, statsStreamLoading, statsStreamError }) {
-  const teamsStats  = statistics?.teams || {};
-  const eventStats  = statistics?.event || {};
-  const liveResults = results || {};
-  const scores      = score   || {};
-
-  const sbStats = getSideBySideStats(teamsStats, homeTeamId, awayTeamId, eventStats, liveResults, scores);
-
-  if (sbStats.length === 0) {
-    return (
-      <div className="section-empty">
-        <p>
-          {isLive
-            ? 'Statistics are being collected and will appear shortly.'
-            : 'Statistics are not available for this match.'}
-        </p>
-      </div>
-    );
-  }
-
+function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isLive, statsStreamDetailed, statsStreamLoading, statsStreamError, incidents }) {
   return (
     <div className="stats-section">
       {statsStreamLoading && (
@@ -204,53 +185,189 @@ function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isLi
         </div>
       )}
 
-      {statsStreamDetailed && (
-        <StatsstreamDetailedSection statsStreamDetailed={statsStreamDetailed} />
+      {statsStreamDetailed ? (
+        <StatsstreamDetailedSection statsStreamDetailed={statsStreamDetailed} incidents={incidents} />
+      ) : (
+        <div className="section-empty">
+          <p>
+            {isLive
+              ? 'Statistics are being collected and will appear shortly.'
+              : 'Statistics are not available for this match.'}
+          </p>
+        </div>
       )}
-
-      <table className="stats-table">
-        <thead>
-          <tr>
-            <th />
-            <th className="stat-home">{homeTeamId ? 'Home' : ''}</th>
-            <th className="stat-away">{awayTeamId ? 'Away' : ''}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sbStats.map(stat => (
-            <tr key={stat.label}>
-              <td className="stat-label">{stat.label}</td>
-              <td className={parseInt(stat.home) > parseInt(stat.away) ? 'stat-highlight' : ''}>
-                {stat.home}
-              </td>
-              <td className={parseInt(stat.away) > parseInt(stat.home) ? 'stat-highlight' : ''}>
-                {stat.away}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 }
 
-function StatsstreamDetailedSection({ statsStreamDetailed }) {
+function parseIncidentMinute(time) {
+  if (!time) return null;
+  const value = String(time).trim();
+  const plusMatch = value.match(/^(\d+)\+(\d+)$/);
+  if (plusMatch) return Number(plusMatch[1]) + Number(plusMatch[2]);
+  const minuteMatch = value.match(/(\d{1,3})/);
+  return minuteMatch ? Number(minuteMatch[1]) : null;
+}
+
+function getIncidentImpact(type) {
+  switch (type) {
+    case 'GOAL': return 6;
+    case 'RED': return 5;
+    case 'PENL': return 4;
+    case 'YELL': return 2;
+    case 'CRNR': return 2;
+    case 'SUBS': return 1;
+    case 'OFFS': return 1;
+    default: return 1;
+  }
+}
+
+function getIncidentIcon(type) {
+  return INCIDENT_ICONS[type] || '•';
+}
+
+function StatsstreamDetailedSection({ statsStreamDetailed, incidents }) {
+  const [showAllStats, setShowAllStats] = useState(false);
   const homeTotals = statsStreamDetailed?.data?.home?.total || {};
   const awayTotals = statsStreamDetailed?.data?.away?.total || {};
 
-  const rows = [
-    ['Goals', homeTotals.goals, awayTotals.goals],
-    ['Shots', homeTotals.total_shots, awayTotals.total_shots],
-    ['Shots on Target', homeTotals.shots_on_target, awayTotals.shots_on_target],
-    ['Shots Off Target', homeTotals.shots_off_target, awayTotals.shots_off_target],
-    ['Shots Blocked', homeTotals.shots_blocked, awayTotals.shots_blocked],
-    ['Corners', homeTotals.corners, awayTotals.corners],
-    ['Attacks', homeTotals.attacks, awayTotals.attacks],
-    ['Dangerous Attacks', homeTotals.dangerous_attacks, awayTotals.dangerous_attacks],
-    ['Fouls', homeTotals.fouls, awayTotals.fouls],
-    ['Yellow Cards', homeTotals.yellow_cards, awayTotals.yellow_cards],
-    ['Possession %', homeTotals.possession, awayTotals.possession],
+  const totalShotsHome = Number(homeTotals.total_shots || 0);
+  const totalShotsAway = Number(awayTotals.total_shots || 0);
+
+  const attackHome = Number(homeTotals.attacks || 0);
+  const attackAway = Number(awayTotals.attacks || 0);
+  const attackTotal = Math.max(attackHome + attackAway, 1);
+
+  const dangerHome = Number(homeTotals.dangerous_attacks || 0);
+  const dangerAway = Number(awayTotals.dangerous_attacks || 0);
+  const dangerTotal = Math.max(dangerHome + dangerAway, 1);
+
+  const possessionHome = Number(homeTotals.possession || 0);
+  const possessionAway = Number(awayTotals.possession || 0);
+  const possessionTotal = Math.max(possessionHome + possessionAway, 100);
+
+  const cornersHome = Number(homeTotals.corners || 0);
+  const cornersAway = Number(awayTotals.corners || 0);
+
+  const allStatEntries = Object.keys({ ...homeTotals, ...awayTotals })
+    .filter(key => !['first_half', 'second_half', 'extra_time', 'possession'].includes(key))
+    .map(key => ({
+      key,
+      label: formatStatLabel(key),
+      home: homeTotals[key],
+      away: awayTotals[key],
+    }))
+    .filter(item => item.home != null || item.away != null)
+    .sort((a, b) => {
+      const priority = [
+        'goals',
+        'total_shots',
+        'shots_on_target',
+        'shots_off_target',
+        'shots_blocked',
+        'corners',
+        'fouls',
+        'yellow_cards',
+        'red_cards',
+        'attacks',
+        'dangerous_attacks',
+      ];
+      const pa = priority.indexOf(a.key);
+      const pb = priority.indexOf(b.key);
+      if (pa === -1 && pb === -1) return a.label.localeCompare(b.label);
+      if (pa === -1) return 1;
+      if (pb === -1) return -1;
+      return pa - pb;
+    });
+
+  const defaultStatKeys = [
+    'goals',
+    'total_shots',
+    'shots_on_target',
+    'shots_off_target',
+    'shots_blocked',
+    'corners',
+    'fouls',
+    'yellow_cards',
+    'red_cards',
+    'attacks',
+    'dangerous_attacks',
   ];
+
+  const displayedStatEntries = showAllStats
+    ? allStatEntries
+    : allStatEntries.filter(entry => defaultStatKeys.includes(entry.key));
+
+  const summaryCards = [
+    { label: 'Goals', home: homeTotals.goals, away: awayTotals.goals, accent: 'rose', icon: '⚽' },
+    { label: 'Yellow', home: homeTotals.yellow_cards, away: awayTotals.yellow_cards, accent: 'amber', icon: '■' },
+    { label: 'Red', home: homeTotals.red_cards, away: awayTotals.red_cards, accent: 'rose', icon: '■' },
+    { label: 'Corners', home: cornersHome, away: cornersAway, accent: 'sky', icon: '⚑' },
+    { label: 'Shots', home: totalShotsHome, away: totalShotsAway, accent: 'blue', icon: '◌' },
+    { label: 'On target', home: homeTotals.shots_on_target, away: awayTotals.shots_on_target, accent: 'emerald', icon: '◎' },
+  ];
+
+  const comparisonMetrics = [
+    {
+      label: 'Επιθέσεις',
+      home: attackHome,
+      away: attackAway,
+      total: attackTotal,
+      leftColor: '#2563eb',
+      rightColor: '#dc2626',
+    },
+    {
+      label: 'Σουτ εντός εστίας',
+      home: totalShotsHome,
+      away: totalShotsAway,
+      total: Math.max(totalShotsHome + totalShotsAway, 1),
+      leftColor: '#2563eb',
+      rightColor: '#dc2626',
+    },
+    {
+      label: 'Επικίνδυνες επιθέσεις',
+      home: dangerHome,
+      away: dangerAway,
+      total: dangerTotal,
+      leftColor: '#2563eb',
+      rightColor: '#dc2626',
+    },
+    {
+      label: 'Possession',
+      home: possessionHome,
+      away: possessionAway,
+      total: possessionTotal,
+      leftColor: '#2563eb',
+      rightColor: '#dc2626',
+      suffix: '%',
+    },
+  ];
+
+  const eventBins = Array.from({ length: 18 }, () => ({ home: 0, away: 0 }));
+  const keyEvents = [];
+
+  for (const incident of Array.isArray(incidents) ? incidents : []) {
+    const minute = parseIncidentMinute(incident?.time);
+    if (minute == null) continue;
+    const index = Math.min(Math.floor(minute / 5), eventBins.length - 1);
+    const impact = getIncidentImpact(incident?.type);
+    if (incident?.teamSide === 0) eventBins[index].home += impact;
+    else if (incident?.teamSide === 1) eventBins[index].away += impact;
+
+    if (['GOAL', 'RED', 'YELL', 'CRNR', 'PENL'].includes(incident?.type)) {
+      keyEvents.push({
+        minute,
+        teamSide: incident?.teamSide,
+        type: incident?.type,
+        icon: getIncidentIcon(incident?.type),
+      });
+    }
+  }
+
+  const maxBinValue = Math.max(
+    1,
+    ...eventBins.map(bin => Math.max(bin.home, bin.away))
+  );
 
   return (
     <div className="statsstream-block">
@@ -261,31 +378,188 @@ function StatsstreamDetailedSection({ statsStreamDetailed }) {
         </div>
       </div>
 
-      <table className="stats-table stats-table--compact">
-        <thead>
-          <tr>
-            <th />
-            <th className="stat-home">Home</th>
-            <th className="stat-away">Away</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map(([label, home, away]) => (
-            <tr key={label}>
-              <td className="stat-label">{label}</td>
-              <td>{home ?? '-'}</td>
-              <td>{away ?? '-'}</td>
-            </tr>
+      <div className="statsstream-preview">
+        <div className="statsstream-summary-grid">
+          {summaryCards.map(card => (
+            <div key={card.label} className={`statsstream-summary-card statsstream-summary-card--${card.accent}`}>
+              <div className="statsstream-summary-icon">{card.icon}</div>
+              <div className="statsstream-summary-label">{card.label}</div>
+              <div className="statsstream-summary-values">
+                <span>{card.home ?? 0}</span>
+                <span>{card.away ?? 0}</span>
+              </div>
+            </div>
           ))}
-        </tbody>
-      </table>
+        </div>
 
-      <details className="stats-json">
-        <summary>Raw statsstream JSON</summary>
-        <pre>{JSON.stringify(statsStreamDetailed, null, 2)}</pre>
-      </details>
+        <div className="statsstream-rings">
+          {comparisonMetrics.map(metric => {
+            const homeWidth = metric.total ? (metric.home / metric.total) * 100 : 0;
+            const ringStyle = {
+              background: `conic-gradient(#2563eb 0 ${homeWidth}%, #dc2626 ${homeWidth}% 100%)`,
+            };
+
+            return (
+              <div key={metric.label} className="statsstream-ring-card">
+                <div className="statsstream-ring-shell">
+                  <span className="statsstream-ring-value statsstream-ring-value--home">{metric.home}{metric.suffix || ''}</span>
+                  <div className="statsstream-ring" style={ringStyle}>
+                    <div className="statsstream-ring-core" />
+                  </div>
+                  <span className="statsstream-ring-value statsstream-ring-value--away">{metric.away}{metric.suffix || ''}</span>
+                </div>
+                <div className="statsstream-ring-label">{metric.label}</div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="statsstream-timeline-card">
+          <div className="statsstream-timeline-title">Χρονική ροή</div>
+          <div className="statsstream-timeline-chart">
+            <div className="statsstream-timeline-midline" />
+            {eventBins.map((bin, index) => {
+              const homeHeight = (bin.home / maxBinValue) * 54;
+              const awayHeight = (bin.away / maxBinValue) * 54;
+              return (
+                <div key={index} className="statsstream-timeline-bin">
+                  <div className="statsstream-timeline-bar statsstream-timeline-bar--home" style={{ height: `${homeHeight}px` }} />
+                  <div className="statsstream-timeline-bar statsstream-timeline-bar--away" style={{ height: `${awayHeight}px` }} />
+                </div>
+              );
+            })}
+
+            {keyEvents.map((event, index) => {
+              const left = Math.min((event.minute / 90) * 100, 100);
+              const topClass = event.teamSide === 0 ? 'statsstream-timeline-event--home' : 'statsstream-timeline-event--away';
+              return (
+                <div
+                  key={`${event.type}-${event.minute}-${index}`}
+                  className={`statsstream-timeline-event ${topClass}`}
+                  style={{ left: `${left}%` }}
+                  title={`${event.type} ${event.minute}'`}
+                >
+                  {event.icon}
+                </div>
+              );
+            })}
+          </div>
+          <div className="statsstream-timeline-axis">
+            <span>0'</span>
+            <span>45'</span>
+            <span>90'</span>
+          </div>
+        </div>
+
+        <div className="statsstream-possession-card">
+          <div className="statsstream-possession-title">Επίδοση</div>
+          <div className="statsstream-possession-row">
+            <span className="statsstream-possession-value statsstream-possession-value--home">{possessionHome}%</span>
+            <span className="statsstream-possession-label">Κατοχή</span>
+            <span className="statsstream-possession-value statsstream-possession-value--away">{possessionAway}%</span>
+          </div>
+          <div className="statsstream-possession-track">
+            <div className="statsstream-possession-fill statsstream-possession-fill--home" style={{ width: `${possessionHome}%` }} />
+            <div className="statsstream-possession-fill statsstream-possession-fill--away" style={{ width: `${possessionAway}%` }} />
+          </div>
+
+          <div className="statsstream-all-stats">
+            {displayedStatEntries.map(stat => {
+              const homeValue = Number(stat.home ?? 0);
+              const awayValue = Number(stat.away ?? 0);
+              const maxValue = Math.max(homeValue, awayValue, 1);
+              const homeWidth = (homeValue / maxValue) * 100;
+              const awayWidth = (awayValue / maxValue) * 100;
+
+              return (
+                <div key={stat.key} className="statsstream-all-stat-row">
+                  <div className="statsstream-all-stat-side statsstream-all-stat-side--home">
+                    <span className="statsstream-all-stat-value statsstream-all-stat-value--home">{formatStatOutput(stat.home)}</span>
+                    <div className="statsstream-all-stat-track">
+                      <div className="statsstream-all-stat-bar statsstream-all-stat-bar--home" style={{ width: `${homeWidth}%` }} />
+                    </div>
+                  </div>
+
+                  <span className="statsstream-all-stat-label">{stat.label}</span>
+
+                  <div className="statsstream-all-stat-side statsstream-all-stat-side--away">
+                    <span className="statsstream-all-stat-value statsstream-all-stat-value--away">{formatStatOutput(stat.away)}</span>
+                    <div className="statsstream-all-stat-track">
+                      <div className="statsstream-all-stat-bar statsstream-all-stat-bar--away" style={{ width: `${awayWidth}%` }} />
+                    </div>
+                    <div className="statsstream-all-stat-bar statsstream-all-stat-bar--away" style={{ width: `${awayWidth}%` }} />
+                  </div>
+              </div>
+              );
+            })}
+          </div>
+
+          {allStatEntries.length > displayedStatEntries.length && (
+            <button
+              type="button"
+              className="statsstream-expand-button"
+              onClick={() => setShowAllStats(prev => !prev)}
+            >
+              {showAllStats ? 'Show less' : 'Show all statistics'}
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
+}
+
+function formatStatLabel(key) {
+  const labelMap = {
+    goals: 'Goals',
+    total_shots: 'Total shots',
+    shots_on_target: 'Shots on target',
+    shots_off_target: 'Shots off target',
+    shots_blocked: 'Shots blocked',
+    throw_ins: 'Throw ins',
+    corners: 'Corners',
+    offsides: 'Offsides',
+    big_chances: 'Big chances',
+    big_chances_missed: 'Big chances missed',
+    woodwork: 'Woodwork',
+    shots_inside_box: 'Shots inside box',
+    shots_outside_box: 'Shots outside box',
+    x_goals_live: 'xG live',
+    attacks: 'Attacks',
+    dangerous_attacks: 'Dangerous attacks',
+    fouls: 'Fouls',
+    yellow_cards: 'Yellow cards',
+    red_cards: 'Red cards',
+    goalkeeper_saves: 'Goalkeeper saves',
+    tackles: 'Tackles',
+    interceptions: 'Interceptions',
+    clearances: 'Clearances',
+    aerials_won: 'Aerials won',
+    duels_won: 'Duels won',
+    possession_lost: 'Possession lost',
+    dribbles: 'Dribbles',
+    possession: 'Possession',
+    passing_accuracy: 'Passing accuracy',
+    passes_attempted: 'Passes attempted',
+    passes_completed: 'Passes completed',
+    acc_long_balls: 'Acc. long balls',
+    acc_crosses: 'Acc. crosses',
+  };
+
+  return labelMap[key] || key.replace(/_/g, ' ');
+}
+
+function formatStatOutput(value) {
+  if (value == null || value === '') return '-';
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) return '-';
+    return Number.isInteger(value) ? String(value) : value.toFixed(2);
+  }
+  const numeric = Number(value);
+  if (Number.isFinite(numeric) && String(value).trim() !== '') {
+    return Number.isInteger(numeric) ? String(numeric) : numeric.toFixed(2);
+  }
+  return String(value);
 }
 
 // ---------------------------------------------------------------------------
@@ -511,10 +785,31 @@ export default function MatchDetailPage() {
     async function load() {
       if (isInitialLoad.current) setLoading(true);
       setError(null);
+      setStatsStreamLoading(true);
+      setStatsStreamError(null);
 
       try {
-        const res = await apiService.getMatchDetail(matchId);
-        if (!cancelled) setData(res);
+        const [matchResult, statsStreamResult] = await Promise.allSettled([
+          apiService.getMatchDetail(matchId),
+          apiService.getStatsstreamDetailed(matchId),
+        ]);
+
+        if (!cancelled) {
+          if (statsStreamResult.status === 'fulfilled') {
+            setStatsStreamDetailed(statsStreamResult.value);
+            console.log('[statsstream/detailed]', statsStreamResult.value);
+          } else {
+            setStatsStreamDetailed(null);
+            setStatsStreamError(statsStreamResult.reason?.message || 'Failed to fetch statsstream details');
+            console.error('[statsstream/detailed] error', statsStreamResult.reason);
+          }
+
+          if (matchResult.status === 'fulfilled') {
+            setData(matchResult.value);
+          } else {
+            throw matchResult.reason;
+          }
+        }
       } catch (err) {
         if (!cancelled) {
           setError(err.message);
@@ -524,6 +819,9 @@ export default function MatchDetailPage() {
         if (!cancelled && isInitialLoad.current) {
           setLoading(false);
           isInitialLoad.current = false;
+        }
+        if (!cancelled) {
+          setStatsStreamLoading(false);
         }
       }
     }
@@ -579,36 +877,6 @@ export default function MatchDetailPage() {
   const [statsStreamDetailed, setStatsStreamDetailed] = useState(null);
   const [statsStreamLoading, setStatsStreamLoading] = useState(false);
   const [statsStreamError, setStatsStreamError] = useState(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadStatsStream() {
-      if (!matchId) return;
-      setStatsStreamLoading(true);
-      setStatsStreamError(null);
-
-      try {
-        const payload = await apiService.getStatsstreamDetailed(matchId);
-        if (cancelled) return;
-        setStatsStreamDetailed(payload);
-        console.log('[statsstream/detailed]', payload);
-      } catch (err) {
-        if (cancelled) return;
-        setStatsStreamError(err.message || 'Failed to fetch statsstream details');
-        setStatsStreamDetailed(null);
-        console.error('[statsstream/detailed] error', err);
-      } finally {
-        if (!cancelled) setStatsStreamLoading(false);
-      }
-    }
-
-    loadStatsStream();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [matchId]);
 
   // ── Render ────────────────────────────────────────────────────────────────
   if (loading) {
@@ -757,6 +1025,7 @@ export default function MatchDetailPage() {
                         statsStreamDetailed={statsStreamDetailed}
                         statsStreamLoading={statsStreamLoading}
                         statsStreamError={statsStreamError}
+                        incidents={data.incidents}
                       />
                     )}
 
