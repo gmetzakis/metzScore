@@ -1,10 +1,7 @@
 .odds-display {
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
-  background: #fafafa;
-  border-radius: 12px;
-  padding: 12px;
+  margin-top: 0;
+  padding: 0;
+  background: transparent;
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -24,13 +21,13 @@
 
 .odds-markets {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 12px;
 }
 
 .odds-market {
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
+  background: rgba(248, 250, 252, 0.96);
+  border: 1px solid rgba(148, 163, 184, 0.16);
   border-radius: 10px;
   padding: 10px;
   transition: border-color 0.2s;
@@ -60,7 +57,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 6px 8px;
-  background: #f8f9fa;
+  background: rgba(255, 255, 255, 0.82);
   border-radius: 6px;
   font-size: 12px;
   transition: background 0.2s;
@@ -85,7 +82,7 @@
   margin-left: 8px;
   min-width: 38px;
   text-align: right;
-  background: #e3f2fd;
+  background: rgba(219, 234, 254, 0.92);
   padding: 3px 7px;
   border-radius: 5px;
   font-size: 11px;
@@ -155,6 +152,10 @@
 @media (max-width: 768px) {
   .odds-markets {
     grid-template-columns: 1fr;
+  }
+
+  .odds-market {
+    padding: 9px;
   }
 
   .ou-table-head,

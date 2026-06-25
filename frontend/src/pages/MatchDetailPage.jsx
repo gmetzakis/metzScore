@@ -502,8 +502,9 @@ export default function MatchDetailPage() {
         ? data.incidents.filter(inc => (inc.props?.filterIds || []).includes(activeFilter))
         : data.incidents)
     : [];
+  const displayedIncidents = [...filteredIncidents].reverse();
 
-  const [activePanel, setActivePanel] = useState('lineups');
+  const [activePanel, setActivePanel] = useState('odds');
 
   // ── Render ────────────────────────────────────────────────────────────────
   if (loading) {
@@ -543,17 +544,17 @@ export default function MatchDetailPage() {
   const hasStats = (statistics && Object.keys(statistics).length > 0) ||
     (results && Object.keys(results).length > 0) ||
     (score && (score.home != null || score.away != null));
-  const hasInfo = Boolean(league?.name || zone?.name || start_time || data?.total_markets != null || data?.url);
   const hasEvents = Array.isArray(data.incidents) && data.incidents.length > 0;
 
   const availablePanels = [
-    hasLineups && { id: 'lineups', label: 'Lineups' },
+    { id: 'odds', label: 'Odds' },
     hasStats && { id: 'stats', label: 'Statistics' },
-    hasInfo && { id: 'info', label: 'Info' },
     hasEvents && { id: 'events', label: 'Events' },
+    hasLineups && { id: 'lineups', label: 'Lineups' },
   ].filter(Boolean);
 
   const hasPitch = Boolean(is_live && pitchAvailable && !pitchLoading);
+  const activePanelLabel = availablePanels.find(panel => panel.id === activePanel)?.label || 'Odds';
 
   return (
     <div className="detail-page">
@@ -619,52 +620,26 @@ export default function MatchDetailPage() {
           )}
         </section>
 
-        <div className="detail-main">
-          <div className="detail-column detail-column--left">
-            {hasOdds && (
-              <section className="detail-card detail-card--panel">
-                <div className="section-head">
-                  <div>
-                    <div className="section-kicker">Markets</div>
-                    <h2 className="section-title">Odds</h2>
+        <section className="detail-card detail-card--match-layout">
+          <div className="match-layout">
+            <div className="match-layout__top">
+              <div className="match-layout__content">
+                <div className="match-block match-block--content">
+                  <div className="section-head section-head--compact">
+                    <div>
+                      <div className="section-kicker">Match view</div>
+                      <h2 className="section-title">{activePanelLabel}</h2>
+                    </div>
                   </div>
-                </div>
-                <OddsDisplay odds={odds} />
-              </section>
-            )}
-
-            <section className="detail-card detail-card--panel">
-              <div className="section-head">
-                <div>
-                  <div className="section-kicker">Available data</div>
-                  <h2 className="section-title">Match panels</h2>
-                </div>
-              </div>
-
-              {availablePanels.length > 0 ? (
-                <>
-                  <div className="panel-tabs">
-                    {availablePanels.map((panel) => (
-                      <button
-                        key={panel.id}
-                        type="button"
-                        className={`panel-tab ${panel.id === activePanel ? 'active' : ''}`}
-                        onClick={() => setActivePanel(panel.id)}
-                      >
-                        {panel.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="panel-body">
-                    {activePanel === 'lineups' && (
-                      <RosterSection
-                        roster={roster}
-                        results={results}
-                        incidents={data.incidents}
-                        homeName={home_team?.name}
-                        awayName={away_team?.name}
-                      />
+                  <div className="panel-body panel-body--views">
+                    {activePanel === 'odds' && (
+                      hasOdds ? (
+                        <OddsDisplay odds={odds} />
+                      ) : (
+                        <div className="section-empty">
+                          <p>Odds are not available for this match.</p>
+                        </div>
+                      )
                     )}
 
                     {activePanel === 'stats' && (
@@ -677,8 +652,6 @@ export default function MatchDetailPage() {
                         isLive={is_live}
                       />
                     )}
-
-                    {activePanel === 'info' && <MatchInfoSection matchData={data} />}
 
                     {activePanel === 'events' && (
                       <>
@@ -704,9 +677,9 @@ export default function MatchDetailPage() {
                           </div>
                         )}
 
-                        {filteredIncidents.length > 0 ? (
+                        {displayedIncidents.length > 0 ? (
                           <div className="incident-list incident-list--dense">
-                            {filteredIncidents.map((inc, i) => (
+                            {displayedIncidents.map((inc, i) => (
                               <IncidentRow
                                 key={`${inc.type}-${i}`}
                                 incident={inc}
@@ -726,59 +699,55 @@ export default function MatchDetailPage() {
                       </>
                     )}
                   </div>
-                </>
-              ) : (
-                <div className="section-empty">
-                  <p>Additional match details are not available for this event.</p>
                 </div>
-              )}
-            </section>
-          </div>
+              </div>
 
-          <div className="detail-column detail-column--right">
-            {hasPitch && (
-              <section className="detail-card detail-card--pitch" ref={pitchRef}>
-                <div className="section-head">
-                  <div>
-                    <div className="section-kicker">Live match</div>
-                    <h2 className="section-title">Pitch coverage</h2>
+              <div className="match-layout__pitch">
+                {hasPitch && (
+                  <div className="match-block match-block--pitch" ref={pitchRef}>
+                    <div className="section-head section-head--compact">
+                      <div>
+                        <div className="section-kicker">Live match</div>
+                        <h2 className="section-title">Pitch coverage</h2>
+                      </div>
+                      <div className="section-badges">
+                        {betradarMatchId && <span className="section-badge section-badge--live">LIVE</span>}
+                      </div>
+                    </div>
+                    <LivePitch
+                      situation={pitchState.situation}
+                      situationTeam={pitchState.situationTeam}
+                      ballPos={pitchState.ballPos}
+                      ballEnd={pitchState.ballEnd}
+                      markers={pitchState.markers}
+                      attackPath={pitchState.attackPath}
+                      latestMarker={pitchState.latestMarker}
+                      isAvailable={pitchAvailable}
+                      homeName={home_team?.name}
+                      awayName={away_team?.name}
+                      homeTeamId={home_team?.id}
+                      awayTeamId={away_team?.id}
+                    />
                   </div>
-                  <div className="section-badges">
-                    {betradarMatchId && <span className="section-badge section-badge--live">LIVE</span>}
-                  </div>
-                </div>
-                <LivePitch
-                  situation={pitchState.situation}
-                  situationTeam={pitchState.situationTeam}
-                  ballPos={pitchState.ballPos}
-                  ballEnd={pitchState.ballEnd}
-                  markers={pitchState.markers}
-                  attackPath={pitchState.attackPath}
-                  latestMarker={pitchState.latestMarker}
-                  isAvailable={pitchAvailable}
-                  homeName={home_team?.name}
-                  awayName={away_team?.name}
-                  homeTeamId={home_team?.id}
-                  awayTeamId={away_team?.id}
-                />
-              </section>
-            )}
+                )}
 
-            {!hasPitch && is_live && (
-              <section className="detail-card detail-card--pitch detail-card--muted">
-                <div className="section-head">
-                  <div>
-                    <div className="section-kicker">Live match</div>
-                    <h2 className="section-title">Pitch coverage</h2>
+                {!hasPitch && is_live && (
+                  <div className="match-block match-block--pitch match-block--muted">
+                    <div className="section-head section-head--compact">
+                      <div>
+                        <div className="section-kicker">Live match</div>
+                        <h2 className="section-title">Pitch coverage</h2>
+                      </div>
+                    </div>
+                    <div className="section-empty">
+                      <p>Live pitch coverage is unavailable for this match.</p>
+                    </div>
                   </div>
-                </div>
-                <div className="section-empty">
-                  <p>Live pitch coverage is unavailable for this match.</p>
-                </div>
-              </section>
-            )}
+                )}
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
