@@ -46,7 +46,11 @@ export default function FavoritesPage() {
 
   const favoriteMatches = useMemo(() => {
     const favSet = new Set(safeFavoriteIds);
-    return allMatches.filter(m => favSet.has(m.id));
+    return allMatches.filter(m => 
+      favSet.has(m.id) &&
+      m.home_team && m.home_team.toLowerCase() !== 'unknown' &&
+      m.away_team && m.away_team.toLowerCase() !== 'unknown'
+    );
   }, [allMatches, safeFavoriteIds]);
 
   useEffect(() => {

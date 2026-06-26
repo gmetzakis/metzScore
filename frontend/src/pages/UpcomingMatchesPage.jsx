@@ -43,6 +43,13 @@ export default function UpcomingMatchesPage() {
 
   const filteredMatches = useMemo(() => {
     let list = matches.filter(m => m.status === 'Not Started');
+    
+    // Exclude matches with unknown teams
+    list = list.filter(m =>
+      m.home_team && m.home_team.toLowerCase() !== 'unknown' &&
+      m.away_team && m.away_team.toLowerCase() !== 'unknown'
+    );
+    
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(m =>

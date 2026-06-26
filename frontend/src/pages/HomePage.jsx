@@ -42,6 +42,12 @@ export default function HomePage() {
   }, [fetchLiveMatches]);
 
   const filteredMatches = matches.filter(m => {
+    // Exclude matches with unknown teams
+    if (!m.home_team || m.home_team.toLowerCase() === 'unknown' ||
+        !m.away_team || m.away_team.toLowerCase() === 'unknown') {
+      return false;
+    }
+    
     if (!search.trim()) return true;
     const q = search.toLowerCase();
     return (
