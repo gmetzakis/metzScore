@@ -95,6 +95,10 @@ function buildQuickStats(results) {
   const stats = [];
   const seenKeys = new Set();
   const source = results && typeof results === 'object' ? results : {};
+  const iconByKey = {
+    red: '🟥',
+    red_cards: '🟥',
+  };
 
   const addFixedStat = (key, label, icon, keys) => {
     const value = getResultSideValue(source, ...keys);
@@ -122,6 +126,7 @@ function buildQuickStats(results) {
     stats.push({
       key,
       label: formatHeroStatLabel(key),
+      icon: iconByKey[key] || null,
       home: value.home ?? 0,
       away: value.away ?? 0,
       fixed: false,
@@ -365,9 +370,12 @@ function StatsstreamDetailedSection({ statsStreamDetailed, incidents, score, isF
     'dangerous_attacks',
   ];
 
+  const defaultDisplayedStatEntries = allStatEntries.filter(entry => defaultStatKeys.includes(entry.key));
+  const hasExtraStats = defaultDisplayedStatEntries.length < allStatEntries.length;
+
   const displayedStatEntries = showAllStats
     ? allStatEntries
-    : allStatEntries.filter(entry => defaultStatKeys.includes(entry.key));
+    : defaultDisplayedStatEntries;
 
   const summaryCards = [
     { label: 'Goals', home: displayHomeTotals.goals, away: displayAwayTotals.goals, accent: 'rose', icon: '⚽' },
@@ -414,41 +422,24 @@ function StatsstreamDetailedSection({ statsStreamDetailed, incidents, score, isF
     },
   ];
 
-  const eventBins = Array.from({ length: 18 }, () => ({ home: 0, away: 0 }));
   const keyEvents = [];
 
   for (const incident of Array.isArray(incidents) ? incidents : []) {
     const minute = parseIncidentMinute(incident?.time);
     if (minute == null) continue;
-    const index = Math.min(Math.floor(minute / 5), eventBins.length - 1);
-    const impact = getIncidentImpact(incident?.type);
-    if (incident?.teamSide === 0) eventBins[index].home += impact;
-    else if (incident?.teamSide === 1) eventBins[index].away += impact;
-
-    if (['GOAL', 'RED', 'YELL', 'CRNR', 'PENL'].includes(incident?.type)) {
+    if (['GOAL', 'RED', 'YELL'].includes(incident?.type)) {
       keyEvents.push({
         minute,
-        teamSide: incident?.teamSide,
         type: incident?.type,
         icon: getIncidentIcon(incident?.type),
+        rawTime: incident?.time,
+        teamSide: incident?.teamSide,
       });
     }
   }
 
-  const maxBinValue = Math.max(
-    1,
-    ...eventBins.map(bin => Math.max(bin.home, bin.away))
-  );
-
   return (
     <div className="statsstream-block">
-      <div className="section-head section-head--compact">
-        <div>
-          <div className="section-kicker">Stoiximan</div>
-          <h3 className="section-title section-title--small">Statsstream detailed</h3>
-        </div>
-      </div>
-
       <div className="statsstream-preview">
         <div className="statsstream-summary-grid">
           {summaryCards.map(card => (
@@ -456,8 +447,12 @@ function StatsstreamDetailedSection({ statsStreamDetailed, incidents, score, isF
               <div className="statsstream-summary-icon">{card.icon}</div>
               <div className="statsstream-summary-label">{card.label}</div>
               <div className="statsstream-summary-values">
-                <span>{card.home ?? 0}</span>
-                <span>{card.away ?? 0}</span>
+                <div className="statsstream-summary-value-row">
+                  <span className="statsstream-summary-value">{card.home ?? 0}</span>
+                </div>
+                <div className="statsstream-summary-value-row">
+                  <span className="statsstream-summary-value">{card.away ?? 0}</span>
+                </div>
               </div>
             </div>
           ))}
@@ -486,39 +481,23 @@ function StatsstreamDetailedSection({ statsStreamDetailed, incidents, score, isF
         </div>
 
         <div className="statsstream-timeline-card">
-          <div className="statsstream-timeline-title">Χρονική ροή</div>
           <div className="statsstream-timeline-chart">
             <div className="statsstream-timeline-midline" />
-            {eventBins.map((bin, index) => {
-              const homeHeight = (bin.home / maxBinValue) * 54;
-              const awayHeight = (bin.away / maxBinValue) * 54;
-              return (
-                <div key={index} className="statsstream-timeline-bin">
-                  <div className="statsstream-timeline-bar statsstream-timeline-bar--home" style={{ height: `${homeHeight}px` }} />
-                  <div className="statsstream-timeline-bar statsstream-timeline-bar--away" style={{ height: `${awayHeight}px` }} />
-                </div>
-              );
-            })}
+            <div className="statsstream-timeline-clock">{formatClock(score?.seconds_since_start)}</div>
 
             {keyEvents.map((event, index) => {
               const left = Math.min((event.minute / 90) * 100, 100);
-              const topClass = event.teamSide === 0 ? 'statsstream-timeline-event--home' : 'statsstream-timeline-event--away';
               return (
                 <div
                   key={`${event.type}-${event.minute}-${index}`}
-                  className={`statsstream-timeline-event ${topClass}`}
+                  className={`statsstream-timeline-event ${event.teamSide === 0 ? 'statsstream-timeline-event--home' : event.teamSide === 1 ? 'statsstream-timeline-event--away' : ''}`}
                   style={{ left: `${left}%` }}
-                  title={`${event.type} ${event.minute}'`}
+                  title={`${event.type} ${event.rawTime || `${event.minute}'`}`}
                 >
                   {event.icon}
                 </div>
               );
             })}
-          </div>
-          <div className="statsstream-timeline-axis">
-            <span>0'</span>
-            <span>45'</span>
-            <span>90'</span>
           </div>
         </div>
 
@@ -565,7 +544,7 @@ function StatsstreamDetailedSection({ statsStreamDetailed, incidents, score, isF
             })}
           </div>
 
-          {allStatEntries.length > displayedStatEntries.length && (
+          {hasExtraStats && (
             <button
               type="button"
               className="statsstream-expand-button"
@@ -587,12 +566,7 @@ function StandingsSection({ standings }) {
 
   return (
     <div className="statsstream-standings-card">
-      <div className="section-head section-head--compact">
-        <div>
-          <div className="section-kicker">Table</div>
-          <h3 className="section-title section-title--small">Standings</h3>
-        </div>
-      </div>
+      {/* Standings header intentionally removed per UI request */}
 
       <div className="statsstream-standings-scroll">
         <table className="statsstream-standings-table">
@@ -879,7 +853,7 @@ function SummaryStrip({ score, results, isLive }) {
           key={item.key}
           className={`summary-stat-card ${item.fixed ? 'summary-stat-card--fixed' : 'summary-stat-card--dynamic'}`}
         >
-          {item.fixed ? (
+          {item.icon ? (
             <span className="summary-stat-icon" aria-hidden="true">{item.icon}</span>
           ) : (
             <span className="summary-stat-label">{item.label}</span>
