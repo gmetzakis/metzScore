@@ -170,15 +170,9 @@ function getSideBySideStats(statsTeams, homeTeamId, awayTeamId, eventStats, live
   return result;
 }
 
-function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isLive, statsStreamDetailed, statsStreamLoading, statsStreamError, incidents }) {
+function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isLive, statsStreamDetailed, statsStreamIsFallback, statsStreamLoading, statsStreamError, incidents }) {
   return (
     <div className="stats-section">
-      {statsStreamLoading && (
-        <div className="section-empty section-empty--tight">
-          <p>Loading Stoiximan statsstream details...</p>
-        </div>
-      )}
-
       {statsStreamError && (
         <div className="section-empty section-empty--tight">
           <p>Statsstream fetch failed: {statsStreamError}</p>
@@ -186,7 +180,12 @@ function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isLi
       )}
 
       {statsStreamDetailed ? (
-        <StatsstreamDetailedSection statsStreamDetailed={statsStreamDetailed} incidents={incidents} />
+        <StatsstreamDetailedSection
+          statsStreamDetailed={statsStreamDetailed}
+          incidents={incidents}
+          score={score}
+          isFallbackStats={statsStreamIsFallback || statsStreamDetailed?.fallback === 'report'}
+        />
       ) : (
         <div className="section-empty">
           <p>
@@ -226,36 +225,48 @@ function getIncidentIcon(type) {
   return INCIDENT_ICONS[type] || '•';
 }
 
-function StatsstreamDetailedSection({ statsStreamDetailed, incidents }) {
+function StatsstreamDetailedSection({ statsStreamDetailed, incidents, score, isFallbackStats }) {
   const [showAllStats, setShowAllStats] = useState(false);
   const homeTotals = statsStreamDetailed?.data?.home?.total || {};
   const awayTotals = statsStreamDetailed?.data?.away?.total || {};
+  const homeGoals = (isFallbackStats || homeTotals.goals == null) ? (score?.home ?? homeTotals.goals ?? 0) : homeTotals.goals;
+  const awayGoals = (isFallbackStats || awayTotals.goals == null) ? (score?.away ?? awayTotals.goals ?? 0) : awayTotals.goals;
 
-  const totalShotsHome = Number(homeTotals.total_shots || 0);
-  const totalShotsAway = Number(awayTotals.total_shots || 0);
+  const displayHomeTotals = {
+    ...homeTotals,
+    goals: homeGoals,
+  };
 
-  const attackHome = Number(homeTotals.attacks || 0);
-  const attackAway = Number(awayTotals.attacks || 0);
+  const displayAwayTotals = {
+    ...awayTotals,
+    goals: awayGoals,
+  };
+
+  const totalShotsHome = Number(displayHomeTotals.total_shots || 0);
+  const totalShotsAway = Number(displayAwayTotals.total_shots || 0);
+
+  const attackHome = Number(displayHomeTotals.attacks || 0);
+  const attackAway = Number(displayAwayTotals.attacks || 0);
   const attackTotal = Math.max(attackHome + attackAway, 1);
 
-  const dangerHome = Number(homeTotals.dangerous_attacks || 0);
-  const dangerAway = Number(awayTotals.dangerous_attacks || 0);
+  const dangerHome = Number(displayHomeTotals.dangerous_attacks || 0);
+  const dangerAway = Number(displayAwayTotals.dangerous_attacks || 0);
   const dangerTotal = Math.max(dangerHome + dangerAway, 1);
 
-  const possessionHome = Number(homeTotals.possession || 0);
-  const possessionAway = Number(awayTotals.possession || 0);
+  const possessionHome = Number(displayHomeTotals.possession || 0);
+  const possessionAway = Number(displayAwayTotals.possession || 0);
   const possessionTotal = Math.max(possessionHome + possessionAway, 100);
 
-  const cornersHome = Number(homeTotals.corners || 0);
-  const cornersAway = Number(awayTotals.corners || 0);
+  const cornersHome = Number(displayHomeTotals.corners || 0);
+  const cornersAway = Number(displayAwayTotals.corners || 0);
 
-  const allStatEntries = Object.keys({ ...homeTotals, ...awayTotals })
+  const allStatEntries = Object.keys({ ...displayHomeTotals, ...displayAwayTotals })
     .filter(key => !['first_half', 'second_half', 'extra_time', 'possession'].includes(key))
     .map(key => ({
       key,
       label: formatStatLabel(key),
-      home: homeTotals[key],
-      away: awayTotals[key],
+      home: displayHomeTotals[key],
+      away: displayAwayTotals[key],
     }))
     .filter(item => item.home != null || item.away != null)
     .sort((a, b) => {
@@ -299,12 +310,12 @@ function StatsstreamDetailedSection({ statsStreamDetailed, incidents }) {
     : allStatEntries.filter(entry => defaultStatKeys.includes(entry.key));
 
   const summaryCards = [
-    { label: 'Goals', home: homeTotals.goals, away: awayTotals.goals, accent: 'rose', icon: '⚽' },
-    { label: 'Yellow', home: homeTotals.yellow_cards, away: awayTotals.yellow_cards, accent: 'amber', icon: '■' },
-    { label: 'Red', home: homeTotals.red_cards, away: awayTotals.red_cards, accent: 'rose', icon: '■' },
+    { label: 'Goals', home: displayHomeTotals.goals, away: displayAwayTotals.goals, accent: 'rose', icon: '⚽' },
+    { label: 'Yellow', home: displayHomeTotals.yellow_cards, away: displayAwayTotals.yellow_cards, accent: 'amber', icon: '■' },
+    { label: 'Red', home: displayHomeTotals.red_cards, away: displayAwayTotals.red_cards, accent: 'rose', icon: '■' },
     { label: 'Corners', home: cornersHome, away: cornersAway, accent: 'sky', icon: '⚑' },
     { label: 'Shots', home: totalShotsHome, away: totalShotsAway, accent: 'blue', icon: '◌' },
-    { label: 'On target', home: homeTotals.shots_on_target, away: awayTotals.shots_on_target, accent: 'emerald', icon: '◎' },
+    { label: 'On target', home: displayHomeTotals.shots_on_target, away: displayAwayTotals.shots_on_target, accent: 'emerald', icon: '◎' },
   ];
 
   const comparisonMetrics = [
@@ -779,6 +790,7 @@ export default function MatchDetailPage() {
   const [error, setError]     = useState(null);
   const [activePanel, setActivePanel] = useState('odds');
   const [statsStreamDetailed, setStatsStreamDetailed] = useState(null);
+  const [statsStreamIsFallback, setStatsStreamIsFallback] = useState(false);
   const [statsStreamLoading, setStatsStreamLoading] = useState(false);
   const [statsStreamError, setStatsStreamError] = useState(null);
   const isInitialLoad         = useRef(true);
@@ -804,6 +816,7 @@ export default function MatchDetailPage() {
           const statsResult = await apiService.getStatsstreamDetailed(matchId);
           if (!cancelled) {
             setStatsStreamDetailed(statsResult);
+            setStatsStreamIsFallback(Boolean(statsResult?.fallback === 'report'));
             console.log('[statsstream/detailed]', statsResult);
           }
         } catch (detailError) {
@@ -822,7 +835,8 @@ export default function MatchDetailPage() {
               if (betradarId) {
                 const reportResult = await apiService.getStatsstreamReport(betradarId);
                 if (!cancelled) {
-                  setStatsStreamDetailed(reportResult);
+                  setStatsStreamDetailed({ ...reportResult, fallback: 'report' });
+                  setStatsStreamIsFallback(true);
                   console.log('[statsstream/report fallback]', reportResult);
                 }
               } else {
@@ -831,6 +845,7 @@ export default function MatchDetailPage() {
             } catch (fallbackError) {
               if (!cancelled) {
                 setStatsStreamDetailed(null);
+                setStatsStreamIsFallback(false);
                 setStatsStreamError(fallbackError.message || 'Failed to fetch stats details');
                 console.error('[stats fallback] error', fallbackError);
               }
@@ -1045,6 +1060,7 @@ export default function MatchDetailPage() {
                         score={score}
                         isLive={is_live}
                         statsStreamDetailed={statsStreamDetailed}
+                        statsStreamIsFallback={statsStreamIsFallback}
                         statsStreamLoading={statsStreamLoading}
                         statsStreamError={statsStreamError}
                         incidents={data.incidents}
