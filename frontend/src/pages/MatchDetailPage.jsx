@@ -180,12 +180,14 @@ function StatsSection({ statistics, homeTeamId, awayTeamId, results, score, isLi
       )}
 
       {statsStreamDetailed ? (
-        <StatsstreamDetailedSection
-          statsStreamDetailed={statsStreamDetailed}
-          incidents={incidents}
-          score={score}
-          isFallbackStats={statsStreamIsFallback || statsStreamDetailed?.fallback === 'report'}
-        />
+        <>
+          <StatsstreamDetailedSection
+            statsStreamDetailed={statsStreamDetailed}
+            incidents={incidents}
+            score={score}
+            isFallbackStats={statsStreamIsFallback || statsStreamDetailed?.fallback === 'report'}
+          />
+        </>
       ) : (
         <div className="section-empty">
           <p>
@@ -515,6 +517,58 @@ function StatsstreamDetailedSection({ statsStreamDetailed, incidents, score, isF
             </button>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function StandingsSection({ standings }) {
+  const rows = Array.isArray(standings?.data) ? standings.data : [];
+
+  if (!rows.length) return null;
+
+  return (
+    <div className="statsstream-standings-card">
+      <div className="section-head section-head--compact">
+        <div>
+          <div className="section-kicker">Table</div>
+          <h3 className="section-title section-title--small">Standings</h3>
+        </div>
+      </div>
+
+      <div className="statsstream-standings-scroll">
+        <table className="statsstream-standings-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Team</th>
+              <th>P</th>
+              <th>W</th>
+              <th>D</th>
+              <th>L</th>
+              <th>GF</th>
+              <th>GA</th>
+              <th>GD</th>
+              <th>Pts</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, index) => (
+              <tr key={`${row.rank ?? index}-${row.team || index}`} title={row.raw_name || row.team || ''}>
+                <td>{row.rank ?? index + 1}</td>
+                <td className="statsstream-standings-team">{row.team ?? '-'}</td>
+                <td>{formatStatOutput(row.played)}</td>
+                <td>{formatStatOutput(row.wins)}</td>
+                <td>{formatStatOutput(row.draws)}</td>
+                <td>{formatStatOutput(row.losses)}</td>
+                <td>{formatStatOutput(row.goals_for)}</td>
+                <td>{formatStatOutput(row.goals_against)}</td>
+                <td>{formatStatOutput(row.goal_diff)}</td>
+                <td>{formatStatOutput(row.points)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -945,19 +999,21 @@ export default function MatchDetailPage() {
   console.log("ENA: ", data);
 
   const hasOdds = odds && Object.keys(odds).length > 0;
-  const hasLineups = roster && (
-    Boolean(roster.lineups?.homeLineup) ||
-    Boolean(roster.lineups?.awayLineup) ||
-    Boolean(roster.benchPlayers?.length)
-  );
+  const hasHomeLineup = Array.isArray(roster?.lineups?.homeLineup?.lineup) && roster.lineups.homeLineup.lineup.some(row => Array.isArray(row) && row.length > 0);
+  const hasAwayLineup = Array.isArray(roster?.lineups?.awayLineup?.lineup) && roster.lineups.awayLineup.lineup.some(row => Array.isArray(row) && row.length > 0);
+  const hasHomeBench = Array.isArray(roster?.lineups?.homeLineup?.benchPlayers) && roster.lineups.homeLineup.benchPlayers.length > 0;
+  const hasAwayBench = Array.isArray(roster?.lineups?.awayLineup?.benchPlayers) && roster.lineups.awayLineup.benchPlayers.length > 0;
+  const hasLineups = Boolean(roster && (hasHomeLineup || hasAwayLineup || hasHomeBench || hasAwayBench));
   const hasStats = (statistics && Object.keys(statistics).length > 0) ||
     (results && Object.keys(results).length > 0) ||
     (score && (score.home != null || score.away != null));
+  const hasStandings = Array.isArray(statsStreamDetailed?.standings?.data) && statsStreamDetailed.standings.data.length > 0;
   const hasEvents = Array.isArray(data.incidents) && data.incidents.length > 0;
 
   const availablePanels = [
     { id: 'odds', label: 'Odds' },
     hasStats && { id: 'stats', label: 'Statistics' },
+    hasStandings && { id: 'standings', label: 'Standings' },
     hasEvents && { id: 'events', label: 'Events' },
     hasLineups && { id: 'lineups', label: 'Lineups' },
   ].filter(Boolean);
@@ -1111,6 +1167,32 @@ export default function MatchDetailPage() {
                           </div>
                         )}
                       </>
+                    )}
+
+                    {activePanel === 'standings' && (
+                      hasStandings ? (
+                        <StandingsSection standings={statsStreamDetailed?.standings} />
+                      ) : (
+                        <div className="section-empty">
+                          <p>Standings are not available for this match.</p>
+                        </div>
+                      )
+                    )}
+
+                    {activePanel === 'lineups' && (
+                      hasLineups ? (
+                        <RosterSection
+                          roster={roster}
+                          results={results}
+                          incidents={data.incidents}
+                          homeName={home_team?.name}
+                          awayName={away_team?.name}
+                        />
+                      ) : (
+                        <div className="section-empty">
+                          <p>Lineups are not available for this match.</p>
+                        </div>
+                      )
                     )}
                   </div>
                 </div>

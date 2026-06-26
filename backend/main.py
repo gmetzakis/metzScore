@@ -162,33 +162,76 @@ def get_match_events_betradar(secondary_id: int):
 
 
 def _fetch_match_detailsextended(secondary_id: int):
-    url = (
-        f"https://sh.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/match_detailsextended/{secondary_id}"
-        "?T=exp=1782495362~acl=/*~data=eyJvIjoiaHR0cHM6Ly9zdGF0c2h1Yi5zcG9ydHJhZGFyLmNvbSIsImEiOiJzdG9peGltYW4iLCJhY3QiOiJvcmlnaW5jaGVjayIsIm9zcmMiOiJob3N0aGVhZGVyIn0~hmac=c41664e9883e7a1e793d3df5ed8991b4b045dafc33f7dc598279e2efc6454fad"
-    )
-
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Referer": f"https://statshub.sportradar.com/stoiximan/el/match/{secondary_id}/report",
-        "Origin": "https://statshub.sportradar.com",
-        "Connection": "keep-alive",
-        "Cache-Control": "no-cache",
-    }
-
-    resp = requests.get(url, headers=headers, timeout=20)
-    resp.raise_for_status()
-    payload = resp.json()
-    doc = payload.get("doc", [])
-    if not doc:
-        raise RuntimeError("Empty Sportradar match_detailsextended response")
-
-    data = doc[0].get("data", {})
+    data = _fetch_match_detailsextended_raw(secondary_id).get("data", {})
     if not isinstance(data, dict):
         raise RuntimeError("Unexpected Sportradar match_detailsextended payload")
 
     return data
+
+
+def _get_betradar_season_id(secondary_id: int):
+    payload = get_match_events_betradar(secondary_id)
+    doc = payload.get('doc', []) if isinstance(payload, dict) else []
+    if not isinstance(doc, list) or not doc:
+        return None
+
+    data = doc[0].get('data', {}) if isinstance(doc[0], dict) else {}
+    if not isinstance(data, dict):
+        return None
+
+    match = data.get('match', {})
+    if not isinstance(match, dict):
+        return None
+
+    season_id = match.get('_seasonid')
+    return int(season_id) if season_id else None
+
+
+def _build_match_standings_payload(match_id=None, secondary_id=None, allow_report_fallback=False):
+    if match_id is not None:
+        try:
+            primary_payload = _fetch_match_standings_primary(match_id)
+            rows = _extract_standings_rows(primary_payload)
+            if rows:
+                return {
+                    "source": "statsstream/standings",
+                    "match_id": match_id,
+                    "data": rows,
+                }
+        except Exception:
+            pass
+
+        if not allow_report_fallback:
+            return None
+
+    if secondary_id is None and match_id is not None:
+        try:
+            secondary_id = get_betradar_match_id(match_id)
+        except Exception:
+            secondary_id = None
+
+    if secondary_id is None:
+        return None
+
+    try:
+        season_id = _get_betradar_season_id(secondary_id)
+        if season_id is None:
+            return None
+
+        season_tables_payload = _fetch_match_standings_season_tables_raw(season_id)
+        rows = _extract_standings_rows(season_tables_payload)
+        if rows:
+            return {
+                "source": "stats_season_tables",
+                "fallback": "report",
+                "betradar_match_id": secondary_id,
+                "season_id": season_id,
+                "data": rows,
+            }
+    except Exception:
+        return None
+
+    return None
 
 
 def _stat_value(values, key):
@@ -215,6 +258,264 @@ def _to_number(value):
             return value
 
     return value
+
+
+def _standings_row_value(row, *keys):
+    for key in keys:
+        value = row.get(key)
+        if value not in (None, ''):
+            return value
+    return None
+
+
+def _clean_standings_name(name):
+    if not name:
+        return None
+    cleaned = str(name).strip()
+    if cleaned.startswith('|') and cleaned.endswith('|') and len(cleaned) > 1:
+        cleaned = cleaned[1:-1]
+    return cleaned
+
+
+def _normalize_standings_row(row):
+    if not isinstance(row, dict):
+        return None
+
+    display_name = _standings_row_value(row, 'translated_name', 'translatedName')
+    if not display_name:
+        display_name = _clean_standings_name(_standings_row_value(row, 'name'))
+
+    if not display_name:
+        return None
+
+    played = _to_number(_standings_row_value(row, 'matches_played', 'played', 'matchesPlayed'))
+    wins = _to_number(_standings_row_value(row, 'matches_won', 'wins', 'matchesWon'))
+    draws = _to_number(_standings_row_value(row, 'matches_draw', 'draws', 'matchesDraw'))
+    losses = _to_number(_standings_row_value(row, 'matches_lost', 'losses', 'matchesLost'))
+    goals_for = _to_number(_standings_row_value(row, 'total_score_for', 'goals_for', 'goalsFor', 'gf'))
+    goals_against = _to_number(_standings_row_value(row, 'total_score_against', 'goals_against', 'goalsAgainst', 'ga'))
+    points = _to_number(_standings_row_value(row, 'points', 'pts'))
+    rank = _to_number(_standings_row_value(row, 'rank', 'position', 'pos', 'place'))
+    goal_diff = _standings_row_value(row, 'goal_diff', 'goalDifference', 'gd')
+    if goal_diff in (None, '') and isinstance(goals_for, (int, float)) and isinstance(goals_against, (int, float)):
+        goal_diff = goals_for - goals_against
+
+    normalized = {
+        'rank': rank,
+        'team': display_name,
+        'raw_name': _standings_row_value(row, 'name'),
+        'played': played,
+        'wins': wins,
+        'draws': draws,
+        'losses': losses,
+        'goals_for': goals_for,
+        'goals_against': goals_against,
+        'goal_diff': _to_number(goal_diff),
+        'points': points,
+        'is_live': bool(row.get('is_live')),
+        'rank_status_id': row.get('rank_status_id'),
+    }
+
+    if all(value in (None, '') for value in normalized.values() if value is not False):
+        return None
+
+    return normalized
+
+
+def _normalize_season_table_row(row):
+    if not isinstance(row, dict):
+        return None
+
+    team = row.get('team', {})
+    if not isinstance(team, dict):
+        return None
+
+    team_name = team.get('mediumname') or team.get('name') or team.get('abbr')
+    if not team_name:
+        return None
+
+    excluded_names = {'Σύνολο', 'Εντός έδρας', 'Εκτός έδρας', 'Αναλυτικά', 'Σύντομο'}
+    if str(team_name).strip() in excluded_names:
+        return None
+
+    played = _to_number(row.get('total'))
+    wins = _to_number(row.get('winTotal'))
+    draws = _to_number(row.get('drawTotal'))
+    losses = _to_number(row.get('lossTotal'))
+    goals_for = _to_number(row.get('goalsForTotal'))
+    goals_against = _to_number(row.get('goalsAgainstTotal'))
+    points = _to_number(row.get('pointsTotal'))
+    rank = _to_number(row.get('pos') or row.get('sortPositionTotal'))
+    goal_diff = _to_number(row.get('goalDiffTotal'))
+
+    if goal_diff in (None, '') and isinstance(goals_for, (int, float)) and isinstance(goals_against, (int, float)):
+        goal_diff = goals_for - goals_against
+
+    normalized = {
+        'rank': rank,
+        'team': _clean_standings_name(team_name),
+        'raw_name': team.get('name'),
+        'played': played,
+        'wins': wins,
+        'draws': draws,
+        'losses': losses,
+        'goals_for': goals_for,
+        'goals_against': goals_against,
+        'goal_diff': goal_diff,
+        'points': points,
+        'is_live': bool(row.get('is_live')),
+        'rank_status_id': row.get('rank_status_id'),
+    }
+
+    if all(value in (None, '') for value in normalized.values() if value is not False):
+        return None
+
+    return normalized
+
+
+def _extract_standings_rows(node):
+    if isinstance(node, dict):
+        payloads = []
+
+        data = node.get('data')
+        if isinstance(data, dict):
+            payloads.append(data)
+
+        doc = node.get('doc')
+        if isinstance(doc, list):
+            for entry in doc:
+                entry_data = entry.get('data') if isinstance(entry, dict) else None
+                if isinstance(entry_data, dict):
+                    payloads.append(entry_data)
+
+        for payload in payloads:
+            tables = payload.get('tables')
+            if isinstance(tables, list):
+                for table in tables:
+                    tablerows = table.get('tablerows') if isinstance(table, dict) else None
+                    if isinstance(tablerows, list):
+                        rows = [_normalize_season_table_row(item) for item in tablerows]
+                        rows = [row for row in rows if row is not None]
+                        if rows:
+                            return rows
+
+            phases = payload.get('phases')
+            if isinstance(phases, list):
+                for phase in phases:
+                    groups = phase.get('groups') if isinstance(phase, dict) else None
+                    if not isinstance(groups, list):
+                        continue
+                    for group in groups:
+                        standings = group.get('standings') if isinstance(group, dict) else None
+                        if isinstance(standings, list):
+                            rows = [_normalize_standings_row(item) for item in standings]
+                            rows = [row for row in rows if row is not None]
+                            if rows:
+                                return rows
+
+        for key in ('standings', 'standing', 'table', 'tables', 'ranking', 'rankings'):
+            if key in node:
+                rows = _extract_standings_rows(node[key])
+                if rows:
+                    return rows
+
+        for value in node.values():
+            rows = _extract_standings_rows(value)
+            if rows:
+                return rows
+
+    if isinstance(node, list):
+        normalized_rows = []
+        for item in node:
+            row = _normalize_standings_row(item)
+            if row is not None:
+                normalized_rows.append(row)
+
+        if len(normalized_rows) >= 2:
+            return normalized_rows
+
+        for item in node:
+            rows = _extract_standings_rows(item)
+            if rows:
+                return rows
+
+    return None
+
+
+def _fetch_match_standings_primary(match_id: int):
+    url = f"https://www.stoiximan.gr/api/statsstream/{match_id}/standings/"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://www.stoiximan.gr/live-scores/",
+        "Origin": "https://www.stoiximan.gr",
+        "Connection": "keep-alive",
+        "Cache-Control": "no-cache",
+        "x-language": "2",
+        "x-operator": "2",
+    }
+
+    resp = requests.get(url, headers=headers, timeout=20)
+    resp.raise_for_status()
+    return resp.json()
+
+
+def _fetch_match_detailsextended_raw(secondary_id: int):
+    url = (
+        f"https://sh.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/match_detailsextended/{secondary_id}"
+        "?T=exp=1782495362~acl=/*~data=eyJvIjoiaHR0cHM6Ly9zdGF0c2h1Yi5zcG9ydHJhZGFyLmNvbSIsImEiOiJzdG9peGltYW4iLCJhY3QiOiJvcmlnaW5jaGVjayIsIm9zcmMiOiJob3N0aGVhZGVyIn0~hmac=c41664e9883e7a1e793d3df5ed8991b4b045dafc33f7dc598279e2efc6454fad"
+    )
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": f"https://statshub.sportradar.com/stoiximan/el/match/{secondary_id}/report",
+        "Origin": "https://statshub.sportradar.com",
+        "Connection": "keep-alive",
+        "Cache-Control": "no-cache",
+    }
+
+    resp = requests.get(url, headers=headers, timeout=20)
+    resp.raise_for_status()
+    payload = resp.json()
+    doc = payload.get("doc", [])
+    if not doc:
+        raise RuntimeError("Empty Sportradar match_detailsextended response")
+
+    raw_doc = doc[0]
+    if not isinstance(raw_doc, dict):
+        raise RuntimeError("Unexpected Sportradar match_detailsextended payload")
+
+    return raw_doc
+
+
+def _fetch_match_standings_season_tables_raw(season_id: int):
+    url = (
+        f"https://sh.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/stats_season_tables/{season_id}//"
+        "?T=exp=1782564482~acl=/*~data=eyJvIjoiaHR0cHM6Ly9zdGF0c2h1Yi5zcG9ydHJhZGFyLmNvbSIsImEiOiJzdG9peGltYW4iLCJhY3QiOiJvcmlnaW5jaGVjayIsIm9zcmMiOiJob3N0aGVhZGVyIn0~hmac=8a06be01d49a9fefcaaace0a6c683c219b1cd0abcfdd1e29fc5cc79561954a64"
+    )
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": f"https://statshub.sportradar.com/stoiximan/el/match/{season_id}/report",
+        "Origin": "https://statshub.sportradar.com",
+        "Connection": "keep-alive",
+        "Cache-Control": "no-cache",
+    }
+
+    resp = requests.get(url, headers=headers, timeout=20)
+    resp.raise_for_status()
+    payload = resp.json()
+
+    if not isinstance(payload, dict):
+        raise RuntimeError("Unexpected Sportradar stats_season_tables payload")
+
+    return payload
 
 
 def _build_match_detailsextended_stats_payload(secondary_id: int):
@@ -328,18 +629,22 @@ def get_statsstream_detailed_endpoint(
             secondary_id = get_betradar_match_id(match_id)
             if secondary_id is not None:
                 data = _build_match_detailsextended_stats_payload(secondary_id)
+                standings = _build_match_standings_payload(match_id, secondary_id, allow_report_fallback=True)
                 return {
                     "status": "success",
                     "match_id": match_id,
                     "fallback": "report",
+                    **({"standings": standings} if standings else {}),
                     **data,
                 }
 
         data = get_statsstream_detailed(match_id)
         STATSSTREAM_SOURCE_CACHE[match_id] = "statsstream"
+        standings = _build_match_standings_payload(match_id)
         return {
             "status": "success",
             "match_id": match_id,
+            **({"standings": standings} if standings else {}),
             **data,
         }
     except Exception as detail_error:
@@ -350,10 +655,12 @@ def get_statsstream_detailed_endpoint(
 
             data = _build_match_detailsextended_stats_payload(secondary_id)
             STATSSTREAM_SOURCE_CACHE[match_id] = "report"
+            standings = _build_match_standings_payload(match_id, secondary_id, allow_report_fallback=True)
             return {
                 "status": "success",
                 "match_id": match_id,
                 "fallback": "report",
+                **({"standings": standings} if standings else {}),
                 **data,
             }
         except Exception as fallback_error:
@@ -369,9 +676,11 @@ def get_statsstream_report_endpoint(
 ):
     try:
         data = _build_match_detailsextended_stats_payload(secondary_id)
+        standings = _build_match_standings_payload(None, secondary_id, allow_report_fallback=True)
         return {
             "status": "success",
             "match_id": secondary_id,
+            **({"standings": standings} if standings else {}),
             **data,
         }
     except Exception as e:
