@@ -1083,8 +1083,6 @@ export default function MatchDetailPage() {
   ].filter(Boolean);
 
   const hasPitch = Boolean(is_live && pitchAvailable && !pitchLoading);
-  const activePanelLabel = availablePanels.find(panel => panel.id === activePanel)?.label || 'Odds';
-
   return (
     <div className="detail-page">
 
@@ -1151,12 +1149,6 @@ export default function MatchDetailPage() {
             <div className="match-layout__top">
               <div className="match-layout__content">
                 <div className="match-block match-block--content">
-                  <div className="section-head section-head--compact">
-                    <div>
-                      <div className="section-kicker">Match view</div>
-                      <h2 className="section-title">{activePanelLabel}</h2>
-                    </div>
-                  </div>
                   <div className="panel-body panel-body--views">
                     {activePanel === 'odds' && (
                       hasOdds ? (

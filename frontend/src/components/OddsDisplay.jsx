@@ -18,7 +18,7 @@ export default function OddsDisplay({ odds }) {
   };
 
   // Preferred market display order
-  const mainMarketTypes = ['1', '13', '9', '15', '14', '10', '34'];
+  const mainMarketTypes = ['9', '15', '10', '11'];
 
   // Group HCTG markets by base type
   const hctgGroups = {};
@@ -30,37 +30,41 @@ export default function OddsDisplay({ odds }) {
     }
   }
 
+  const renderStandardMarket = (marketType) => {
+    if (!odds[marketType]) return null;
+
+    const market = odds[marketType];
+    const marketName = marketTypeNames[market.market_type] || market.market_name;
+    const selections = market.selections || [];
+
+    return (
+      <div key={marketType} className="odds-market">
+        <div className="market-name">{marketName}</div>
+        <div className="odds-list">
+          {selections.map((selection) => (
+            <div key={selection.id} className="odds-item">
+              <span className="odds-name">{selection.name}</span>
+              <span className="odds-price">{selection.price?.toFixed(2)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const orderedOverUnderGroups = Object.entries(hctgGroups)
+    .sort(([a], [b]) => {
+      const order = ['13', '14', '34'];
+      return order.indexOf(a) - order.indexOf(b);
+    });
+
   return (
     <div className="odds-display">
-      <div className="odds-header">Odds</div>
-
       <div className="odds-markets">
-        {mainMarketTypes.map((marketType) => {
-          // Skip HCTG types - they're handled separately below
-          if ([13, 14, 34].includes(Number(marketType))) return null;
-          if (!odds[marketType]) return null;
-
-          const market = odds[marketType];
-          const marketName = marketTypeNames[market.market_type] || market.market_name;
-          const selections = market.selections || [];
-
-          return (
-            <div key={marketType} className="odds-market">
-              <div className="market-name">{marketName}</div>
-              <div className="odds-list">
-                {selections.map((selection) => (
-                  <div key={selection.id} className="odds-item">
-                    <span className="odds-name">{selection.name}</span>
-                    <span className="odds-price">{selection.price?.toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
+        {renderStandardMarket('1')}
 
         {/* Render all Over/Under markets grouped by type */}
-        {Object.entries(hctgGroups).map(([baseType, group]) => {
+        {orderedOverUnderGroups.map(([baseType, group]) => {
           const marketName = marketTypeNames[group.market_type] || 'Over/Under';
 
           // Collect all selections from all handicap markets
@@ -75,20 +79,16 @@ export default function OddsDisplay({ odds }) {
               <div className="market-name">{marketName}</div>
               {rows.length > 0 ? (
                 <div className="ou-table">
-                  <div className="ou-table-head">
-                    <span></span>
-                    <span>Line</span>
-                    <span></span>
-                  </div>
                   {rows.map((row, idx) => (
                     <div key={idx} className="ou-table-row">
-                      <span className="odds-price ou-side">
-                        {row.overPrice != null ? row.overPrice.toFixed(2) : '-'}
-                      </span>
-                      <span className="ou-line">{row.line}</span>
-                      <span className="odds-price ou-side">
-                        {row.underPrice != null ? row.underPrice.toFixed(2) : '-'}
-                      </span>
+                      <div className="ou-box ou-box--over">
+                        <span className="ou-side-label">Over {row.line}</span>
+                        <span className="odds-price ou-side">{row.overPrice != null ? row.overPrice.toFixed(2) : '-'}</span>
+                      </div>
+                      <div className="ou-box ou-box--under">
+                        <span className="ou-side-label">Under {row.line}</span>
+                        <span className="odds-price ou-side">{row.underPrice != null ? row.underPrice.toFixed(2) : '-'}</span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -105,6 +105,8 @@ export default function OddsDisplay({ odds }) {
             </div>
           );
         })}
+
+        {mainMarketTypes.map(renderStandardMarket)}
       </div>
     </div>
   );
