@@ -777,6 +777,10 @@ export default function MatchDetailPage() {
   const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(null);
+  const [activePanel, setActivePanel] = useState('odds');
+  const [statsStreamDetailed, setStatsStreamDetailed] = useState(null);
+  const [statsStreamLoading, setStatsStreamLoading] = useState(false);
+  const [statsStreamError, setStatsStreamError] = useState(null);
   const isInitialLoad         = useRef(true);
 
   useEffect(() => {
@@ -789,25 +793,48 @@ export default function MatchDetailPage() {
       setStatsStreamError(null);
 
       try {
-        const [matchResult, statsStreamResult] = await Promise.allSettled([
-          apiService.getMatchDetail(matchId),
-          apiService.getStatsstreamDetailed(matchId),
-        ]);
+        const matchResult = await apiService.getMatchDetail(matchId);
 
         if (!cancelled) {
-          if (statsStreamResult.status === 'fulfilled') {
-            setStatsStreamDetailed(statsStreamResult.value);
-            console.log('[statsstream/detailed]', statsStreamResult.value);
-          } else {
-            setStatsStreamDetailed(null);
-            setStatsStreamError(statsStreamResult.reason?.message || 'Failed to fetch statsstream details');
-            console.error('[statsstream/detailed] error', statsStreamResult.reason);
-          }
+          setData(matchResult);
+        }
 
-          if (matchResult.status === 'fulfilled') {
-            setData(matchResult.value);
-          } else {
-            throw matchResult.reason;
+        // Try original statsstream endpoint first
+        try {
+          const statsResult = await apiService.getStatsstreamDetailed(matchId);
+          if (!cancelled) {
+            setStatsStreamDetailed(statsResult);
+            console.log('[statsstream/detailed]', statsResult);
+          }
+        } catch (detailError) {
+          // Fallback: try Betradar report if available
+          if (!cancelled) {
+            console.warn('[statsstream/detailed] failed, trying Betradar fallback', detailError);
+            try {
+              // Resolve Betradar ID
+              let betradarId = matchResult?.betradar_id;
+              if (!betradarId) {
+                const statsRes = await apiService.statsplayer(matchId);
+                const statModels = statsRes?.data?.statPlayerModels || [];
+                betradarId = statModels[0]?.matchId;
+              }
+
+              if (betradarId) {
+                const reportResult = await apiService.getStatsstreamReport(betradarId);
+                if (!cancelled) {
+                  setStatsStreamDetailed(reportResult);
+                  console.log('[statsstream/report fallback]', reportResult);
+                }
+              } else {
+                throw new Error('Could not resolve Betradar ID');
+              }
+            } catch (fallbackError) {
+              if (!cancelled) {
+                setStatsStreamDetailed(null);
+                setStatsStreamError(fallbackError.message || 'Failed to fetch stats details');
+                console.error('[stats fallback] error', fallbackError);
+              }
+            }
           }
         }
       } catch (err) {
@@ -872,11 +899,6 @@ export default function MatchDetailPage() {
         : data.incidents)
     : [];
   const displayedIncidents = [...filteredIncidents].reverse();
-
-  const [activePanel, setActivePanel] = useState('odds');
-  const [statsStreamDetailed, setStatsStreamDetailed] = useState(null);
-  const [statsStreamLoading, setStatsStreamLoading] = useState(false);
-  const [statsStreamError, setStatsStreamError] = useState(null);
 
   // ── Render ────────────────────────────────────────────────────────────────
   if (loading) {
