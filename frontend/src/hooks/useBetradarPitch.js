@@ -88,6 +88,12 @@ function buildMarkerKey(marker) {
   ].join('|');
 }
 
+function normalizeNumericId(value) {
+  if (value == null) return null;
+  const asString = String(value).trim();
+  return /^\d+$/.test(asString) ? asString : null;
+}
+
 function parseBetradarEvents(events = []) {
   if (!Array.isArray(events) || !events.length) return null;
 
@@ -208,20 +214,51 @@ export default function useBetradarPitch(matchId) {
 
     (async () => {
       try {
-        console.log(`[useBetradarPitch] Fetching secondary ID for match ${matchId}...`);
-        const res  = await fetch(`http://localhost:8000/api/football/statsplayer/${matchId}`, { signal: controller.signal });
-        const data = await res.json();
+        console.log(`[useBetradarPitch] Resolving betradar ID for match ${matchId}...`);
+
+        let detailData = null;
+        let statsData = null;
+
+        try {
+          const detailRes = await fetch(`http://localhost:8000/api/football/matches/${matchId}`, {
+            signal: controller.signal,
+          });
+          if (detailRes.ok) {
+            detailData = await detailRes.json();
+          }
+        } catch {
+          // Fall through to statsplayer fallback.
+        }
+
+        try {
+          const statsRes = await fetch(`http://localhost:8000/api/football/statsplayer/${matchId}`, {
+            signal: controller.signal,
+          });
+          if (statsRes.ok) {
+            statsData = await statsRes.json();
+          }
+        } catch {
+          // Keep the error handling centralized below.
+        }
 
         if (cancelledRef.current) return;
 
-        const secondaryId =
-          data?.data?.statPlayerModels?.[0]?.matchId ??
-          data?.data?.statPlayerModels?.[1]?.matchId ?? null;
+        const detailId = normalizeNumericId(detailData?.betradar_id);
 
-        console.log(`[useBetradarPitch] Got secondary ID: ${secondaryId}`);
+        const statsModels = statsData?.data?.statPlayerModels;
+        const statsId = Array.isArray(statsModels)
+          ? statsModels
+              .map(model => normalizeNumericId(model?.matchId))
+              .find(Boolean)
+          : null;
+
+        const secondaryId = detailId || statsId;
+        const idSource = detailId ? 'match detail' : statsId ? 'statsplayer fallback' : 'none';
+
+        console.log(`[useBetradarPitch] Resolved ID: ${secondaryId} (source: ${idSource})`);
 
         if (secondaryId) {
-          setBetradarMatchId(String(secondaryId));
+          setBetradarMatchId(secondaryId);
           setIsAvailable(true);
         } else {
           setIsAvailable(false);
