@@ -52,25 +52,83 @@ function getMomentumValue(results) {
   return attacks >= awayAttacks ? 'home' : 'away';
 }
 
-function buildQuickStats(score, results) {
-
-  const formatters = {
-    possession: value => value != null ? `${value}%` : '-',
+function formatHeroStatLabel(key) {
+  const labelMap = {
+    corners: 'Corners',
+    yellow: 'Yellow cards',
+    yellow_cards: 'Yellow cards',
+    red: 'Red cards',
+    red_cards: 'Red cards',
+    xGoals: 'xG',
+    x_goals_live: 'xG',
+    possession: 'Possession',
+    shots: 'Shots',
+    shotsOnTarget: 'Shots on target',
+    shots_off_target: 'Shots off target',
+    shots_blocked: 'Shots blocked',
+    fouls: 'Fouls',
+    offsides: 'Offsides',
+    penalties: 'Penalties',
+    attacks: 'Attacks',
+    dangerousAttacks: 'Dangerous attacks',
   };
 
-  return Object.entries(results || {})
-    .filter(([key]) => key.toLowerCase() !== 'sportid')
-    .filter(([key]) => key.toLowerCase() !== 'scorers')
-    .filter(([key]) => key.toLowerCase() !== 'injurytime')
-    .map(([key, value]) => ({
-      label: key.charAt(0).toUpperCase() + key.slice(1),
-      home: formatters[key]
-        ? formatters[key](value?.home)
-        : value?.home ?? '-',
-      away: formatters[key]
-        ? formatters[key](value?.away)
-        : value?.away ?? '-',
-    }));
+  return labelMap[key] || key.replace(/_/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase());
+}
+
+function getResultSideValue(results, ...keys) {
+  for (const key of keys) {
+    const value = results?.[key];
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      return {
+        home: value.home ?? 0,
+        away: value.away ?? 0,
+        present: true,
+      };
+    }
+  }
+
+  return { home: 0, away: 0, present: false };
+}
+
+function buildQuickStats(results) {
+  const stats = [];
+  const seenKeys = new Set();
+  const source = results && typeof results === 'object' ? results : {};
+
+  const addFixedStat = (key, label, icon, keys) => {
+    const value = getResultSideValue(source, ...keys);
+    seenKeys.add(key);
+    keys.forEach(alias => seenKeys.add(String(alias).toLowerCase()));
+    stats.push({
+      key,
+      label,
+      icon,
+      home: value.home,
+      away: value.away,
+      fixed: true,
+    });
+  };
+
+  addFixedStat('corners', 'Corners', '🚩', ['corners']);
+  addFixedStat('yellow', 'Yellow cards', '🟨', ['yellow', 'yellow_cards']);
+
+  for (const [key, value] of Object.entries(source)) {
+    const lowerKey = key.toLowerCase();
+    if (['sportid', 'scorers', 'injurytime'].includes(lowerKey)) continue;
+    if (seenKeys.has(key) || seenKeys.has(lowerKey)) continue;
+    if (!value || typeof value !== 'object' || Array.isArray(value)) continue;
+
+    stats.push({
+      key,
+      label: formatHeroStatLabel(key),
+      home: value.home ?? 0,
+      away: value.away ?? 0,
+      fixed: false,
+    });
+  }
+
+  return stats;
 }
 
 // ---------------------------------------------------------------------------
@@ -812,13 +870,20 @@ function MatchInfoSection({ matchData }) {
 }
 
 function SummaryStrip({ score, results, isLive }) {
-  const quickStats = buildQuickStats(score, results);
+  const quickStats = buildQuickStats(results);
 
   return (
     <div className="summary-strip">
       {quickStats.map(item => (
-        <div key={item.label} className="summary-stat-card">
-          <span className="summary-stat-label">{item.label}</span>
+        <div
+          key={item.key}
+          className={`summary-stat-card ${item.fixed ? 'summary-stat-card--fixed' : 'summary-stat-card--dynamic'}`}
+        >
+          {item.fixed ? (
+            <span className="summary-stat-icon" aria-hidden="true">{item.icon}</span>
+          ) : (
+            <span className="summary-stat-label">{item.label}</span>
+          )}
           <div className="summary-stat-values">
             <span className="summary-stat-value">{item.home}</span>
             <span className="summary-stat-divider">-</span>
@@ -826,7 +891,6 @@ function SummaryStrip({ score, results, isLive }) {
           </div>
         </div>
       ))}
-      
     </div>
   );
 }
@@ -1047,27 +1111,24 @@ export default function MatchDetailPage() {
               <div className="hero-team__name">{home_team?.name || 'Home'}</div>
             </div>
 
-            <div className="hero-score">
-              <div className="hero-score__value">{score?.home ?? '-'}</div>
-              <div className="hero-score__separator">:</div>
-              <div className="hero-score__value">{score?.away ?? '-'}</div>
+            <div className="hero-score-stack">
+              <div className="hero-time">
+                {is_live ? formatClock(score?.seconds_since_start) : '—'}
+              </div>
+
+              <div className="hero-score">
+                <div className="hero-score__value">{score?.home ?? '-'}</div>
+                <div className="hero-score__separator">:</div>
+                <div className="hero-score__value">{score?.away ?? '-'}</div>
+              </div>
+
+              <SummaryStrip score={score} results={results} isLive={is_live} />
             </div>
 
             <div className="hero-team hero-team--away">
               <div className="hero-team__name">{away_team?.name || 'Away'}</div>
             </div>
-
-            <div className="hero-time">
-              {is_live ? formatClock(score?.seconds_since_start) : '—'}
-            </div>
           </div>
-
-
-          <div className="detail-hero__facts">
-            
-          </div>
-
-          <SummaryStrip score={score} results={results} isLive={is_live} />
 
           {availablePanels.length > 0 && (
             <div className="detail-tabs detail-tabs--panel">

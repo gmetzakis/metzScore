@@ -145,13 +145,12 @@
 
 .detail-hero__teams {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  grid-template-rows: auto auto;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   justify-items: center;
   justify-content: center;
   position: relative;
-  gap: 1px;
+  gap: 16px;
 }
 
 .hero-team {
@@ -159,11 +158,12 @@
   align-items: center;
   gap: 14px;
   min-width: 0;
+  width: 100%;
 }
 
 
-.hero-team--home { justify-self: end; }
-.hero-team--away { justify-self: start; }
+.hero-team--home { justify-self: end; justify-content: flex-end; }
+.hero-team--away { justify-self: start; justify-content: flex-start; }
 
 .hero-team__name {
   min-width: 0;
@@ -171,13 +171,20 @@
   word-break: break-all
 }
 
+.hero-score-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: min(100%, 520px);
+}
+
 .hero-score {
-  grid-row: 1;
-  grid-column: 2;
   display: flex;
   align-items: baseline;
   gap: 10px;
-  padding: 8px 18px;
+  padding: 4px 12px 0;
 }
 
 .hero-score__value {
@@ -194,17 +201,14 @@
 }
 
 .hero-time {
-  grid-row: 2;
-  grid-column: 2;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: #fff;
+  color: rgba(255, 255, 255, 0.78);
+  letter-spacing: 0.02em;
 }
 
 .detail-hero__facts {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  display: none;
 }
 
 .hero-fact {
@@ -228,38 +232,65 @@
 }
 
 .summary-strip {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 10px;
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-.summary-stat-card,
-.summary-status-pill {
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.summary-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.summary-stat-card {
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
 }
 
 .summary-stat-label {
   display: block;
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.62);
+  color: rgba(255, 255, 255, 0.66);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-bottom: 6px;
 }
 
 .summary-stat-values {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  font-size: 15px;
+  gap: 6px;
+  font-size: 14px;
   font-weight: 800;
 }
 
 .summary-stat-divider {
   color: rgba(255, 255, 255, 0.45);
+}
+
+.summary-stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.summary-stat-card--fixed .summary-stat-values {
+  gap: 5px;
+}
+
+.summary-stat-card--dynamic .summary-stat-values {
+  padding-left: 2px;
 }
 
 .summary-status-pill {
@@ -1320,14 +1351,13 @@
     justify-self: center;
   }
 
-  .detail-hero__facts,
   .summary-strip,
   .info-grid {
     grid-template-columns: 1fr 1fr;
   }
 
   .summary-strip {
-    grid-template-columns: 1fr 1fr;
+    justify-content: flex-start;
   }
 
   .summary-status-pill {
@@ -1365,7 +1395,12 @@
   }
 
   .summary-strip {
-    grid-template-columns: 1fr;
+    gap: 8px;
+    justify-content: flex-start;
+  }
+
+  .summary-stat-card {
+    padding: 6px 10px;
   }
 
   .detail-tabs {
