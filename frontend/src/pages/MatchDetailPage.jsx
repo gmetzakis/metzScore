@@ -1079,9 +1079,7 @@ export default function MatchDetailPage() {
           </div>
 
           <div className="detail-hero__teams">
-            <div className="hero-team hero-team--home">
-              <div className="hero-team__name">{home_team?.name || 'Home'}</div>
-            </div>
+            
 
             <div className="hero-score-stack">
               <div className="hero-time">
@@ -1089,17 +1087,25 @@ export default function MatchDetailPage() {
               </div>
 
               <div className="hero-score">
+                <div className="hero-team hero-team--home">
+                  <div className="hero-team__name">{home_team?.name || 'Home'}</div>
+                </div>
+                
                 <div className="hero-score__value">{score?.home ?? '-'}</div>
-                <div className="hero-score__separator">:</div>
+                <div className="hero-score__separator">-</div>
                 <div className="hero-score__value">{score?.away ?? '-'}</div>
+                
+                <div className="hero-team hero-team--away">
+                  <div className="hero-team__name">{away_team?.name || 'Away'}</div>
+                </div>
               </div>
+
+             
 
               <SummaryStrip score={score} results={results} isLive={is_live} />
             </div>
 
-            <div className="hero-team hero-team--away">
-              <div className="hero-team__name">{away_team?.name || 'Away'}</div>
-            </div>
+            
           </div>
 
           {availablePanels.length > 0 && (
