@@ -1228,15 +1228,6 @@ export default function MatchDetailPage() {
               <div className="match-layout__pitch">
                 {hasPitch && (
                   <div className="match-block match-block--pitch" ref={pitchRef}>
-                    <div className="section-head section-head--compact">
-                      <div>
-                        <div className="section-kicker">Live match</div>
-                        <h2 className="section-title">Pitch coverage</h2>
-                      </div>
-                      <div className="section-badges">
-                        {betradarMatchId && <span className="section-badge section-badge--live">LIVE</span>}
-                      </div>
-                    </div>
                     <LivePitch
                       situation={pitchState.situation}
                       situationTeam={pitchState.situationTeam}
