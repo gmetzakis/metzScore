@@ -96,8 +96,8 @@ function buildQuickStats(results) {
   const seenKeys = new Set();
   const source = results && typeof results === 'object' ? results : {};
   const iconByKey = {
-    red: '🟥',
-    red_cards: '🟥',
+    red: <img src="../../public/icons/red.svg"/>,
+    red_cards: <img src="../../public/icons/red.svg"/>,
   };
 
   const addFixedStat = (key, label, icon, keys) => {
@@ -114,8 +114,8 @@ function buildQuickStats(results) {
     });
   };
 
-  addFixedStat('corners', 'Corners', '🚩', ['corners']);
-  addFixedStat('yellow', 'Yellow cards', '🟨', ['yellow', 'yellow_cards']);
+  addFixedStat('corners', 'Corners', <img src="../../public/icons/corner.svg"/>, ['corners']);
+  addFixedStat('yellow', 'Yellow cards', <img src="../../public/icons/yellow.svg"/>, ['yellow', 'yellow_cards']);
 
   for (const [key, value] of Object.entries(source)) {
     const lowerKey = key.toLowerCase();
@@ -141,13 +141,13 @@ function buildQuickStats(results) {
 // ---------------------------------------------------------------------------
 
 const INCIDENT_ICONS = {
-  GOAL: '⚽',
-  YELL: '🟨',
-  RED: '🟥️',
-  SUBS: '🔄',
+  GOAL: <img src="../../public/icons/goal.svg"/>,
+  YELL: <img src="../../public/icons/yellow.svg"/>,
+  RED: <img src="../../public/icons/red.svg"/>,
+  SUBS: <img src="../../public/icons/sub.svg"/>,
   OFFS: '📐',
   PENL: '🎯',
-  CRNR: '🚩',
+  CRNR: <img src="../../public/icons/corner.svg"/>,
   EBEG: '▶',
   PEND: '⏸',
   PBEG: '▶',
@@ -379,7 +379,7 @@ function StatsstreamDetailedSection({ statsStreamDetailed, incidents, score, isF
     : defaultDisplayedStatEntries;
 
   const summaryCards = [
-    { label: 'Goals', home: displayHomeTotals.goals, away: displayAwayTotals.goals, accent: 'rose', icon: '⚽' },
+    { label: 'Goals', home: displayHomeTotals.goals, away: displayAwayTotals.goals, accent: 'rose', icon: <img src="../../public/icons/goal.svg"/> },
     { label: 'Yellow', home: displayHomeTotals.yellow_cards, away: displayAwayTotals.yellow_cards, accent: 'amber', icon: '■' },
     { label: 'Red', home: displayHomeTotals.red_cards, away: displayAwayTotals.red_cards, accent: 'rose', icon: '■' },
     { label: 'Corners', home: cornersHome, away: cornersAway, accent: 'sky', icon: '⚑' },
@@ -745,7 +745,7 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
                 return (
                   <div key={`${p.id || p.name}-${i}`} className="roster-player">
                     <span className="player-name">{p.name}</span>
-                    {goals > 0 && <span className="player-goal">{'⚽'.repeat(goals)}</span>}
+                    {goals > 0 && <span className="player-goal">{Array.from({ length: goals }).map((_, i) => (<img key={i} src='../../public/icons/goal.svg' /> ))}</span>}
                     {outMinute && <span className="player-sub-out">{outMinute}'</span>}
                   </div>
                 );
@@ -763,7 +763,7 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
                 return (
                   <div key={`${p.id || p.name}-${i}`} className="roster-player roster-bench-player">
                     <span className="player-name">{p.name}</span>
-                    {goals > 0 && <span className="player-goal">{'⚽'.repeat(goals)}</span>}
+                    {goals > 0 && <span className="player-goal">{Array.from({ length: goals }).map((_, i) => (<img key={i} src='../../public/icons/goal.svg' /> ))}</span>}
                     {minuteStr && <span className="player-sub-minute">{minuteStr}'</span>}
                   </div>
                 );

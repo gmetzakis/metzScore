@@ -66,13 +66,13 @@ function normalizeType(value) {
 
 function markerIcon(type) {
   const normalized = normalizeType(type);
-  if (normalized === "goal") return "⚽";
-  if (normalized === "corner") return "🚩";
+  if (normalized === "goal") return <img src="../../public/icons/goal.svg"/>;
+  if (normalized === "corner") return <img src="../../public/icons/corner.svg"/>;
   if (normalized === "shotontarget" || normalized === "shotofftarget" || normalized === "shot") return "🎯";
   if (normalized === "goalkeepersave" || normalized === "save") return "🧤";
-  if (normalized === "card") return "🟨";
+  if (normalized === "card") return <img src="../../public/icons/yellow.svg"/>;
   if (normalized === "penalty") return "⛳";
-  if (normalized === "substitution") return "🔄";
+  if (normalized === "substitution") return <img src="../../public/icons/sub.svg"/>;
   if (normalized === "freekick") return "🦶";
   if (normalized === "goalkick") return "🥅";
   if (normalized === "throwin") return "↩";
@@ -389,7 +389,7 @@ export default function LivePitch({
 
         {showIdle && (
           <div className="pitch-overlay-message pitch-overlay-message--idle">
-            <span className="pitch-msg-icon">⚽</span>
+            <span className="pitch-msg-icon"><img src="../../public/icons/goal.svg"/></span>
             <span className="pitch-msg-text">Waiting for live data…</span>
           </div>
         )}
@@ -425,10 +425,10 @@ export default function LivePitch({
           {markers.length > 0 && (
             <>
               <div className="pitch-summary-chips" aria-label="Pitch event summary">
-                {summaryCounts.goals > 0 && <span className="pitch-summary-chip pitch-summary-chip--goal">⚽ {summaryCounts.goals} Goals</span>}
-                {summaryCounts.corners > 0 && <span className="pitch-summary-chip pitch-summary-chip--corner">🚩 {summaryCounts.corners} Corners</span>}
+                {summaryCounts.goals > 0 && <span className="pitch-summary-chip pitch-summary-chip--goal"><img src="../../public/icons/goal.svg"/> {summaryCounts.goals} Goals</span>}
+                {summaryCounts.corners > 0 && <span className="pitch-summary-chip pitch-summary-chip--corner"><img src="../../public/icons/corner.svg"/> {summaryCounts.corners} Corners</span>}
                 {summaryCounts.shots > 0 && <span className="pitch-summary-chip pitch-summary-chip--shot">🎯 {summaryCounts.shots} Shots</span>}
-                {summaryCounts.cards > 0 && <span className="pitch-summary-chip pitch-summary-chip--card">🟨 {summaryCounts.cards} Cards</span>}
+                {summaryCounts.cards > 0 && <span className="pitch-summary-chip pitch-summary-chip--card"><img src="../../public/icons/yellow.svg"/> {summaryCounts.cards} Cards</span>}
                 {summaryCounts.saves > 0 && <span className="pitch-summary-chip pitch-summary-chip--save">🧤 {summaryCounts.saves} Saves</span>}
                 {summaryCounts.penalties > 0 && <span className="pitch-summary-chip pitch-summary-chip--penalty">⛳ {summaryCounts.penalties} Penalties</span>}
               </div>
