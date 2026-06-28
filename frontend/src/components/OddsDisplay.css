@@ -17,8 +17,7 @@
 }
 
 .odds-market {
-  background:
-    linear-gradient(180deg, rgba(24, 31, 51, 0.98), rgba(17, 24, 39, 0.98));
+  background: linear-gradient(180deg, rgba(24, 31, 51, 0.98), rgba(17, 24, 39, 0.98));
   border: 1px solid rgba(148, 163, 184, 0.16);
   border-radius: 20px;
   padding: 9px 11px;

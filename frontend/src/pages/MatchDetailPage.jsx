@@ -162,6 +162,7 @@ function IncidentRow({ incident, homeName, awayName }) {
     type === 'GOAL' && 'inc-goal',
     type === 'YELL' && 'inc-yellow',
     type === 'SUBS' && 'inc-subs',
+    type === 'RED' && 'inc-red',
   ].filter(Boolean).join(' ');
 
   return (
@@ -439,121 +440,119 @@ function StatsstreamDetailedSection({ statsStreamDetailed, incidents, score, isF
   }
 
   return (
-    <div className="statsstream-block">
-      <div className="statsstream-preview">
-        <div className="statsstream-summary-grid">
-          {summaryCards.map(card => (
-            <div key={card.label} className={`statsstream-summary-card statsstream-summary-card--${card.accent}`}>
-              <div className="statsstream-summary-icon">{card.icon}</div>
-              <div className="statsstream-summary-label">{card.label}</div>
-              <div className="statsstream-summary-values">
-                <div className="statsstream-summary-value-row">
-                  <span className="statsstream-summary-value">{card.home ?? 0}</span>
-                </div>
-                <div className="statsstream-summary-value-row">
-                  <span className="statsstream-summary-value">{card.away ?? 0}</span>
-                </div>
+    <div className="statsstream-preview">
+      <div className="statsstream-summary-grid">
+        {summaryCards.map(card => (
+          <div key={card.label} className={`statsstream-summary-card statsstream-summary-card--${card.accent}`}>
+            <div className="statsstream-summary-icon">{card.icon}</div>
+            <div className="statsstream-summary-label">{card.label}</div>
+            <div className="statsstream-summary-values">
+              <div className="statsstream-summary-value-row">
+                <span className="statsstream-summary-value">{card.home ?? 0}</span>
+              </div>
+              <div className="statsstream-summary-value-row">
+                <span className="statsstream-summary-value">{card.away ?? 0}</span>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+      </div>
 
-        <div className="statsstream-rings">
-          {comparisonMetrics.map(metric => {
-            const homeWidth = metric.total ? (metric.home / metric.total) * 100 : 0;
-            const ringStyle = {
-              background: `conic-gradient(#2563eb 0 ${homeWidth}%, #dc2626 ${homeWidth}% 100%)`,
-            };
+      <div className="statsstream-rings">
+        {comparisonMetrics.map(metric => {
+          const homeWidth = metric.total ? (metric.home / metric.total) * 100 : 0;
+          const ringStyle = {
+            background: `conic-gradient(#2563eb 0 ${homeWidth}%, #dc2626 ${homeWidth}% 100%)`,
+          };
 
-            return (
-              <div key={metric.label} className="statsstream-ring-card">
-                <div className="statsstream-ring-shell">
-                  <span className="statsstream-ring-value statsstream-ring-value--home">{metric.home}{metric.suffix || ''}</span>
-                  <div className="statsstream-ring" style={ringStyle}>
-                    <div className="statsstream-ring-core" />
-                  </div>
-                  <span className="statsstream-ring-value statsstream-ring-value--away">{metric.away}{metric.suffix || ''}</span>
+          return (
+            <div key={metric.label} className="statsstream-ring-card">
+              <div className="statsstream-ring-shell">
+                <span className="statsstream-ring-value statsstream-ring-value--home">{metric.home}{metric.suffix || ''}</span>
+                <div className="statsstream-ring" style={ringStyle}>
+                  <div className="statsstream-ring-core" />
                 </div>
-                <div className="statsstream-ring-label">{metric.label}</div>
+                <span className="statsstream-ring-value statsstream-ring-value--away">{metric.away}{metric.suffix || ''}</span>
+              </div>
+              <div className="statsstream-ring-label">{metric.label}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="statsstream-timeline-card">
+        <div className="statsstream-timeline-chart">
+          <div className="statsstream-timeline-midline" />
+          <div className="statsstream-timeline-clock">{formatClock(score?.seconds_since_start)}</div>
+
+          {keyEvents.map((event, index) => {
+            const left = Math.min((event.minute / 90) * 100, 100);
+            return (
+              <div
+                key={`${event.type}-${event.minute}-${index}`}
+                className={`statsstream-timeline-event ${event.teamSide === 0 ? 'statsstream-timeline-event--home' : event.teamSide === 1 ? 'statsstream-timeline-event--away' : ''}`}
+                style={{ left: `${left}%` }}
+                title={`${event.type} ${event.rawTime || `${event.minute}'`}`}
+              >
+                {event.icon}
               </div>
             );
           })}
         </div>
+      </div>
 
-        <div className="statsstream-timeline-card">
-          <div className="statsstream-timeline-chart">
-            <div className="statsstream-timeline-midline" />
-            <div className="statsstream-timeline-clock">{formatClock(score?.seconds_since_start)}</div>
-
-            {keyEvents.map((event, index) => {
-              const left = Math.min((event.minute / 90) * 100, 100);
-              return (
-                <div
-                  key={`${event.type}-${event.minute}-${index}`}
-                  className={`statsstream-timeline-event ${event.teamSide === 0 ? 'statsstream-timeline-event--home' : event.teamSide === 1 ? 'statsstream-timeline-event--away' : ''}`}
-                  style={{ left: `${left}%` }}
-                  title={`${event.type} ${event.rawTime || `${event.minute}'`}`}
-                >
-                  {event.icon}
-                </div>
-              );
-            })}
-          </div>
+      <div className="statsstream-possession-card">
+        <div className="statsstream-possession-title">Επίδοση</div>
+        <div className="statsstream-possession-row">
+          <span className="statsstream-possession-value statsstream-possession-value--home">{possessionHome}%</span>
+          <span className="statsstream-possession-label">Κατοχή</span>
+          <span className="statsstream-possession-value statsstream-possession-value--away">{possessionAway}%</span>
+        </div>
+        <div className="statsstream-possession-track">
+          <div className="statsstream-possession-fill statsstream-possession-fill--home" style={{ width: `${possessionHome}%` }} />
+          <div className="statsstream-possession-fill statsstream-possession-fill--away" style={{ width: `${possessionAway}%` }} />
         </div>
 
-        <div className="statsstream-possession-card">
-          <div className="statsstream-possession-title">Επίδοση</div>
-          <div className="statsstream-possession-row">
-            <span className="statsstream-possession-value statsstream-possession-value--home">{possessionHome}%</span>
-            <span className="statsstream-possession-label">Κατοχή</span>
-            <span className="statsstream-possession-value statsstream-possession-value--away">{possessionAway}%</span>
-          </div>
-          <div className="statsstream-possession-track">
-            <div className="statsstream-possession-fill statsstream-possession-fill--home" style={{ width: `${possessionHome}%` }} />
-            <div className="statsstream-possession-fill statsstream-possession-fill--away" style={{ width: `${possessionAway}%` }} />
-          </div>
+        <div className="statsstream-all-stats">
+          {displayedStatEntries.map(stat => {
+            const homeValue = Number(stat.home ?? 0);
+            const awayValue = Number(stat.away ?? 0);
+            const maxValue = Math.max(homeValue, awayValue, 1);
+            const homeWidth = (homeValue / maxValue) * 100;
+            const awayWidth = (awayValue / maxValue) * 100;
 
-          <div className="statsstream-all-stats">
-            {displayedStatEntries.map(stat => {
-              const homeValue = Number(stat.home ?? 0);
-              const awayValue = Number(stat.away ?? 0);
-              const maxValue = Math.max(homeValue, awayValue, 1);
-              const homeWidth = (homeValue / maxValue) * 100;
-              const awayWidth = (awayValue / maxValue) * 100;
-
-              return (
-                <div key={stat.key} className="statsstream-all-stat-row">
-                  <div className="statsstream-all-stat-side statsstream-all-stat-side--home">
-                    <span className="statsstream-all-stat-value statsstream-all-stat-value--home">{formatStatOutput(stat.home)}</span>
-                    <div className="statsstream-all-stat-track">
-                      <div className="statsstream-all-stat-bar statsstream-all-stat-bar--home" style={{ width: `${homeWidth}%` }} />
-                    </div>
+            return (
+              <div key={stat.key} className="statsstream-all-stat-row">
+                <div className="statsstream-all-stat-side statsstream-all-stat-side--home">
+                  <span className="statsstream-all-stat-value statsstream-all-stat-value--home">{formatStatOutput(stat.home)}</span>
+                  <div className="statsstream-all-stat-track">
+                    <div className="statsstream-all-stat-bar statsstream-all-stat-bar--home" style={{ width: `${homeWidth}%` }} />
                   </div>
+                </div>
 
-                  <span className="statsstream-all-stat-label">{stat.label}</span>
+                <span className="statsstream-all-stat-label">{stat.label}</span>
 
-                  <div className="statsstream-all-stat-side statsstream-all-stat-side--away">
-                    <span className="statsstream-all-stat-value statsstream-all-stat-value--away">{formatStatOutput(stat.away)}</span>
-                    <div className="statsstream-all-stat-track">
-                      <div className="statsstream-all-stat-bar statsstream-all-stat-bar--away" style={{ width: `${awayWidth}%` }} />
-                    </div>
+                <div className="statsstream-all-stat-side statsstream-all-stat-side--away">
+                  <span className="statsstream-all-stat-value statsstream-all-stat-value--away">{formatStatOutput(stat.away)}</span>
+                  <div className="statsstream-all-stat-track">
                     <div className="statsstream-all-stat-bar statsstream-all-stat-bar--away" style={{ width: `${awayWidth}%` }} />
                   </div>
-              </div>
-              );
-            })}
-          </div>
-
-          {hasExtraStats && (
-            <button
-              type="button"
-              className="statsstream-expand-button"
-              onClick={() => setShowAllStats(prev => !prev)}
-            >
-              {showAllStats ? 'Show less' : 'Show all statistics'}
-            </button>
-          )}
+                  <div className="statsstream-all-stat-bar statsstream-all-stat-bar--away" style={{ width: `${awayWidth}%` }} />
+                </div>
+            </div>
+            );
+          })}
         </div>
+
+        {hasExtraStats && (
+          <button
+            type="button"
+            className="statsstream-expand-button"
+            onClick={() => setShowAllStats(prev => !prev)}
+          >
+            {showAllStats ? 'Show less' : 'Show all statistics'}
+          </button>
+        )}
       </div>
     </div>
   );
