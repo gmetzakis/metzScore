@@ -145,8 +145,8 @@ const INCIDENT_ICONS = {
   YELL: <img src="../../public/icons/yellow.svg"/>,
   RED: <img src="../../public/icons/red.svg"/>,
   SUBS: <img src="../../public/icons/sub.svg"/>,
-  OFFS: '📐',
-  PENL: '🎯',
+  OFFS: <img src="../../public/icons/offside.svg"/>,
+  PENL: <img src="../../public/icons/penalty.svg"/>,
   CRNR: <img src="../../public/icons/corner.svg"/>,
   EBEG: '▶',
   PEND: '⏸',
@@ -380,11 +380,11 @@ function StatsstreamDetailedSection({ statsStreamDetailed, incidents, score, isF
 
   const summaryCards = [
     { label: 'Goals', home: displayHomeTotals.goals, away: displayAwayTotals.goals, accent: 'rose', icon: <img src="../../public/icons/goal.svg"/> },
-    { label: 'Yellow', home: displayHomeTotals.yellow_cards, away: displayAwayTotals.yellow_cards, accent: 'amber', icon: '■' },
-    { label: 'Red', home: displayHomeTotals.red_cards, away: displayAwayTotals.red_cards, accent: 'rose', icon: '■' },
-    { label: 'Corners', home: cornersHome, away: cornersAway, accent: 'sky', icon: '⚑' },
-    { label: 'Shots', home: totalShotsHome, away: totalShotsAway, accent: 'blue', icon: '◌' },
-    { label: 'On target', home: displayHomeTotals.shots_on_target, away: displayAwayTotals.shots_on_target, accent: 'emerald', icon: '◎' },
+    { label: 'Yellow', home: displayHomeTotals.yellow_cards, away: displayAwayTotals.yellow_cards, accent: 'amber', icon: <img src="../../public/icons/yellow.svg"/> },
+    { label: 'Red', home: displayHomeTotals.red_cards, away: displayAwayTotals.red_cards, accent: 'rose', icon: <img src="../../public/icons/red.svg"/> },
+    { label: 'Corners', home: cornersHome, away: cornersAway, accent: 'sky', icon: <img src="../../public/icons/corner.svg"/> },
+    { label: 'Shots', home: totalShotsHome, away: totalShotsAway, accent: 'blue', icon: <img src="../../public/icons/shots.svg"/> },
+    { label: 'On target', home: displayHomeTotals.shots_on_target, away: displayAwayTotals.shots_on_target, accent: 'emerald', icon: <img src="../../public/icons/shots_on_target.svg"/>},
   ];
 
   const comparisonMetrics = [
@@ -444,8 +444,10 @@ function StatsstreamDetailedSection({ statsStreamDetailed, incidents, score, isF
       <div className="statsstream-summary-grid">
         {summaryCards.map(card => (
           <div key={card.label} className={`statsstream-summary-card statsstream-summary-card--${card.accent}`}>
-            <div className="statsstream-summary-icon">{card.icon}</div>
-            <div className="statsstream-summary-label">{card.label}</div>
+            <div className="statsstream-summary-header">
+              <div className="statsstream-summary-icon">{card.icon}</div>
+              <div className="statsstream-summary-label">{card.label}</div>
+            </div>
             <div className="statsstream-summary-values">
               <div className="statsstream-summary-value-row">
                 <span className="statsstream-summary-value">{card.home ?? 0}</span>

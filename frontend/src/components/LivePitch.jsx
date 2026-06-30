@@ -71,7 +71,7 @@ function markerIcon(type) {
   if (normalized === "shotontarget" || normalized === "shotofftarget" || normalized === "shot") return "🎯";
   if (normalized === "goalkeepersave" || normalized === "save") return "🧤";
   if (normalized === "card") return <img src="../../public/icons/yellow.svg"/>;
-  if (normalized === "penalty") return "⛳";
+  if (normalized === "penalty") return <img src="../../public/icons/penalty.svg"/>;
   if (normalized === "substitution") return <img src="../../public/icons/sub.svg"/>;
   if (normalized === "freekick") return "🦶";
   if (normalized === "goalkick") return "🥅";
