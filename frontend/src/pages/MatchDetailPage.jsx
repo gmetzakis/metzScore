@@ -910,7 +910,7 @@ export default function MatchDetailPage() {
           if (!cancelled) {
             setStatsStreamDetailed(statsResult);
             setStatsStreamIsFallback(Boolean(statsResult?.fallback === 'report'));
-            console.log('[statsstream/detailed]', statsResult);
+            //console.log('[statsstream/detailed]', statsResult);
           }
         } catch (detailError) {
           // Fallback: try Betradar report if available
@@ -1035,7 +1035,7 @@ export default function MatchDetailPage() {
     incident_filters, statistics, is_live, status,
     roster, start_time,
   } = data;
-  console.log("ENA: ", data);
+  // console.log("ENA: ", data);
 
   const hasOdds = odds && Object.keys(odds).length > 0;
   const hasHomeLineup = Array.isArray(roster?.lineups?.homeLineup?.lineup) && roster.lineups.homeLineup.lineup.some(row => Array.isArray(row) && row.length > 0);

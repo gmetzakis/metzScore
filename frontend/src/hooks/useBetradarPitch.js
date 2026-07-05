@@ -22,9 +22,14 @@ const NOTABLE_TYPES = new Set([
   'goal',
   'substitution',
   'foul',
+  'injury',
+  'injuries',
+  'stoppagetime',
+  'extratime',
+  'stoppage',
+  'possessionevent',
   'attack',
   'dangerousattack',
-  'possession',
 ]);
 
 function normalizeType(value) {
@@ -94,31 +99,70 @@ function normalizeNumericId(value) {
   return /^\d+$/.test(asString) ? asString : null;
 }
 
+function isPossessionType(value) {
+  const normalized = normalizeType(value);
+  return normalized === 'possession' || normalized === 'possessionevent' || normalized === 'possesionevent';
+}
+
+function getEventOrderValue(event) {
+  const uts = Number(event?.uts);
+  if (Number.isFinite(uts)) return uts;
+
+  const seconds = Number(event?.seconds);
+  if (Number.isFinite(seconds)) return seconds;
+
+  return -1;
+}
+
+function sortEventsForPlayback(events) {
+  return [...events]
+    .map((event, index) => ({ event, index, order: getEventOrderValue(event) }))
+    .sort((left, right) => left.order - right.order || left.index - right.index)
+    .map(item => item.event);
+}
+
 function parseBetradarEvents(events = []) {
   if (!Array.isArray(events) || !events.length) return null;
 
+  const orderedEvents = sortEventsForPlayback(events);
+
   let situation     = null;
   let situationTeam = null;
+  let situationOrder = -1;
   let ballPos       = null;
   let ballEnd       = null;
   let attackPath    = [];
   let latestMarker  = null;
+  let latestMarkerOrder = -1;
   const markers     = [];
 
-  for (const e of events) {
+  for (const e of orderedEvents) {
     if (!e || e.disabled) continue;
 
     // Use _doctype as authoritative type; fall back to type field.
     const doctype = normalizeType(e._doctype || e.type);
+    const eventOrder = getEventOrderValue(e);
 
     // ── Match situation (primary source of ball pos + game state) ────────
     if (doctype === 'matchsituation') {
-      situation     = e.situation || situation;   // 'dangerous' | 'attack' | 'safe'
-      situationTeam = e.team      || null;
+      if (eventOrder >= situationOrder) {
+        situation     = e.situation || situation;   // 'dangerous' | 'attack' | 'safe'
+        situationTeam = e.team      || null;
+        situationOrder = eventOrder;
+      }
 
       if (typeof e.X === 'number' && typeof e.Y === 'number') {
         ballPos = { x: e.X, y: e.Y };
       }
+    }
+
+    if (isPossessionType(doctype)) {
+      if (eventOrder >= situationOrder) {
+        situation = 'possession';
+        situationTeam = e.team || situationTeam;
+        situationOrder = eventOrder;
+      }
+      continue;
     }
 
     // ── Ball coordinates (companion events — coords[] is always empty,
@@ -160,8 +204,16 @@ function parseBetradarEvents(events = []) {
 
       marker.key = buildMarkerKey(marker);
       markers.push(marker);
-      latestMarker = marker;
+
+      if (eventOrder >= latestMarkerOrder) {
+        latestMarker = marker;
+        latestMarkerOrder = eventOrder;
+      }
     }
+  }
+
+  if (latestMarkerOrder < situationOrder) {
+    latestMarker = null;
   }
 
   return {
@@ -301,6 +353,9 @@ export default function useBetradarPitch(matchId) {
           data?.result?.events ||
           [];
         const parsed = parseBetradarEvents(events);
+        console.log(events);
+        console.log(parsed);
+        console.log('-------------------');
 
         if (parsed) {
           const freshMarkers = (parsed.markers || []).filter(marker => {
@@ -316,7 +371,7 @@ export default function useBetradarPitch(matchId) {
             ballPos:       parsed.ballPos       ?? prev.ballPos,
             ballEnd:       parsed.ballEnd       ?? prev.ballEnd,
             attackPath:    parsed.attackPath?.length ? parsed.attackPath : prev.attackPath,
-            latestMarker:  parsed.latestMarker  ?? prev.latestMarker,
+            latestMarker:  parsed.latestMarker ?? null,
             markers:       freshMarkers.length ? [...prev.markers, ...freshMarkers].slice(-80) : prev.markers,
           }));
         }

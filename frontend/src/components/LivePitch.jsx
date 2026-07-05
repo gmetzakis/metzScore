@@ -77,6 +77,8 @@ function markerIcon(type) {
   if (normalized === "goalkick") return "🥅";
   if (normalized === "throwin") return "↩";
   if (normalized === "possibleevent" || normalized === "var") return "📺";
+  if (normalized === "injury" || normalized === "injuries") return "🩹";
+  if (normalized === "stoppagetime" || normalized === "extratime" || normalized === "stoppage") return "⏱";
   return "•";
 }
 
@@ -84,6 +86,7 @@ function markerLabel(type) {
   const normalized = normalizeType(type);
   if (normalized === "goal") return "Goal";
   if (normalized === "corner") return "Corner";
+  if (normalized === "halftime" || normalized === "half" || normalized === "halftrime") return "Half-time";
   if (normalized === "shotontarget") return "Shot on target";
   if (normalized === "shotofftarget") return "Shot off target";
   if (normalized === "shot") return "Shot";
@@ -94,6 +97,10 @@ function markerLabel(type) {
   if (normalized === "freekick") return "Free kick";
   if (normalized === "goalkick") return "Goal kick";
   if (normalized === "throwin") return "Throw-in";
+  if (normalized === "injury" || normalized === "injuries") return "Injury";
+  if (normalized === "stoppagetime") return "Stoppage time";
+  if (normalized === "extratime") return "Extra time";
+  if (normalized === "stoppage") return "Stoppage";
   if (normalized === "possibleevent" || normalized === "var") return "VAR";
   if (normalized === "foul") return "Foul";
   if (normalized === "attack") return "Attack";
@@ -129,6 +136,9 @@ function shouldShowTransientMarker(marker) {
   return [
     "goal",
     "corner",
+    "halftime",
+    "half",
+    "halftimebreak",
     "freekick",
     "freekick",
     "waterbreak",
@@ -150,7 +160,6 @@ function shouldShowTransientMarker(marker) {
     "penalty",
     "substitution",
     "foul",
-    "possibleevent",
     "var",
   ].includes(normalized);
 }
@@ -192,6 +201,7 @@ function getFloatingPlacement(point) {
 function getModeLabel(mode) {
   if (mode === "dangerous") return "Dangerous attack";
   if (mode === "attack") return "Attack";
+  if (mode === "safe") return "Safe";
   if (mode === "possession") return "Possession";
   return markerLabel(mode);
 }
@@ -255,16 +265,10 @@ export default function LivePitch({
   const [visibleMarker, setVisibleMarker] = useState(null);
 
   const timerRef      = useRef(null);
-  const markerTimerRef = useRef(null);
   const processedRef  = useRef("");
-  const markerKeyRef  = useRef("");
 
   const clearTimer = () => {
     if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
-  };
-
-  const clearMarkerTimer = () => {
-    if (markerTimerRef.current) { clearTimeout(markerTimerRef.current); markerTimerRef.current = null; }
   };
 
   // Process a single WS-style event data object
@@ -312,8 +316,6 @@ export default function LivePitch({
 
   useEffect(() => () => clearTimer(), []);
 
-  useEffect(() => () => clearMarkerTimer(), []);
-
   // ── Resolved display values ────────────────────────────────────────────────
   // Betradar direct props take priority over WS-parsed state
   const useBetradar =
@@ -332,23 +334,20 @@ export default function LivePitch({
   const markers  = useBetradar && Array.isArray(propMarkers) ? propMarkers : [];
   const attackPath = useBetradar && Array.isArray(propAttackPath) ? safePathPoints(propAttackPath) : [];
   const latestMarker = useBetradar ? propLatestMarker : null;
-  const latestMarkerCandidate = useBetradar
-    ? latestMarker || markers[markers.length - 1] || null
-    : latestMarker || null;
+  const latestMarkerCandidate = useBetradar ? latestMarker || null : null;
 
   useEffect(() => {
-    if (!latestMarkerCandidate) return;
-    if (!shouldShowTransientMarker(latestMarkerCandidate) && !isMessageStyleMarker(latestMarkerCandidate)) return;
-
-    const key = getLatestMarkerKey(latestMarkerCandidate);
-    if (key === markerKeyRef.current) return;
-    markerKeyRef.current = key;
-    setVisibleMarker(latestMarkerCandidate);
-
-    clearMarkerTimer();
-    markerTimerRef.current = setTimeout(() => {
+    if (!latestMarkerCandidate) {
       setVisibleMarker(null);
-    }, 4500);
+      return;
+    }
+
+    if (!shouldShowTransientMarker(latestMarkerCandidate) && !isMessageStyleMarker(latestMarkerCandidate)) {
+      setVisibleMarker(null);
+      return;
+    }
+
+    setVisibleMarker(latestMarkerCandidate);
   }, [latestMarkerCandidate]);
 
   // Infer direction from ball coordinates if team is not available
@@ -360,11 +359,19 @@ export default function LivePitch({
   const showIdle         = isAvailable && !hasTimeline;
   const liveFocusPoint    = ballPos || { x: dir === "away" ? 18 : 82, y: 50 };
   const livePlacement     = getFloatingPlacement(liveFocusPoint);
+  const markerFocusPoint = visibleMarker && typeof visibleMarker.x === "number" && typeof visibleMarker.y === "number"
+    ? { x: visibleMarker.x, y: visibleMarker.y }
+    : liveFocusPoint;
+  const markerPlacement = getFloatingPlacement(markerFocusPoint);
   const attackFrontXRaw = ballPos && typeof ballPos.x === "number"
     ? ballPos.x
     : dir === "home" ? 66.67 : 33.33;
   const attackFrontX = Math.max(10, Math.min(90, attackFrontXRaw));
   const dangerousFrontX = attackFrontX;
+  const possessionMode = mode === "possession" || mode === "safe";
+  const possessionSide = dir === "home" ? "home" : "away";
+  const showStateOverlay = !visibleMarker && possessionMode;
+  const showModeOverlay = !visibleMarker && mode && mode !== "attack" && mode !== "dangerous" && !possessionMode;
 
   return (
     <div className="pitch-wrapper">
@@ -398,11 +405,17 @@ export default function LivePitch({
         )}
 
         {/* Situation overlays */}
-        {mode === "possession" && (
-          <div className={`overlay possession ${dir === "away" ? "away" : "home"}`} />
+        {showStateOverlay && (
+          <div className={`overlay possession ${possessionSide}`}>
+            <div className="possession-shadow" aria-hidden="true" />
+            <div className="possession-overlay-info" aria-live="polite">
+              <span className="possession-overlay-title">{getModeLabel(mode)}</span>
+              <span className="possession-overlay-team">{dir === "home" ? (homeName || "Home") : (awayName || "Away")}</span>
+            </div>
+          </div>
         )}
 
-        {mode === "attack" && (
+        {!visibleMarker && mode === "attack" && (
           <div
             className={`overlay attack ${dir === "away" ? "away" : "home"}`}
             style={{ "--attack-front": `${attackFrontX}%` }}
@@ -415,7 +428,7 @@ export default function LivePitch({
           </div>
         )}
 
-        {mode === "dangerous" && (
+        {!visibleMarker && mode === "dangerous" && (
           <div
             className={`overlay dangerous ${dir === "away" ? "away" : "home"}`}
             style={{ "--danger-front": `${dangerousFrontX}%` }}
@@ -445,7 +458,7 @@ export default function LivePitch({
         )}
 
         {/* Live situation badge */}
-        {mode && mode !== "attack" && mode !== "dangerous" && (
+        {showModeOverlay && (
           <div
             className={`pitch-event pitch-event--live pitch-event--${mode} pitch-event--${livePlacement.horizontal} pitch-event--${livePlacement.vertical}`}
             style={{ left: `${liveFocusPoint.x}%`, top: `${liveFocusPoint.y}%` }}
@@ -467,8 +480,8 @@ export default function LivePitch({
         {/* Event marker */}
         {visibleMarker && (
           <div
-            className={`pitch-event pitch-event--${getMarkerTone(visibleMarker.type)} pitch-event--${getFloatingPlacement(visibleMarker).horizontal} pitch-event--${getFloatingPlacement(visibleMarker).vertical} pitch-event--latest`}
-            style={{ left: `${visibleMarker.x}%`, top: `${visibleMarker.y}%` }}
+            className={`pitch-event pitch-event--${getMarkerTone(visibleMarker.type)} pitch-event--${markerPlacement.horizontal} pitch-event--${markerPlacement.vertical} pitch-event--latest`}
+            style={{ left: `${markerFocusPoint.x}%`, top: `${markerFocusPoint.y}%` }}
             title={`${getMarkerContextLabel(visibleMarker) || markerLabel(visibleMarker.type)}${resolveTeamLabel(visibleMarker, homeTeamId, awayTeamId, homeName, awayName) ? `: ${resolveTeamLabel(visibleMarker, homeTeamId, awayTeamId, homeName, awayName)}` : ""}${getMarkerMessage(visibleMarker) ? ` - ${getMarkerMessage(visibleMarker)}` : ""}`}
             aria-label={`${getMarkerContextLabel(visibleMarker) || markerLabel(visibleMarker.type)}${resolveTeamLabel(visibleMarker, homeTeamId, awayTeamId, homeName, awayName) ? ` ${resolveTeamLabel(visibleMarker, homeTeamId, awayTeamId, homeName, awayName)}` : ""}${getMarkerMessage(visibleMarker) ? ` ${getMarkerMessage(visibleMarker)}` : ""}`}
           >

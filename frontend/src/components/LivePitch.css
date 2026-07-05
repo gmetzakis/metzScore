@@ -131,20 +131,86 @@
   z-index: 4;
 }
 
-/* Possession — subtle half-glow */
-.overlay.possession.home {
-  background: linear-gradient(
-    to right,
-    rgba(255,255,255,0.13) 0%,
-    transparent 55%
-  );
-}
+/* Possession — shaded half pitch */
+.overlay.possession.home,
 .overlay.possession.away {
-  background: linear-gradient(
-    to left,
-    rgba(255,255,255,0.13) 0%,
-    transparent 55%
-  );
+  background: transparent;
+}
+
+.possession-shadow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.overlay.possession.home .possession-shadow {
+  left: 0;
+  width: 50%;
+  background: linear-gradient(90deg, rgba(12, 34, 18, 0.66) 0%, rgba(12, 34, 18, 0.58) 100%);
+}
+
+.overlay.possession.away .possession-shadow {
+  right: 0;
+  width: 50%;
+  background: linear-gradient(270deg, rgba(12, 34, 18, 0.66) 0%, rgba(12, 34, 18, 0.58) 100%);
+}
+
+.possession-overlay-info {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+.overlay.possession.home .possession-overlay-info {
+  left: 18%;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.overlay.possession.home .possession-overlay-info::after {
+  content: "";
+  position: absolute;
+  right: -16px;
+  top: 2px;
+  width: 5px;
+  height: calc(100% - 4px);
+  border-radius: 999px;
+  background: rgba(236, 247, 238, 0.95);
+}
+
+.overlay.possession.away .possession-overlay-info {
+  right: 18%;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.overlay.possession.away .possession-overlay-info::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 2px;
+  width: 5px;
+  height: calc(100% - 4px);
+  border-radius: 999px;
+  background: rgba(236, 247, 238, 0.95);
+}
+
+.possession-overlay-title {
+  font-size: clamp(22px, 3.5vw, 52px);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.possession-overlay-team {
+  font-size: clamp(15px, 2.3vw, 38px);
+  font-weight: 500;
+  opacity: 0.95;
 }
 
 /* Attack — stronger gradient + arrow animation */
@@ -720,6 +786,23 @@
 .pitch-event--substitution .pitch-event-accent,
 .pitch-event-icon--substitution {
   background: rgba(128, 128, 128, 0.82);
+}
+
+.pitch-event--foul .pitch-event-accent,
+.pitch-event-icon--foul {
+  background: rgba(166, 186, 255, 0.95);
+}
+
+.pitch-event--foul .pitch-event-card {
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.32),
+    0 0 0 2px rgba(166, 186, 255, 0.12),
+    0 0 18px rgba(166, 186, 255, 0.22);
+}
+
+.pitch-event--foul .pitch-event-title,
+.pitch-event--foul .pitch-event-team {
+  color: rgba(255, 255, 255, 0.97);
 }
 
 .pitch-event--attack .pitch-event-accent {
