@@ -435,6 +435,7 @@ export default function useBetradarPitch(matchId) {
   const [error, setError]             = useState(null);
 
   const pollRef      = useRef(null);
+  const resolveRef   = useRef(null);
   const errorCount   = useRef(0);
   const cancelledRef = useRef(false);
   const seenMarkersRef = useRef(new Set());
@@ -451,8 +452,18 @@ export default function useBetradarPitch(matchId) {
     seenMarkersRef.current = new Set();
 
     const controller = new AbortController();
+    const retryDelayMs = 5000;
 
-    (async () => {
+    const clearResolveTimer = () => {
+      if (resolveRef.current) {
+        clearTimeout(resolveRef.current);
+        resolveRef.current = null;
+      }
+    };
+
+    const resolveSecondaryId = async () => {
+      if (cancelledRef.current) return;
+
       try {
         console.log(`[useBetradarPitch] Resolving betradar ID for match ${matchId}...`);
 
@@ -498,22 +509,33 @@ export default function useBetradarPitch(matchId) {
         console.log(`[useBetradarPitch] Resolved ID: ${secondaryId} (source: ${idSource})`);
 
         if (secondaryId) {
+          clearResolveTimer();
           setBetradarMatchId(secondaryId);
           setIsAvailable(true);
-        } else {
-          setIsAvailable(false);
           setIsLoading(false);
+        } else {
+          if (!cancelledRef.current) {
+            setIsAvailable(false);
+            setIsLoading(true);
+            clearResolveTimer();
+            resolveRef.current = setTimeout(resolveSecondaryId, retryDelayMs);
+          }
         }
       } catch (err) {
         if (cancelledRef.current || err.name === 'AbortError') return;
         setError(err.message || 'Failed to fetch Betradar match ID');
         setIsAvailable(false);
-        setIsLoading(false);
+        setIsLoading(true);
+        clearResolveTimer();
+        resolveRef.current = setTimeout(resolveSecondaryId, retryDelayMs);
       }
-    })();
+    };
+
+    resolveSecondaryId();
 
     return () => {
       cancelledRef.current = true;
+      clearResolveTimer();
       controller.abort();
     };
   }, [matchId]);
@@ -574,9 +596,8 @@ export default function useBetradarPitch(matchId) {
         errorCount.current++;
         const msg = err.message || 'Sportradar timeline fetch failed';
         setError(msg);
-        if (errorCount.current >= MAX_ERRORS) {
-          console.warn('[useBetradarPitch] Stopping poll after repeated errors:', msg);
-          clearInterval(pollRef.current);
+        if (errorCount.current === MAX_ERRORS) {
+          console.warn('[useBetradarPitch] Continuing to poll after repeated errors:', msg);
         }
       } finally {
         if (!cancelledRef.current) setIsLoading(false);
