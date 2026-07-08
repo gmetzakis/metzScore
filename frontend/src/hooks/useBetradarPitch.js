@@ -99,6 +99,194 @@ function normalizeNumericId(value) {
   return /^\d+$/.test(asString) ? asString : null;
 }
 
+function readStatusText(value) {
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed || null;
+  }
+
+  if (value && typeof value === 'object') {
+    const keys = ['status', 'name', 'label', 'text', 'description', 'phase', 'title'];
+    for (const key of keys) {
+      if (typeof value[key] === 'string' && value[key].trim()) {
+        return value[key].trim();
+      }
+    }
+  }
+
+  return null;
+}
+
+function readStatusId(value) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (value && typeof value === 'object') {
+    const candidate = value._id ?? value.id ?? value.statusId;
+    const parsed = Number(candidate);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return null;
+}
+
+function extractTimelineStatus(data) {
+  const statusCandidates = [
+    data?.doc?.[0]?.data?.status,
+    data?.doc?.[0]?.status,
+    data?.doc?.[0]?.data?.match?.status,
+    data?.data?.status,
+    data?.data?.match?.status,
+    data?.result?.status,
+    data?.result?.match?.status,
+    data?.status,
+  ];
+
+  let statusText = null;
+  let statusId = null;
+
+  for (const candidate of statusCandidates) {
+    if (statusId == null) {
+      const id = readStatusId(candidate);
+      if (id != null) statusId = id;
+    }
+
+    if (!statusText) {
+      const text = readStatusText(candidate);
+      if (text) statusText = text;
+    }
+
+    if (statusText && statusId != null) break;
+  }
+
+  const matchStatusCandidates = [
+    data?.doc?.[0]?.data?.match?.matchstatus,
+    data?.doc?.[0]?.data?.matchstatus,
+    data?.data?.match?.matchstatus,
+    data?.data?.matchstatus,
+    data?.result?.match?.matchstatus,
+    data?.result?.matchstatus,
+    data?.matchstatus,
+  ];
+
+  let matchStatus = null;
+  for (const candidate of matchStatusCandidates) {
+    const text = readStatusText(candidate);
+    if (text) {
+      matchStatus = text;
+      break;
+    }
+  }
+
+  if (!statusText && statusId == null && !matchStatus) {
+    return null;
+  }
+
+  return {
+    text: statusText,
+    id: statusId,
+    matchStatus,
+  };
+}
+
+function classifyTimelineStatusName(value) {
+  const text = String(value || '').trim();
+  if (!text) return null;
+
+  const lower = text.toLocaleLowerCase('el-GR');
+
+  if (lower === 'ημίχρονο') {
+    return 'halftime';
+  }
+
+  if (lower === 'δεν ξεκίνησε') {
+    return 'notstarted';
+  }
+
+  if (lower.includes('1ο ημίχρονο') || lower.includes('1o ημίχρονο')) {
+    return 'live';
+  }
+
+  if (lower.includes('2ο ημίχρονο') || lower.includes('2o ημίχρονο')) {
+    return 'live';
+  }
+
+  const ascii = normalizeType(text);
+  if (!ascii) return null;
+
+  if (ascii === 'halftime' || ascii === 'half' || ascii === 'halftimebreak') {
+    return 'halftime';
+  }
+
+  if (ascii === 'notstarted' || ascii === 'notstartedyet' || ascii.startsWith('notstarted')) {
+    return 'notstarted';
+  }
+
+  if (ascii === '1sthalf' || ascii === '2ndhalf' || ascii.includes('firsthalf') || ascii.includes('secondhalf')) {
+    return 'live';
+  }
+
+  return null;
+}
+
+function isPitchStatusOverlay(statusInfo) {
+  if (!statusInfo) return false;
+
+  const statusKind = classifyTimelineStatusName(statusInfo.text);
+  if (statusKind === 'halftime' || statusKind === 'notstarted') {
+    return true;
+  }
+
+  if (statusKind === 'live') {
+    return false;
+  }
+
+  if (statusInfo.id === 31) {
+    return true;
+  }
+
+  const normalized = normalizeType(statusInfo.text);
+  if (!normalized) return false;
+
+  if (normalized === 'half' || normalized === 'halftime' || normalized === 'halftimebreak') {
+    return true;
+  }
+
+  if (normalized === 'notstarted' || normalized === 'notstartedyet' || normalized.startsWith('notstarted')) {
+    return true;
+  }
+
+  return false;
+}
+
+function buildStatusMarker(statusInfo) {
+  const statusKind = classifyTimelineStatusName(statusInfo?.text);
+  const statusText = statusInfo?.text || (statusInfo?.id === 31 ? 'Half-time' : 'Not started yet');
+  const normalized = normalizeType(statusText);
+  const matchStatus = normalizeType(statusInfo?.matchStatus);
+
+  const isHalfTime = statusKind === 'halftime' || (statusKind == null && (statusInfo?.id === 31 || normalized === 'half' || normalized === 'halftime' || normalized === 'halftimebreak'));
+  const isNotStarted = statusKind === 'notstarted' || (!isHalfTime && statusKind == null && (normalized === 'notstarted' || normalized === 'notstartedyet' || normalized.startsWith('notstarted') || matchStatus === 'notstarted'));
+  const type = isNotStarted ? 'notstarted' : 'halftime';
+
+  return {
+    id: `status:${normalized || 'unknown'}`,
+    key: `status:${normalized || 'unknown'}`,
+    type,
+    team: null,
+    description: statusText,
+    name: statusText,
+    time: null,
+    seconds: null,
+    x: null,
+    y: null,
+    playerName: null,
+  };
+}
+
 function isPossessionType(value) {
   const normalized = normalizeType(value);
   return normalized === 'possession' || normalized === 'possessionevent' || normalized === 'possesionevent';
@@ -352,29 +540,32 @@ export default function useBetradarPitch(matchId) {
           data?.events ||
           data?.result?.events ||
           [];
-        const parsed = parseBetradarEvents(events);
-        console.log(events);
-        console.log(parsed);
-        console.log('-------------------');
 
-        if (parsed) {
-          const freshMarkers = (parsed.markers || []).filter(marker => {
+        const statusInfo = extractTimelineStatus(data);
+        const statusMarker = isPitchStatusOverlay(statusInfo)
+          ? buildStatusMarker(statusInfo)
+          : null;
+
+        const parsed = parseBetradarEvents(events);
+
+        const freshMarkers = parsed
+          ? (parsed.markers || []).filter(marker => {
             const key = marker.key || buildMarkerKey(marker);
             if (seenMarkersRef.current.has(key)) return false;
             seenMarkersRef.current.add(key);
             return true;
-          });
+          })
+          : [];
 
-          setPitchState(prev => ({
-            situation:     parsed.situation     ?? prev.situation,
-            situationTeam: parsed.situationTeam ?? prev.situationTeam,
-            ballPos:       parsed.ballPos       ?? prev.ballPos,
-            ballEnd:       parsed.ballEnd       ?? prev.ballEnd,
-            attackPath:    parsed.attackPath?.length ? parsed.attackPath : prev.attackPath,
-            latestMarker:  parsed.latestMarker ?? null,
-            markers:       freshMarkers.length ? [...prev.markers, ...freshMarkers].slice(-80) : prev.markers,
-          }));
-        }
+        setPitchState(prev => ({
+          situation:     parsed?.situation     ?? prev.situation,
+          situationTeam: parsed?.situationTeam ?? prev.situationTeam,
+          ballPos:       parsed?.ballPos       ?? prev.ballPos,
+          ballEnd:       parsed?.ballEnd       ?? prev.ballEnd,
+          attackPath:    parsed?.attackPath?.length ? parsed.attackPath : prev.attackPath,
+          latestMarker:  statusMarker ?? parsed?.latestMarker ?? null,
+          markers:       freshMarkers.length ? [...prev.markers, ...freshMarkers].slice(-80) : prev.markers,
+        }));
 
         errorCount.current = 0;
         setError(null);
