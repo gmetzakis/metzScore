@@ -73,10 +73,15 @@
 /* Favorites clear button */
 .favorites-clear-btn {
   margin-left: auto;
-  background: var(--accent);
+  background: #cb1515;
   color: #fff;
   border-radius: 8px;
   padding: 8px 12px;
+}
+
+.favorites-clear-btn:hover:not(:disabled) {
+  background: #a80f0f;
+  border-color: #a80f0f;
 }
 
 .favorites-clear-btn:disabled {
@@ -108,7 +113,7 @@
   font-size: 0.95em;
   background-color: var(--border-light);
   border-radius: 8px;
-  border: 1px dashed var(--border);
+  border: 1px var(--border);
 }
 
 /* Compact layout for match listings */

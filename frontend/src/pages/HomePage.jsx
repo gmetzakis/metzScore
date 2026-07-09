@@ -93,7 +93,7 @@ export default function HomePage() {
           <>
             <div className="matches-info">
               <span>
-                {filteredMatches.length} match{filteredMatches.length !== 1 ? 'es' : ''} found
+                {filteredMatches.length} match{filteredMatches.length !== 1 ? 'es' : ''}
                 {search && ` for "${search}"`}
               </span>
             </div>

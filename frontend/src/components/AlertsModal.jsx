@@ -71,7 +71,7 @@ export default function AlertsModal({ open, onClose }) {
           ) : error ? (
             <div className="alerts-modal-error">{error}</div>
           ) : alertMatches.length === 0 ? (
-            <div className="alerts-modal-empty">No alert-enabled matches.</div>
+            <div className="alerts-modal-empty">No matches.</div>
           ) : (
             <ul className="alerts-modal-list">
               {alertMatches.map((match) => (

@@ -99,7 +99,7 @@ export default function UpcomingMatchesPage() {
           <>
             <div className="matches-info">
               <span>
-                {filteredMatches.length} match{filteredMatches.length !== 1 ? 'es' : ''} found
+                {filteredMatches.length} match{filteredMatches.length !== 1 ? 'es' : ''}
                 {search && ` matching "${search}"`}
               </span>
             </div>

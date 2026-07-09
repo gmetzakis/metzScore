@@ -1374,11 +1374,24 @@
   .detail-main {
     grid-template-columns: 1fr;
   }
+
+  .hero-score-stack {
+    left: auto;
+    top: auto;
+    transform: none;
+    width: min(100%, 520px);
+    margin: 0 auto;
+  }
+
+  .detail-hero__teams {
+    justify-content: center;
+  }
 }
 
 @media (max-width: 860px) {
   .detail-hero__teams {
-    grid-template-columns: 1fr;
+    display: flex;
+    justify-content: center;
     text-align: center;
   }
 
@@ -1399,7 +1412,7 @@
   }
 
   .summary-strip {
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   .summary-status-pill {
@@ -1407,7 +1420,32 @@
   }
 
   .statsstream-summary-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 2px;
+  }
+
+  .statsstream-summary-card {
+    padding: 5px 3px 6px;
+    gap: 2px;
+  }
+
+  .statsstream-summary-icon {
+    width: 13px;
+    height: 13px;
+    padding: 1px 2px;
+  }
+
+  .statsstream-summary-label {
+    font-size: 7px;
+  }
+
+  .statsstream-summary-values {
+    gap: 0;
+    margin-top: 0;
+  }
+
+  .statsstream-summary-value {
+    font-size: 10px;
   }
 }
 
@@ -1437,12 +1475,16 @@
   }
 
   .hero-score__value {
-    font-size: clamp(40px, 14vw, 58px);
+    font-size: 28px;
+  }
+
+  .hero-score__separator {
+    font-size: 28px;
   }
 
   .summary-strip {
     gap: 8px;
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   .summary-stat-card {
@@ -1454,7 +1496,27 @@
   }
 
   .statsstream-summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 1px;
+  }
+
+  .statsstream-summary-card {
+    padding: 4px 2px 5px;
+    gap: 1px;
+  }
+
+  .statsstream-summary-icon {
+    width: 12px;
+    height: 12px;
+    padding: 1px;
+  }
+
+  .statsstream-summary-label {
+    font-size: 6px;
+  }
+
+  .statsstream-summary-value {
+    font-size: 9px;
   }
 
   .statsstream-rings {

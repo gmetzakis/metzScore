@@ -98,8 +98,7 @@ export default function FavoritesPage() {
                   <span>
                     {favoriteMatches.length} favorite match{favoriteMatches.length !== 1 ? 'es' : ''} ·
                     <span className="fav-live"> {liveCount} Live</span> ·
-                    <span className="fav-upcoming"> {upcomingCount} Upcoming</span> ·
-                    <span className="fav-finished"> {finishedCount} Finished</span>
+                    <span className="fav-upcoming"> {upcomingCount} Upcoming</span>
                   </span>
                 </div>
                 <LeagueGroupedList matches={favoriteMatches} />

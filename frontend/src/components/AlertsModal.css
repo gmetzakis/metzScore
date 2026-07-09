@@ -4,14 +4,14 @@
   background: rgba(15, 23, 42, 0.28);
   z-index: 999;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 20px;
+  padding: 88px 20px 20px;
 }
 
 .alerts-modal {
   width: min(420px, 100%);
-  max-height: calc(100vh - 64px);
+  max-height: calc(100vh - 108px);
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -73,6 +73,8 @@
 
 .alerts-modal-body {
   padding: 14px 16px 16px;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: auto;
 }
 
@@ -193,4 +195,46 @@
 .alerts-modal-option.active {
   background: var(--border-light);
   color: var(--text-h);
+}
+
+@media (max-width: 640px) {
+  .alerts-modal-backdrop {
+    padding: 76px 12px 12px;
+  }
+
+  .alerts-modal {
+    max-height: calc(100vh - 104px);
+  }
+
+  .alerts-modal-header {
+    padding: 12px 14px;
+  }
+
+  .alerts-modal-actions {
+    padding: 10px 14px;
+  }
+
+  .alerts-modal-body {
+    padding: 12px 14px 14px;
+  }
+
+  .alerts-modal-list {
+    gap: 5px;
+  }
+
+  .alerts-modal-item {
+    padding: 9px 10px;
+  }
+
+  .alerts-modal-item-label {
+    font-size: 0.82rem;
+  }
+
+  .alerts-modal-item-meta {
+    font-size: 0.68rem;
+  }
+
+  .alerts-modal-remove {
+    padding: 7px 10px;
+  }
 }

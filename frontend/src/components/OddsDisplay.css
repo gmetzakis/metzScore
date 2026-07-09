@@ -167,6 +167,10 @@
     display: none;
   }
 
+  .ou-table-row + .ou-table-row {
+    margin-top: 8px;
+  }
+
   .ou-box {
     min-height: 30px;
   }
