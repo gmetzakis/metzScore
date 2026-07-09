@@ -206,53 +206,57 @@
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   color: rgba(255, 255, 255, 0.95);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
 }
 
 .overlay.possession.home .possession-overlay-info {
-  left: 18%;
+  left: 8%;
   align-items: flex-start;
   text-align: left;
+  transform: translateY(-50%) scale(0.82);
+  transform-origin: left center;
 }
 
 .overlay.possession.home .possession-overlay-info::after {
   content: "";
   position: absolute;
-  right: -16px;
+  right: -14px;
   top: 2px;
-  width: 5px;
+  width: 4px;
   height: calc(100% - 4px);
   border-radius: 999px;
   background: rgba(236, 247, 238, 0.95);
 }
 
 .overlay.possession.away .possession-overlay-info {
-  right: 18%;
+  right: 8%;
   align-items: flex-end;
   text-align: right;
+  transform: translateY(-50%) scale(0.82);
+  transform-origin: right center;
 }
 
 .overlay.possession.away .possession-overlay-info::before {
   content: "";
   position: absolute;
-  left: -16px;
+  left: -14px;
   top: 2px;
-  width: 5px;
+  width: 4px;
   height: calc(100% - 4px);
   border-radius: 999px;
   background: rgba(236, 247, 238, 0.95);
 }
 
 .possession-overlay-title {
-  font-size: clamp(22px, 3.5vw, 52px);
+  font-size: clamp(18px, 2.8vw, 42px);
   font-weight: 800;
   line-height: 1;
 }
 
 .possession-overlay-team {
-  font-size: clamp(15px, 2.3vw, 38px);
+  font-size: clamp(12px, 1.9vw, 30px);
   font-weight: 500;
   opacity: 0.95;
 }
@@ -292,53 +296,57 @@
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   color: rgba(255, 255, 255, 0.9);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .overlay.attack.home .attack-overlay-info {
-  left: 39%;
+  left: 22%;
   align-items: flex-start;
   text-align: left;
+  transform: translateY(-50%) scale(0.82);
+  transform-origin: left center;
 }
 
 .overlay.attack.home .attack-overlay-info::after {
   content: "";
   position: absolute;
-  right: -16px;
+  right: -14px;
   top: 2px;
-  width: 5px;
+  width: 4px;
   height: calc(100% - 4px);
   border-radius: 999px;
   background: rgba(236, 247, 238, 0.9);
 }
 
 .overlay.attack.away .attack-overlay-info {
-  right: 39%;
+  right: 22%;
   align-items: flex-end;
   text-align: right;
+  transform: translateY(-50%) scale(0.82);
+  transform-origin: right center;
 }
 
 .overlay.attack.away .attack-overlay-info::before {
   content: "";
   position: absolute;
-  left: -16px;
+  left: -14px;
   top: 2px;
-  width: 5px;
+  width: 4px;
   height: calc(100% - 4px);
   border-radius: 999px;
   background: rgba(236, 247, 238, 0.9);
 }
 
 .attack-overlay-title {
-  font-size: clamp(22px, 3.5vw, 52px);
+  font-size: clamp(18px, 2.8vw, 42px);
   font-weight: 800;
   line-height: 1;
 }
 
 .attack-overlay-team {
-  font-size: clamp(15px, 2.3vw, 38px);
+  font-size: clamp(12px, 1.9vw, 30px);
   font-weight: 500;
   opacity: 0.95;
 }
@@ -378,53 +386,57 @@
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   color: rgba(255, 255, 255, 0.95);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
 }
 
 .overlay.dangerous.home .dangerous-overlay-info {
-  left: 39%;
+  left: 22%;
   align-items: flex-start;
   text-align: left;
+  transform: translateY(-50%) scale(0.82);
+  transform-origin: left center;
 }
 
 .overlay.dangerous.home .dangerous-overlay-info::after {
   content: "";
   position: absolute;
-  right: -16px;
+  right: -14px;
   top: 2px;
-  width: 5px;
+  width: 4px;
   height: calc(100% - 4px);
   border-radius: 999px;
   background: rgba(255, 154, 154, 0.95);
 }
 
 .overlay.dangerous.away .dangerous-overlay-info {
-  right: 39%;
+  right: 22%;
   align-items: flex-end;
   text-align: right;
+  transform: translateY(-50%) scale(0.82);
+  transform-origin: right center;
 }
 
 .overlay.dangerous.away .dangerous-overlay-info::before {
   content: "";
   position: absolute;
-  left: -16px;
+  left: -14px;
   top: 2px;
-  width: 5px;
+  width: 4px;
   height: calc(100% - 4px);
   border-radius: 999px;
   background: rgba(255, 154, 154, 0.95);
 }
 
 .dangerous-overlay-title {
-  font-size: clamp(22px, 3.5vw, 52px);
+  font-size: clamp(18px, 2.8vw, 42px);
   font-weight: 800;
   line-height: 1;
 }
 
 .dangerous-overlay-team {
-  font-size: clamp(15px, 2.3vw, 38px);
+  font-size: clamp(12px, 1.9vw, 30px);
   font-weight: 500;
   opacity: 0.95;
 }
@@ -442,9 +454,9 @@
   left: 50%;
   transform: translate(-50%, -50%);
   color: rgba(255,220,100,0.9);
-  font-size: clamp(14px, 3vw, 26px);
+  font-size: clamp(11px, 2.2vw, 20px);
   font-weight: 700;
-  letter-spacing: 6px;
+  letter-spacing: 4px;
   text-shadow: 0 0 12px rgba(255,200,50,0.7);
   animation: arrowFloat 0.9s ease-in-out infinite;
   white-space: nowrap;
