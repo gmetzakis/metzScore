@@ -148,9 +148,9 @@ const INCIDENT_ICONS = {
   OFFS: <img src="../../public/icons/offside.svg"/>,
   PENL: <img src="../../public/icons/penalty.svg"/>,
   CRNR: <img src="../../public/icons/corner.svg"/>,
-  EBEG: '▶',
-  PEND: '⏸',
-  PBEG: '▶',
+  EBEG: <img src="../../public/icons/whistle.svg"/>,
+  PEND: <img src="../../public/icons/whistle.svg"/>,
+  PBEG: <img src="../../public/icons/whistle.svg"/>,
   Aggregated: '📊',
 };
 
