@@ -68,17 +68,6 @@ function markerIcon(type) {
   const normalized = normalizeType(type);
   if (normalized === "goal") return <img src="/icons/goal.svg" alt="" />;
   if (normalized === "corner") return <img src="/icons/corner.svg" alt="" />;
-  if (normalized === "shotontarget" || normalized === "shotofftarget" || normalized === "shot") return "🎯";
-  if (normalized === "goalkeepersave" || normalized === "save") return "🧤";
-  if (normalized === "card") return <img src="/icons/yellow.svg" alt="" />;
-  if (normalized === "penalty") return <img src="/icons/penalty.svg" alt="" />;
-  if (normalized === "substitution") return <img src="/icons/sub.svg" alt="" />;
-  if (normalized === "freekick") return "🦶";
-  if (normalized === "goalkick") return "🥅";
-  if (normalized === "throwin") return "↩";
-  if (normalized === "possibleevent" || normalized === "var") return "📺";
-  if (normalized === "injury" || normalized === "injuries") return "🩹";
-  if (normalized === "stoppagetime" || normalized === "extratime" || normalized === "stoppage") return "⏱";
   return "•";
 }
 
