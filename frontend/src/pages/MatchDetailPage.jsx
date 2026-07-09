@@ -155,8 +155,7 @@ const INCIDENT_ICONS = {
 };
 
 function IncidentRow({ incident, homeName, awayName }) {
-  const { description, type, time, teamSide } = incident;
-  const sideLabel = teamSide === 0 ? homeName : teamSide === 1 ? awayName : '';
+  const { description, type, time } = incident;
   const cls = [
     'incident-row',
     type === 'GOAL' && 'inc-goal',
@@ -171,7 +170,6 @@ function IncidentRow({ incident, homeName, awayName }) {
       <span className="inc-icon">{INCIDENT_ICONS[type] || '•'}</span>
       <div className="inc-body">
         <span className="inc-desc">{description}</span>
-        {sideLabel && <span className="inc-team"> · {sideLabel}</span>}
       </div>
     </div>
   );

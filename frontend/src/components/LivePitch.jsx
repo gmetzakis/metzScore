@@ -226,6 +226,11 @@ function getLatestMarkerKey(marker) {
   return marker?.key || marker?.id || `${marker?.type || ""}-${marker?.seconds ?? ""}-${marker?.x ?? ""}-${marker?.y ?? ""}`;
 }
 
+function isStatusMarkerType(type) {
+  const normalized = normalizeType(type);
+  return normalized === "halftime" || normalized === "notstarted";
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -345,9 +350,15 @@ export default function LivePitch({
   const attackPath = useBetradar && Array.isArray(propAttackPath) ? safePathPoints(propAttackPath) : [];
   const latestMarker = useBetradar ? propLatestMarker : null;
   const latestMarkerCandidate = useBetradar ? latestMarker || null : null;
+  const isStatusScreen = Boolean(latestMarkerCandidate && isStatusMarkerType(latestMarkerCandidate.type));
 
   useEffect(() => {
     if (!latestMarkerCandidate) {
+      setVisibleMarker(null);
+      return;
+    }
+
+    if (isStatusScreen) {
       setVisibleMarker(null);
       return;
     }
@@ -358,11 +369,11 @@ export default function LivePitch({
     }
 
     setVisibleMarker(latestMarkerCandidate);
-  }, [latestMarkerCandidate]);
+  }, [latestMarkerCandidate, isStatusScreen]);
 
   // Infer direction from ball coordinates if team is not available
   const dir = team || inferDirectionFromPositions(ballPos, ballEndP) || "home";
-  const hasTimeline = Boolean(mode || ballPos || attackPath.length || visibleMarker);
+  const hasTimeline = Boolean(mode || ballPos || attackPath.length || visibleMarker || isStatusScreen);
 
   // ── Rendering ──────────────────────────────────────────────────────────────
   const showNotAvailable = !isAvailable;
@@ -373,6 +384,7 @@ export default function LivePitch({
     ? { x: visibleMarker.x, y: visibleMarker.y }
     : liveFocusPoint;
   const markerPlacement = getFloatingPlacement(markerFocusPoint);
+  const statusText = latestMarkerCandidate?.name || latestMarkerCandidate?.description || markerLabel(latestMarkerCandidate?.type);
   const attackFrontXRaw = ballPos && typeof ballPos.x === "number"
     ? ballPos.x
     : dir === "home" ? 66.67 : 33.33;
@@ -396,7 +408,7 @@ export default function LivePitch({
         <div className="center-dot" />
 
         {/* Ball movement path */}
-        {attackPath.length > 1 && (
+        {!isStatusScreen && attackPath.length > 1 && (
           <svg className="pitch-paths" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
             <polyline
               className="pitch-path-line"
@@ -415,7 +427,7 @@ export default function LivePitch({
         )}
 
         {/* Situation overlays */}
-        {showStateOverlay && (
+        {!isStatusScreen && showStateOverlay && (
           <div className={`overlay possession ${possessionSide}`}>
             <div className="possession-shadow" aria-hidden="true" />
             <div className="possession-overlay-info" aria-live="polite">
@@ -425,7 +437,7 @@ export default function LivePitch({
           </div>
         )}
 
-        {!visibleMarker && mode === "attack" && (
+        {!isStatusScreen && !visibleMarker && mode === "attack" && (
           <div
             className={`overlay attack ${dir === "away" ? "away" : "home"}`}
             style={{ "--attack-front": `${attackFrontX}%` }}
@@ -438,7 +450,7 @@ export default function LivePitch({
           </div>
         )}
 
-        {!visibleMarker && mode === "dangerous" && (
+        {!isStatusScreen && !visibleMarker && mode === "dangerous" && (
           <div
             className={`overlay dangerous ${dir === "away" ? "away" : "home"}`}
             style={{ "--danger-front": `${dangerousFrontX}%` }}
@@ -452,7 +464,7 @@ export default function LivePitch({
         )}
 
         {/* Ball */}
-        {ballPos && (
+        {!isStatusScreen && ballPos && (
           <div
             className="ball"
             style={{ left: `${ballPos.x}%`, top: `${ballPos.y}%` }}
@@ -460,7 +472,7 @@ export default function LivePitch({
         )}
 
         {/* Ball target ghost */}
-        {ballEndP && mode && (
+        {!isStatusScreen && ballEndP && mode && (
           <div
             className="ball-end"
             style={{ left: `${ballEndP.x}%`, top: `${ballEndP.y}%` }}
@@ -468,7 +480,7 @@ export default function LivePitch({
         )}
 
         {/* Live situation badge */}
-        {showModeOverlay && (
+        {!isStatusScreen && showModeOverlay && (
           <div
             className={`pitch-event pitch-event--live pitch-event--${mode} pitch-event--${livePlacement.horizontal} pitch-event--${livePlacement.vertical}`}
             style={{ left: `${liveFocusPoint.x}%`, top: `${liveFocusPoint.y}%` }}
@@ -488,7 +500,7 @@ export default function LivePitch({
         )}
 
         {/* Event marker */}
-        {visibleMarker && (
+        {!isStatusScreen && visibleMarker && (
           <div
             className={`pitch-event pitch-event--${getMarkerTone(visibleMarker.type)} pitch-event--${markerPlacement.horizontal} pitch-event--${markerPlacement.vertical} pitch-event--latest`}
             style={{ left: `${markerFocusPoint.x}%`, top: `${markerFocusPoint.y}%` }}
@@ -510,6 +522,14 @@ export default function LivePitch({
                 {resolveTeamLabel(visibleMarker, homeTeamId, awayTeamId, homeName, awayName) && <div className="pitch-event-team">{resolveTeamLabel(visibleMarker, homeTeamId, awayTeamId, homeName, awayName)}</div>}
                 {shouldShowMarkerMessage(visibleMarker) && <div className="pitch-event-message">{getMarkerMessage(visibleMarker)}</div>}
               </div>
+            </div>
+          </div>
+        )}
+
+        {isStatusScreen && (
+          <div className="pitch-status-overlay" aria-live="polite" aria-atomic="true">
+            <div className="pitch-status-card">
+              <div className="pitch-status-title">{statusText}</div>
             </div>
           </div>
         )}
