@@ -116,6 +116,17 @@ function getMarkerMessage(marker) {
   return marker?.message || marker?.event_message || marker?.note || marker?.detail || marker?.description || marker?.text || marker?.title || marker?.label || marker?.short_message || marker?.message_text || marker?.commentary || "";
 }
 
+function shouldShowMarkerMessage(marker) {
+  const message = String(getMarkerMessage(marker) || "").trim();
+  if (!message) return false;
+
+  const contextLabel = String(getMarkerContextLabel(marker) || "").trim().toLocaleLowerCase("el-GR");
+  const titleLabel = String(markerLabel(marker?.type) || "").trim().toLocaleLowerCase("el-GR");
+  const normalizedMessage = message.toLocaleLowerCase("el-GR");
+
+  return normalizedMessage !== contextLabel && normalizedMessage !== titleLabel;
+}
+
 function getMarkerContextLabel(marker) {
   return marker?.name || marker?.type_label || marker?.event_name || marker?.eventType || "";
 }
@@ -170,11 +181,21 @@ function getMarkerTone(type) {
 }
 
 function formatMarkerTime(marker) {
-  if (marker?.time) return marker.time;
+  const rawTime = marker?.time;
+  if (rawTime != null && rawTime !== "") {
+    const asText = String(rawTime).trim();
+    if (/^\d+$/.test(asText)) {
+      return `${asText}'`;
+    }
+    if (/^\d+\s*'?$/.test(asText)) {
+      return `${asText.replace(/\s*'?$/, "")}'`;
+    }
+    return asText;
+  }
+
   if (marker?.seconds == null) return "";
   const mins = Math.floor(marker.seconds / 60);
-  const secs = marker.seconds % 60;
-  return `${mins}:${String(secs).padStart(2, "0")}`;
+  return `${mins}'`;
 }
 
 function getFloatingPlacement(point) {
@@ -487,7 +508,7 @@ export default function LivePitch({
                   {formatMarkerTime(visibleMarker) && <span className="pitch-event-time">{formatMarkerTime(visibleMarker)}</span>}
                 </div>
                 {resolveTeamLabel(visibleMarker, homeTeamId, awayTeamId, homeName, awayName) && <div className="pitch-event-team">{resolveTeamLabel(visibleMarker, homeTeamId, awayTeamId, homeName, awayName)}</div>}
-                {getMarkerMessage(visibleMarker) && <div className="pitch-event-message">{getMarkerMessage(visibleMarker)}</div>}
+                {shouldShowMarkerMessage(visibleMarker) && <div className="pitch-event-message">{getMarkerMessage(visibleMarker)}</div>}
               </div>
             </div>
           </div>
