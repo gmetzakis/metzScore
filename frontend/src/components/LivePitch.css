@@ -280,14 +280,14 @@
   left: 0;
   width: var(--attack-front, 66.67%);
   background: linear-gradient(90deg, rgba(8, 34, 18, 0.58) 0%, rgba(8, 34, 18, 0.52) 72%, rgba(8, 34, 18, 0.48) 100%);
-  clip-path: polygon(0 0, 75% 0, 88.5% 13.5%, 81.5% 31.5%, 100% 50%, 80.5% 68.2%, 87.2% 86.4%, 74% 100%, 0 100%);
+  clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%);
 }
 
 .overlay.attack.away .attack-shadow {
   right: 0;
   width: calc(100% - var(--attack-front, 33.33%));
   background: linear-gradient(270deg, rgba(8, 34, 18, 0.58) 0%, rgba(8, 34, 18, 0.52) 72%, rgba(8, 34, 18, 0.48) 100%);
-  clip-path: polygon(26% 0, 12.8% 13.6%, 19.5% 31.8%, 0 50%, 18.5% 68.5%, 11.5% 86.5%, 25% 100%, 100% 100%, 100% 0);
+  clip-path: polygon(12% 0, 0 50%, 12% 100%, 100% 100%, 100% 0);
 }
 
 .attack-overlay-info {
@@ -369,15 +369,15 @@
 .overlay.dangerous.home .dangerous-shadow {
   left: 0;
   width: var(--danger-front, 66.67%);
-  background: linear-gradient(90deg, rgba(36, 10, 10, 0.62) 0%, rgba(30, 10, 10, 0.56) 72%, rgba(24, 8, 8, 0.52) 100%);
-  clip-path: polygon(0 0, 72% 0, 100% 18%, 84% 30%, 97% 50%, 84% 70%, 100% 82%, 72% 100%, 0 100%);
+  background: linear-gradient(90deg, rgba(8, 34, 18, 0.58) 0%, rgba(8, 34, 18, 0.52) 72%, rgba(8, 34, 18, 0.48) 100%);
+  clip-path: polygon(0 0, 86% 0, 100% 50%, 86% 100%, 0 100%);
 }
 
 .overlay.dangerous.away .dangerous-shadow {
   right: 0;
   width: calc(100% - var(--danger-front, 33.33%));
-  background: linear-gradient(270deg, rgba(36, 10, 10, 0.62) 0%, rgba(30, 10, 10, 0.56) 72%, rgba(24, 8, 8, 0.52) 100%);
-  clip-path: polygon(28% 0, 0 18%, 16% 30%, 3% 50%, 16% 70%, 0 82%, 28% 100%, 100% 100%, 100% 0);
+  background: linear-gradient(90deg, rgba(8, 34, 18, 0.58) 0%, rgba(8, 34, 18, 0.52) 72%, rgba(8, 34, 18, 0.48) 100%);
+  clip-path: polygon(14% 0, 0 50%, 14% 100%, 100% 100%, 100% 0);
 }
 
 .dangerous-overlay-info {
