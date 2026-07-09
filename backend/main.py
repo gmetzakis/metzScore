@@ -19,6 +19,8 @@ app = FastAPI(
     description="Professional sports notifications API with football focus",
 )
 
+SPORTRADAR_TOKEN = os.getenv("SPORTRADAR_TOKEN", "")
+
 STATSSTREAM_SOURCE_CACHE = {}
 
 # CORS for frontend
@@ -142,7 +144,7 @@ def get_statsplayer_endpoint(
     
 
 def get_match_events_betradar(secondary_id: int):
-    url = (f"https://widgets.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/match_timelinedelta/{secondary_id}?T=exp=1782552131~acl=/*~data=eyJvIjoiaHR0cHM6Ly93d3cuc3RvaXhpbWFuLmdyIiwiYSI6IjUwMWEwMjAyMTkzZTA0NTU2OWQwOTAyOWU1NWM4OTNjIiwiYWN0Ijoib3JpZ2luY2hlY2siLCJvc3JjIjoib3JpZ2luIn0~hmac=de4c546bb8c900ccd1fb14613579e398025e3c4eac515f74d44da9e14a2cef0a")
+    url = f"https://widgets.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/match_timelinedelta/{secondary_id}?T={SPORTRADAR_TOKEN}"
 
     headers = {
         "User-Agent": "PostmanRuntime/7.51.1",
@@ -465,7 +467,7 @@ def _fetch_match_standings_primary(match_id: int):
 def _fetch_match_detailsextended_raw(secondary_id: int):
     url = (
         f"https://sh.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/match_detailsextended/{secondary_id}"
-        "?T=exp=1782495362~acl=/*~data=eyJvIjoiaHR0cHM6Ly9zdGF0c2h1Yi5zcG9ydHJhZGFyLmNvbSIsImEiOiJzdG9peGltYW4iLCJhY3QiOiJvcmlnaW5jaGVjayIsIm9zcmMiOiJob3N0aGVhZGVyIn0~hmac=c41664e9883e7a1e793d3df5ed8991b4b045dafc33f7dc598279e2efc6454fad"
+        f"?T={SPORTRADAR_TOKEN}"
     )
 
     headers = {
@@ -494,8 +496,7 @@ def _fetch_match_detailsextended_raw(secondary_id: int):
 
 def _fetch_match_standings_season_tables_raw(season_id: int):
     url = (
-        f"https://sh.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/stats_season_tables/{season_id}//"
-        "?T=exp=1782564482~acl=/*~data=eyJvIjoiaHR0cHM6Ly9zdGF0c2h1Yi5zcG9ydHJhZGFyLmNvbSIsImEiOiJzdG9peGltYW4iLCJhY3QiOiJvcmlnaW5jaGVjayIsIm9zcmMiOiJob3N0aGVhZGVyIn0~hmac=8a06be01d49a9fefcaaace0a6c683c219b1cd0abcfdd1e29fc5cc79561954a64"
+        f"https://sh.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/stats_season_tables/{season_id}//?T={SPORTRADAR_TOKEN}"
     )
 
     headers = {
