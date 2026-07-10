@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { FavoritesProvider, useFavorites } from './context/FavoritesContext';
 import HomePage from './pages/HomePage';
 import UpcomingMatchesPage from './pages/UpcomingMatchesPage';
@@ -35,7 +35,9 @@ function AppContents() {
   return (
     <>
       <header className="site-header">
-        <h1>MetzScore</h1>
+        <Link to="/" className="site-title-link" aria-label="Go to live matches">
+          <h1>MetzScore</h1>
+        </Link>
         <button
           className="alerts-launcher"
           onClick={() => setAlertsOpen(true)}

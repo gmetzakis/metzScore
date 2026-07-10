@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import MatchCard from './MatchCard';
 import './LeagueGroupedList.css';
 
@@ -8,7 +8,7 @@ const getFlagUrl = (countryCode) => {
   return `https://www.stoiximan.gr/assets/icons/flags/${countryCode}.svg?v=2.0.0`;
 };
 
-export default function LeagueGroupedList({ matches }) {
+export default function LeagueGroupedList({ matches, bulkAction }) {
   // Group matches by country first, then by league
   const groupedByCountry = {};
   for (const match of matches) {
@@ -27,6 +27,33 @@ export default function LeagueGroupedList({ matches }) {
   // State for expanded countries and leagues
   const [expandedCountries, setExpandedCountries] = useState({});
   const [expandedLeagues, setExpandedLeagues] = useState({});
+
+  useEffect(() => {
+    if (!bulkAction || !bulkAction.id || !bulkAction.type) {
+      return;
+    }
+
+    if (bulkAction.type === 'expand') {
+      const nextExpandedCountries = {};
+      const nextExpandedLeagues = {};
+
+      for (const countryName of Object.keys(groupedByCountry)) {
+        nextExpandedCountries[countryName] = true;
+        for (const league of Object.keys(groupedByCountry[countryName].leagues)) {
+          nextExpandedLeagues[`${countryName}-${league}`] = true;
+        }
+      }
+
+      setExpandedCountries(nextExpandedCountries);
+      setExpandedLeagues(nextExpandedLeagues);
+      return;
+    }
+
+    if (bulkAction.type === 'collapse') {
+      setExpandedCountries({});
+      setExpandedLeagues({});
+    }
+  }, [bulkAction?.id, bulkAction?.type]);
 
   if (matches.length === 0) {
     return (

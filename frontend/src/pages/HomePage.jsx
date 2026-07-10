@@ -11,6 +11,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
+  const [allExpanded, setAllExpanded] = useState(false);
+  const [bulkAction, setBulkAction] = useState({ id: 0, type: null });
   const isInitialLoad = useRef(true);
 
   const fetchLiveMatches = useCallback(async () => {
@@ -96,8 +98,18 @@ export default function HomePage() {
                 {filteredMatches.length} match{filteredMatches.length !== 1 ? 'es' : ''}
                 {search && ` for "${search}"`}
               </span>
+              <button
+                className="live-toggle-btn"
+                onClick={() => {
+                  const nextType = allExpanded ? 'collapse' : 'expand';
+                  setAllExpanded((prev) => !prev);
+                  setBulkAction((prev) => ({ id: prev.id + 1, type: nextType }));
+                }}
+              >
+                {allExpanded ? 'Collapse all' : 'Expand all'}
+              </button>
             </div>
-            <LeagueGroupedList matches={filteredMatches} />
+            <LeagueGroupedList matches={filteredMatches} bulkAction={bulkAction} />
           </>
         )}
       </div>

@@ -7,7 +7,7 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: #fff;
+  background: #ffffff;
   border-bottom: 1px solid var(--border);
   padding: 12px 0 12px;
   margin-bottom: 16px;
@@ -32,6 +32,8 @@
   border-bottom: 1px solid var(--border);
   padding-bottom: 8px;
   margin-bottom: 12px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .nav-link {
@@ -53,6 +55,20 @@
   color: var(--accent);
   border-bottom-color: var(--accent);
   font-weight: 600;
+}
+
+.live-toggle-btn {
+  margin-left: auto;
+  background: #f3f4f6;
+  color: var(--text-h);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.live-toggle-btn:hover {
+  background: #e5e7eb;
+  border-color: var(--border);
 }
 
 /* Search styling */

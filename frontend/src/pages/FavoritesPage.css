@@ -70,6 +70,20 @@
   margin-bottom: 12px;
 }
 
+.favorites-toggle-btn {
+  margin-left: auto;
+  background: #f3f4f6;
+  color: var(--text-h);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.favorites-toggle-btn:hover {
+  background: #e5e7eb;
+  border-color: var(--border);
+}
+
 /* Favorites clear button */
 .favorites-clear-btn {
   margin-left: auto;

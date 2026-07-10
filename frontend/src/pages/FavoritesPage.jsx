@@ -12,6 +12,8 @@ export default function FavoritesPage() {
   const [allMatches, setAllMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [allExpanded, setAllExpanded] = useState(false);
+  const [bulkAction, setBulkAction] = useState({ id: 0, type: null });
   const isInitialLoad = useRef(true);
 
   const fetchAllMatches = useCallback(async () => {
@@ -100,8 +102,18 @@ export default function FavoritesPage() {
                     <span className="fav-live"> {liveCount} Live</span> ·
                     <span className="fav-upcoming"> {upcomingCount} Upcoming</span>
                   </span>
+                  <button
+                    className="favorites-toggle-btn"
+                    onClick={() => {
+                      const nextType = allExpanded ? 'collapse' : 'expand';
+                      setAllExpanded((prev) => !prev);
+                      setBulkAction((prev) => ({ id: prev.id + 1, type: nextType }));
+                    }}
+                  >
+                    {allExpanded ? 'Collapse all' : 'Expand all'}
+                  </button>
                 </div>
-                <LeagueGroupedList matches={favoriteMatches} />
+                <LeagueGroupedList matches={favoriteMatches} bulkAction={bulkAction} />
               </>
             )}
           </>
