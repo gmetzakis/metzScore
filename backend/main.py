@@ -1,7 +1,12 @@
+import base64
+import base64
+import hashlib
 import json
 import os
+from threading import Lock
 
 import requests # type: ignore
+from Crypto.Cipher import AES # type: ignore
 from dotenv import load_dotenv # type: ignore
 from fastapi import FastAPI # type: ignore
 from fastapi.middleware.cors import CORSMiddleware # type: ignore
@@ -19,7 +24,14 @@ app = FastAPI(
     description="Professional sports notifications API with football focus",
 )
 
+SPORTRADAR_CLIENT_ID = "501a0202193e045569d09029e55c893c"
+SPORTRADAR_LICENSING_URL = f"https://widgets.sir.sportradar.com/{SPORTRADAR_CLIENT_ID}/licensing"
+
 SPORTRADAR_TOKEN = os.getenv("SPORTRADAR_TOKEN", "")
+SPORTRADAR_FEEDS_URL = os.getenv("SPORTRADAR_FEEDS_URL", "https://widgets.fn.sportradar.com")
+SPORTRADAR_CLIENT_ALIAS = os.getenv("SPORTRADAR_CLIENT_ALIAS", "stoiximan")
+SPORTRADAR_LICENSING_JSON = None
+SPORTRADAR_TOKEN_LOCK = Lock()
 
 STATSSTREAM_SOURCE_CACHE = {}
 
@@ -91,6 +103,129 @@ def get_match_detail_endpoint(
         return {"status": "error", "message": str(e)}, 500
 
 
+def _fetch_sportradar_licensing_blob():
+    response = requests.get(
+        SPORTRADAR_LICENSING_URL,
+        headers={
+            "User-Agent": "Mozilla/5.0",
+            "Accept": "application/json,text/plain,*/*",
+            "referer": "https://www.stoiximan.gr/",
+            "origin": "https://www.stoiximan.gr",
+        },
+        timeout=15,
+    )
+    response.raise_for_status()
+
+    try:
+        data = response.json()
+    except ValueError:
+        data = response.text
+
+    if isinstance(data, dict) and "text" in data:
+        return data["text"]
+
+    return data
+
+
+def _evp_bytes_to_key(password: bytes, salt: bytes, key_length: int = 32, iv_length: int = 16):
+    derived = b""
+    previous = b""
+
+    while len(derived) < key_length + iv_length:
+        previous = hashlib.md5(previous + password + salt).digest()
+        derived += previous
+
+    return derived[:key_length], derived[key_length:key_length + iv_length]
+
+
+def _decrypt_sportradar_licensing_blob(encrypted: str, client_id: str):
+    raw = base64.b64decode(encrypted)
+    salt = b""
+    ciphertext = raw
+
+    if raw.startswith(b"Salted__") and len(raw) > 16:
+        salt = raw[8:16]
+        ciphertext = raw[16:]
+
+    key, iv = _evp_bytes_to_key(client_id.encode("utf-8"), salt)
+    decrypted = AES.new(key, AES.MODE_CBC, iv).decrypt(ciphertext)
+    padding_length = decrypted[-1]
+
+    if 0 < padding_length <= AES.block_size:
+        decrypted = decrypted[:-padding_length]
+
+    return json.loads(decrypted.decode("utf-8"))
+
+
+def _extract_fishnet_token(lic_json):
+    if not isinstance(lic_json, dict) or not lic_json.get("fishnetToken"):
+        raise RuntimeError("fishnetToken not found in licensing JSON")
+
+    token_obj = lic_json["fishnetToken"]
+
+    if isinstance(token_obj, str):
+        return token_obj
+
+    if isinstance(token_obj, dict) and token_obj.get("token"):
+        return token_obj["token"]
+
+    raise RuntimeError("Unexpected fishnetToken format")
+
+
+def _refresh_sportradar_settings():
+    global SPORTRADAR_TOKEN, SPORTRADAR_FEEDS_URL, SPORTRADAR_CLIENT_ALIAS, SPORTRADAR_LICENSING_JSON
+
+    licensing_blob = _fetch_sportradar_licensing_blob()
+    licensing_json = _decrypt_sportradar_licensing_blob(licensing_blob, SPORTRADAR_CLIENT_ID)
+
+    token = _extract_fishnet_token(licensing_json)
+    SPORTRADAR_TOKEN = token
+    SPORTRADAR_FEEDS_URL = licensing_json.get("fishnetFeedsUrl") or SPORTRADAR_FEEDS_URL or "https://widgets.fn.sportradar.com"
+    SPORTRADAR_CLIENT_ALIAS = licensing_json.get("fishnetClientAlias") or SPORTRADAR_CLIENT_ALIAS or "stoiximan"
+    SPORTRADAR_LICENSING_JSON = licensing_json
+    return token
+
+
+def get_sportradar_token(force_refresh=False):
+    with SPORTRADAR_TOKEN_LOCK:
+        if force_refresh or not SPORTRADAR_TOKEN:
+            try:
+                return _refresh_sportradar_settings()
+            except Exception:
+                if SPORTRADAR_TOKEN:
+                    return SPORTRADAR_TOKEN
+                raise
+
+    return SPORTRADAR_TOKEN
+
+
+def _is_unauthorized_feed_response(response):
+    if response.status_code in (401, 403):
+        return True
+
+    response_text = response.text.lower()
+    return "unauthorized feed" in response_text or ("unauthorized" in response_text and "feed" in response_text)
+
+
+def _request_sportradar_json(url_builder, headers, timeout=20):
+    last_error = None
+
+    for attempt in range(2):
+        token = get_sportradar_token(force_refresh=attempt == 1)
+        response = requests.get(url_builder(token), headers=headers, timeout=timeout)
+
+        if _is_unauthorized_feed_response(response):
+            last_error = RuntimeError("Unauthorized feed response")
+            continue
+
+        response.raise_for_status()
+        return response.json()
+
+    if last_error is not None:
+        raise last_error
+
+    raise RuntimeError("Sportradar request failed")
+
 
 def get_player_stats(match_id: int):
     url = (f"https://www.stoiximan.gr/api/liveevent/statsplayer?id={match_id}")
@@ -114,7 +249,7 @@ def get_betradar_match_id(match_id: int):
         detail = get_match_detail(match_id)
         betradar_id = detail.get("betradar_id") if isinstance(detail, dict) else None
         if betradar_id:
-          return int(betradar_id)
+            return int(betradar_id)
     except Exception:
         pass
 
@@ -127,25 +262,7 @@ def get_betradar_match_id(match_id: int):
 
     return None
 
-@app.get("/api/football/statsplayer/{match_id}")
-def get_statsplayer_endpoint(
-    match_id: int = Path(..., description="Stoiximan match id")
-):
-    try:
-        data = get_player_stats(match_id)
-
-        return data
-
-    except Exception as e:
-        return {
-            "status": "error",
-            "message": str(e)
-        }
-    
-
 def get_match_events_betradar(secondary_id: int):
-    url = f"https://widgets.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/match_timelinedelta/{secondary_id}?T={SPORTRADAR_TOKEN}"
-
     headers = {
         "User-Agent": "PostmanRuntime/7.51.1",
         "Accept": "*/*",
@@ -153,14 +270,11 @@ def get_match_events_betradar(secondary_id: int):
         "origin": "https://www.stoiximan.gr"
     }
 
-    resp = requests.get(
-        url,
-        headers=headers,
-        timeout=15
+    return _request_sportradar_json(
+        lambda token: f"{SPORTRADAR_FEEDS_URL.rstrip('/')}/{SPORTRADAR_CLIENT_ALIAS}/el/Etc:UTC/gismo/match_timelinedelta/{secondary_id}?T={token}",
+        headers,
+        timeout=15,
     )
-    resp.raise_for_status()
-    print(resp.json())
-    return resp.json()
 
 
 def _fetch_match_detailsextended(secondary_id: int):
@@ -465,11 +579,6 @@ def _fetch_match_standings_primary(match_id: int):
 
 
 def _fetch_match_detailsextended_raw(secondary_id: int):
-    url = (
-        f"https://sh.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/match_detailsextended/{secondary_id}"
-        f"?T={SPORTRADAR_TOKEN}"
-    )
-
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         "Accept": "application/json, text/plain, */*",
@@ -480,9 +589,11 @@ def _fetch_match_detailsextended_raw(secondary_id: int):
         "Cache-Control": "no-cache",
     }
 
-    resp = requests.get(url, headers=headers, timeout=20)
-    resp.raise_for_status()
-    payload = resp.json()
+    payload = _request_sportradar_json(
+        lambda token: f"https://sh.fn.sportradar.com/{SPORTRADAR_CLIENT_ALIAS}/el/Etc:UTC/gismo/match_detailsextended/{secondary_id}?T={token}",
+        headers,
+        timeout=20,
+    )
     doc = payload.get("doc", [])
     if not doc:
         raise RuntimeError("Empty Sportradar match_detailsextended response")
@@ -495,10 +606,6 @@ def _fetch_match_detailsextended_raw(secondary_id: int):
 
 
 def _fetch_match_standings_season_tables_raw(season_id: int):
-    url = (
-        f"https://sh.fn.sportradar.com/stoiximan/el/Etc:UTC/gismo/stats_season_tables/{season_id}//?T={SPORTRADAR_TOKEN}"
-    )
-
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         "Accept": "application/json, text/plain, */*",
@@ -509,9 +616,11 @@ def _fetch_match_standings_season_tables_raw(season_id: int):
         "Cache-Control": "no-cache",
     }
 
-    resp = requests.get(url, headers=headers, timeout=20)
-    resp.raise_for_status()
-    payload = resp.json()
+    payload = _request_sportradar_json(
+        lambda token: f"https://sh.fn.sportradar.com/{SPORTRADAR_CLIENT_ALIAS}/el/Etc:UTC/gismo/stats_season_tables/{season_id}//?T={token}",
+        headers,
+        timeout=20,
+    )
 
     if not isinstance(payload, dict):
         raise RuntimeError("Unexpected Sportradar stats_season_tables payload")

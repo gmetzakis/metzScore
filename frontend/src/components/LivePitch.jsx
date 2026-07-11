@@ -544,7 +544,6 @@ export default function LivePitch({
 
         {showIdle && (
           <div className="pitch-overlay-message pitch-overlay-message--idle">
-            <span className="pitch-msg-icon"><img src="/icons/goal.svg" alt="" /></span>
             <span className="pitch-msg-text">Waiting for live data…</span>
           </div>
         )}
