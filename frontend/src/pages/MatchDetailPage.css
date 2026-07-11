@@ -27,6 +27,8 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 2px;
+  background: rgba(236, 234, 236, 0.96);
+  border-radius: 999px;
 }
 
 .back-link,
