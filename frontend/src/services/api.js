@@ -3,7 +3,7 @@
  * Keeps API endpoints abstracted from React components
  */
 
-const API_BASE_URL = "http://localhost:8000/api";
+import { API_BASE_URL } from "./apiConfig";
 
 export const apiService = {
   /**

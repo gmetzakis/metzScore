@@ -35,10 +35,35 @@ SPORTRADAR_TOKEN_LOCK = Lock()
 
 STATSSTREAM_SOURCE_CACHE = {}
 
+
+def _get_app_mode():
+    return os.getenv("APP_MODE", "local").strip().lower()
+
+
+def _get_cors_origins():
+    mode = _get_app_mode()
+
+    if mode == "prod":
+        origins = [origin.strip() for origin in os.getenv("FRONTEND_ORIGINS", "").split(",") if origin.strip()]
+        return origins or ["http://localhost:5173", "http://localhost:5174"]
+
+    if mode == "lan":
+        return None
+
+    return ["http://localhost:5173", "http://localhost:5174"]
+
+
+def _get_cors_origin_regex():
+    if _get_app_mode() != "lan":
+        return None
+
+    return r"^https?://(localhost|127\.0\.0\.1|10(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2}|100\.(?:6[4-9]|[7-9]\d|1\d\d|12[0-7])(?:\.\d{1,3}){2})(:\d+)?$"
+
 # CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174"],  # Vite dev servers
+    allow_origins=_get_cors_origins() or [],
+    allow_origin_regex=_get_cors_origin_regex(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

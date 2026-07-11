@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { API_BASE_URL } from '../services/apiConfig';
 
 const POLL_INTERVAL_MS = 1000;
 const MAX_ERRORS       = 5;
@@ -471,7 +472,7 @@ export default function useBetradarPitch(matchId) {
         let statsData = null;
 
         try {
-          const detailRes = await fetch(`http://localhost:8000/api/football/matches/${matchId}`, {
+          const detailRes = await fetch(`${API_BASE_URL}/football/matches/${matchId}`, {
             signal: controller.signal,
           });
           if (detailRes.ok) {
@@ -482,7 +483,7 @@ export default function useBetradarPitch(matchId) {
         }
 
         try {
-          const statsRes = await fetch(`http://localhost:8000/api/football/statsplayer/${matchId}`, {
+          const statsRes = await fetch(`${API_BASE_URL}/football/statsplayer/${matchId}`, {
             signal: controller.signal,
           });
           if (statsRes.ok) {
@@ -551,7 +552,7 @@ export default function useBetradarPitch(matchId) {
       if (cancelledRef.current) return;
 
       try {
-        const res  = await fetch(`http://localhost:8000/api/football/matchstats/betradar/${betradarMatchId}`);
+        const res  = await fetch(`${API_BASE_URL}/football/matchstats/betradar/${betradarMatchId}`);
         const data = await res.json();
 
         if (cancelledRef.current) return;
