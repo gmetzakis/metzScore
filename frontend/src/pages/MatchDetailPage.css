@@ -21,12 +21,6 @@
   box-shadow: 0 24px 56px rgba(15, 23, 42, 0.14);
 }
 
-.detail-loading {
-  display: flex;
-  justify-content: center;
-  padding: 60px 0;
-}
-
 /* Navigation */
 .detail-nav {
   display: flex;
@@ -46,12 +40,9 @@
   font-weight: 700;
   padding: 10px 14px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(15, 23, 42, 0.08);
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
   backdrop-filter: blur(12px);
 }
-
 .back-link:hover,
 .back-link-mobile:hover {
   transform: translateY(-1px);
@@ -67,6 +58,9 @@
   .back-link-mobile { display: inline-flex; }
 }
 
+    .hero-team__name {
+      max-width: min(26vw, 180px);
+    }
 /* Hero */
 .detail-hero {
   display: flex;
@@ -146,6 +140,7 @@
 .detail-hero__teams {
   display: flex;
   align-items: center;
+  justify-content: center;
   width: 100%;
   padding-inline: clamp(8px, 4vw, 48px);
   position: relative;
@@ -162,12 +157,12 @@
 
 .hero-team--home {
   justify-content: flex-end;
-  padding-inline-end: clamp(24px, 5vw, 22px);
+  padding-inline-end: clamp(14px, 3vw, 28px);
 }
 
 .hero-team--away {
   justify-content: flex-start;
-  padding-inline-start: clamp(24px, 5vw, 22px);
+  padding-inline-start: clamp(14px, 3vw, 28px);
 }
 
 .hero-team__name {
@@ -184,12 +179,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -20%);
-  min-width: min(100%, 520px);
-  padding: 28px 12px 0;
+  width: min(100%, 780px);
+  margin: 0 auto;
+  padding: 24px 12px 0;
   z-index: 1;
   gap: 6px;
 }
@@ -199,6 +191,8 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
+  width: 100%;
+  min-width: 0;
 }
 
 .hero-score__value {
@@ -1376,11 +1370,7 @@
   }
 
   .hero-score-stack {
-    left: auto;
-    top: auto;
-    transform: none;
-    width: min(100%, 520px);
-    margin: 0 auto;
+    width: min(100%, 620px);
   }
 
   .detail-hero__teams {
@@ -1388,22 +1378,88 @@
   }
 }
 
-@media (max-width: 860px) {
-  .detail-hero__teams {
+@media (max-width: 520px) {
+  .hero-score {
     display: flex;
-    justify-content: center;
-    text-align: center;
+    flex-wrap: wrap;
+    gap: 6px 8px;
   }
 
   .hero-team,
   .hero-team--away {
+    flex-basis: 100%;
+    padding-inline: 0;
     justify-content: center;
-    flex-direction: row;
-    text-align: left;
+  }
+
+  .hero-team__name {
+    max-width: 100%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .hero-score__value,
+  .hero-score__separator {
+    font-size: 22px;
+  }
+}
+@media (max-width: 860px) {
+  .detail-hero__teams {
+    text-align: center;
   }
 
   .hero-score {
-    justify-self: center;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 8px;
+  }
+
+  .hero-team,
+  .hero-team--away {
+    min-width: 0;
+    padding-inline: 0;
+    text-align: center;
+  }
+
+  .hero-team--home {
+    justify-content: end;
+    justify-self: end;
+    padding-inline-end: clamp(20px, 7vw, 20px);
+  }
+
+  .hero-team--away {
+    justify-content: start;
+    justify-self: start;
+    padding-inline-start: clamp(20px, 7vw, 20px);
+  }
+
+  .hero-team__name {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hero-score > .hero-team--home {
+    grid-column: 1;
+  }
+
+  .hero-score > .hero-score__value:first-of-type {
+    grid-column: 2;
+  }
+
+  .hero-score > .hero-score__separator {
+    grid-column: 3;
+  }
+
+  .hero-score > .hero-score__value:last-of-type {
+    grid-column: 4;
+  }
+
+  .hero-score > .hero-team--away {
+    grid-column: 5;
   }
 
   .summary-strip,
@@ -1475,11 +1531,20 @@
   }
 
   .hero-score__value {
-    font-size: 28px;
+    font-size: 24px;
   }
 
   .hero-score__separator {
-    font-size: 28px;
+    font-size: 24px;
+  }
+
+  .hero-score {
+    column-gap: 10px;
+  }
+
+  .hero-team__name {
+    font-size: 14px;
+    max-width: min(24vw, 120px);
   }
 
   .summary-strip {
