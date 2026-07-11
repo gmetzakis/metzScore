@@ -88,12 +88,14 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: 0;
 }
 
 .detail-hero__league-badge {
   display: inline-flex;
   align-items: center;
+  min-width: 0;
   padding: 6px 12px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.1);
@@ -101,6 +103,9 @@
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .detail-hero__kickoff {
@@ -1379,6 +1384,13 @@
 }
 
 @media (max-width: 520px) {
+  .detail-hero__league-badge {
+    display: inline-block;
+    padding: 2px 5px 2px 4px;
+    max-width: min(28vw, 100px);
+    vertical-align: middle;
+  }
+
   .hero-score {
     display: flex;
     flex-wrap: wrap;
@@ -1506,6 +1518,13 @@
 }
 
 @media (max-width: 640px) {
+  .detail-hero__league-badge {
+    display: inline-block;
+    padding: 4px 10px 4px 8px;
+    max-width: min(30vw, 160px);
+    vertical-align: middle;
+  }
+
   .detail-page {
     padding: 10px 10px 22px;
   }
@@ -1605,5 +1624,14 @@
 
   .section-title {
     font-size: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .detail-hero__league-badge {
+    display: inline-block;
+    padding: 4px 8px 4px 8px;
+    max-width: min(25vw, 110px);
+    vertical-align: middle;
   }
 }
