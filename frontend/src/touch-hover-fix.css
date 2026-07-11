@@ -1,0 +1,145 @@
+@media (hover: none), (pointer: coarse) {
+  a:hover,
+  button:hover,
+  [role='button']:hover {
+    text-decoration: none !important;
+  }
+
+  .site-title-link:hover h1 {
+    opacity: 1 !important;
+  }
+
+  .alerts-launcher:hover {
+    color: inherit !important;
+  }
+
+  .match-card:hover {
+    background: var(--bg) !important;
+    border-color: var(--border) !important;
+  }
+
+  .alert-config-toggle:hover {
+    color: grey !important;
+  }
+
+  .alert-config-option:hover {
+    background: transparent !important;
+  }
+
+  .fav-btn:hover {
+    color: var(--text) !important;
+  }
+
+  .fav-btn.fav-on:hover {
+    color: #f0c400 !important;
+  }
+
+  .alert-btn:hover {
+    color: var(--text) !important;
+  }
+
+  .alert-btn.alert-on:hover {
+    color: #4666f8 !important;
+  }
+
+  .back-link:hover,
+  .back-link-mobile:hover {
+    color: #2c3e50 !important;
+    background: rgba(255, 255, 255, 0.78) !important;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05) !important;
+    transform: none !important;
+  }
+
+  .detail-tab:hover,
+  .panel-tab:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #fff !important;
+    transform: none !important;
+  }
+
+  .inc-pill:hover {
+    transform: none !important;
+  }
+
+  .roster-player:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .info-link:hover {
+    text-decoration: none !important;
+  }
+
+  .nav-link:hover {
+    color: var(--text) !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+  }
+
+  .live-toggle-btn:hover {
+    background: #f3f4f6 !important;
+    border-color: var(--border) !important;
+  }
+
+  .search-clear:hover {
+    background-color: transparent !important;
+    color: #999 !important;
+  }
+
+  .filter-btn:hover {
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+    background-color: #fff !important;
+  }
+
+  .favorites-toggle-btn:hover {
+    background: #f3f4f6 !important;
+    border-color: var(--border) !important;
+  }
+
+  .favorites-clear-btn:hover:not(:disabled) {
+    background: #cb1515 !important;
+    border-color: #cb1515 !important;
+  }
+
+  .country-header:hover,
+  .league-header:hover {
+    color: var(--text-h) !important;
+  }
+
+  .league-matches .match-card:hover {
+    background-color: transparent !important;
+  }
+
+  .alerts-modal-clear:hover:not(:disabled) {
+    background: #cb1515 !important;
+    border-color: #cb1515 !important;
+  }
+
+  .alerts-modal-settings:hover {
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+  }
+
+  .alerts-modal-remove:hover {
+    background: #cb1515 !important;
+    border-color: #cb1515 !important;
+  }
+
+  .alerts-modal-option:hover {
+    background: transparent !important;
+    color: var(--text) !important;
+  }
+
+  .odds-market:hover {
+    border-color: rgba(148, 163, 184, 0.16) !important;
+    transform: none !important;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12) !important;
+  }
+
+  .odds-item:hover,
+  .ou-box:hover {
+    background: rgba(51, 65, 85, 0.78) !important;
+    transform: none !important;
+  }
+}

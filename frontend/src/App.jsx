@@ -9,6 +9,7 @@ import AlertsModal from './components/AlertsModal';
 import useScoreAlertNotifications from './hooks/useScoreAlertNotifications';
 import { apiService } from './services/api';
 import './App.css';
+import './touch-hover-fix.css';
 
 function AppContents() {
   const [alertsOpen, setAlertsOpen] = useState(false);
