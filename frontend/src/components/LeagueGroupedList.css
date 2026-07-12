@@ -223,8 +223,11 @@
     height: 16px;
   }
   .country-count {
-    font-size: 1rem;
-    padding: 3px 6px;
+    font-size: 0.8rem;
+    padding: 3px 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-left: 0;
   }
   .league-header {
     font-size: 1rem;
