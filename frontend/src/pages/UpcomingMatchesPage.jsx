@@ -67,13 +67,16 @@ export default function UpcomingMatchesPage() {
     <div className="upcoming-matches-page">
       <div className="page-navigation">
         <Link to="/" className="nav-link">
-          Live Matches
+          <img src="/mobile_icons/live-svgrepo-com.svg" alt="" className="nav-icon" />
+          <span className="nav-label">Live Matches</span>
         </Link>
         <Link to="/upcoming-matches" className="nav-link active">
-          Upcoming Matches
+          <img src="/mobile_icons/schedule-svgrepo-com.svg" alt="" className="nav-icon" />
+          <span className="nav-label">Upcoming</span>
         </Link>
         <Link to="/favorites" className="nav-link">
-          ☆ Favorites
+          <img src="/mobile_icons/star-svgrepo-com.svg" alt="" className="nav-icon" />
+          <span className="nav-label">Favorites</span>
         </Link>
       </div>
 

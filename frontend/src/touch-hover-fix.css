@@ -105,6 +105,13 @@
     border-radius: 0 !important;
   }
 
+  .nav-link.active:hover,
+  .nav-link.active:active,
+  .nav-link.active {
+    color: #a262b0e5 !important;
+    background-color: transparent !important;
+  }
+
   .live-toggle-btn:hover {
     background: transparent;
     border-color: var(--border) !important;

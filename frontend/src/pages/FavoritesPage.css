@@ -57,6 +57,10 @@
   font-weight: 600;
 }
 
+.nav-icon {
+  display: none;
+}
+
 /* Matches info bar */
 .matches-info {
   display: flex;
@@ -86,11 +90,12 @@
 
 /* Favorites clear button */
 .favorites-clear-btn {
-  margin-left: auto;
   background: #cb1515;
   color: #fff;
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: 8px 16px;
+  font-size: 0.85em;
+  margin-bottom: 12px;
 }
 
 .favorites-clear-btn:hover:not(:disabled) {
@@ -157,7 +162,7 @@
     background: var(--bg);
     border-top: 1px solid var(--border);
     border-bottom: none;
-    padding: 8px 12px;
+    padding: 6px 0;
     margin-bottom: 0;
     justify-content: center;
     gap: 0;
@@ -167,15 +172,32 @@
   .nav-link {
     flex: 1;
     text-align: center;
-    padding: 10px 8px;
+    padding: 6px 4px;
     border-bottom: none;
     border-radius: 8px;
-    font-size: 0.8em;
+    font-size: 0.65em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: #999;
+  }
+
+  .nav-icon {
+    display: block;
+    width: 22px;
+    height: 22px;
+    filter: grayscale(1) brightness(1.8);
+  }
+
+  .nav-link.active .nav-icon {
+    filter: brightness(0) invert(55%) sepia(25%) saturate(600%) hue-rotate(235deg);
   }
 
   .nav-link.active {
-    background: var(--accent);
-    color: #fff;
+    background: none;
+    color: #8B85C8;
     border-bottom: none;
+    font-weight: 600;
   }
 }

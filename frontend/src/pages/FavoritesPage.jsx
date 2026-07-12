@@ -72,17 +72,17 @@ export default function FavoritesPage() {
     <div className="favorites-page">
       <div className="page-navigation">
         <Link to="/" className="nav-link">
-          Live Matches
+          <img src="/mobile_icons/live-svgrepo-com.svg" alt="" className="nav-icon" />
+          <span className="nav-label">Live Matches</span>
         </Link>
         <Link to="/upcoming-matches" className="nav-link">
-          Upcoming Matches
+          <img src="/mobile_icons/schedule-svgrepo-com.svg" alt="" className="nav-icon" />
+          <span className="nav-label">Upcoming</span>
         </Link>
         <Link to="/favorites" className="nav-link active">
-          ☆ Favorites
+          <img src="/mobile_icons/star-svgrepo-com.svg" alt="" className="nav-icon" />
+          <span className="nav-label">Favorites</span>
         </Link>
-        <button className="favorites-clear-btn" onClick={clearAllFavorites} disabled={!favoriteIds.length}>
-          Clear favorites
-        </button>
       </div>
 
       <div className="page-content">
@@ -98,7 +98,7 @@ export default function FavoritesPage() {
               <>
                 <div className="matches-info">
                   <span>
-                    {favoriteMatches.length} favorite match{favoriteMatches.length !== 1 ? 'es' : ''} ·
+                    {favoriteMatches.length} match{favoriteMatches.length !== 1 ? 'es' : ''} ·
                     <span className="fav-live"> {liveCount} Live</span> ·
                     <span className="fav-upcoming"> {upcomingCount} Upcoming</span>
                   </span>
@@ -113,6 +113,9 @@ export default function FavoritesPage() {
                     {allExpanded ? 'Collapse all' : 'Expand all'}
                   </button>
                 </div>
+                <button className="favorites-clear-btn" onClick={clearAllFavorites} disabled={!favoriteIds.length}>
+                  Clear favorites
+                </button>
                 <LeagueGroupedList matches={favoriteMatches} bulkAction={bulkAction} />
               </>
             )}
