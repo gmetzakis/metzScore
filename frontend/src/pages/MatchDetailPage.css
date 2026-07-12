@@ -59,10 +59,6 @@
   .back-link { display: none; }
   .back-link-mobile { display: inline-flex; }
 }
-
-    .hero-team__name {
-      max-width: min(26vw, 180px);
-    }
 /* Hero */
 .detail-hero {
   display: flex;
@@ -175,10 +171,11 @@
 .hero-team__name {
   min-width: 0;
   white-space: nowrap;
-  overflow: visible;
-  text-overflow: clip;
+  overflow: hidden;
+  text-overflow: ellipsis;
   word-break: normal;
   flex: 0 0 auto;
+  max-width: min(36vw, 320px);
 }
 
 .hero-score-stack {
@@ -194,12 +191,34 @@
 }
 
 .hero-score {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto minmax(0, 1fr);
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  column-gap: 8px;
   width: 100%;
   min-width: 0;
+}
+
+.hero-score > .hero-team--home {
+  grid-column: 1;
+  justify-self: end;
+}
+
+.hero-score > .hero-score__value:first-of-type {
+  grid-column: 2;
+}
+
+.hero-score > .hero-score__separator {
+  grid-column: 3;
+}
+
+.hero-score > .hero-score__value:last-of-type {
+  grid-column: 4;
+}
+
+.hero-score > .hero-team--away {
+  grid-column: 5;
+  justify-self: start;
 }
 
 .hero-score__value {
@@ -1573,10 +1592,6 @@
     justify-content: center;
   }
 
-  .summary-stat-card {
-    padding: 6px 10px;
-  }
-
   .detail-tabs {
     gap: 6px;
   }
@@ -1603,6 +1618,10 @@
 
   .statsstream-summary-value {
     font-size: 9px;
+  }
+
+  .summary-stat-values {
+    font-size: 12px;
   }
 
   .statsstream-rings {
