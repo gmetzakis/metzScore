@@ -7,7 +7,7 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: #ffffff;
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
   padding: 12px 0 12px;
   margin-bottom: 16px;
@@ -59,7 +59,7 @@
 
 .live-toggle-btn {
   margin-left: auto;
-  background: #f3f4f6;
+  background: var(--border-light);
   color: var(--text-h);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -67,7 +67,7 @@
 }
 
 .live-toggle-btn:hover {
-  background: #e5e7eb;
+  background: var(--border);
   border-color: var(--border);
 }
 

@@ -40,13 +40,13 @@
 
 
 .match-time.not-started {
-  color: black;
+  color: var(--text-h);
 }
 
 /* Vertical separator */
 .match-separator {
   width: 1.5px;
-  background-color: #eee;
+  background-color: var(--border);
   margin: 0 8px;
   flex-shrink: 0;
   align-self: stretch; /* stretch to full card height */

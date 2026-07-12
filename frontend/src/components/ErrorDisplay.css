@@ -8,6 +8,14 @@
   color: #c33;
 }
 
+@media (prefers-color-scheme: dark) {
+  .error-display {
+    background: rgba(254, 38, 38, 0.12);
+    border-color: rgba(254, 38, 38, 0.3);
+    color: #fca5a5;
+  }
+}
+
 .error-icon {
   font-size: 48px;
   margin-bottom: 15px;
