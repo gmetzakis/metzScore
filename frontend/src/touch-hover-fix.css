@@ -1,8 +1,18 @@
 @media (hover: none), (pointer: coarse) {
+  button,
+  [role='button'],
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   a:hover,
   button:hover,
   [role='button']:hover {
     text-decoration: none !important;
+  }
+
+  .match-card:active {
+    -webkit-tap-highlight-color: transparent;
   }
 
   .country-header:focus,
@@ -66,6 +76,13 @@
   .panel-tab:hover {
     background: rgba(255, 255, 255, 0.12) !important;
     color: #fff !important;
+    transform: none !important;
+  }
+
+  .detail-tab.active:hover,
+  .panel-tab.active:hover {
+    background: #fff !important;
+    color: #0f172a !important;
     transform: none !important;
   }
 
