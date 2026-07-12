@@ -5,6 +5,18 @@
     text-decoration: none !important;
   }
 
+  .country-header:focus,
+  .league-header:focus {
+    outline: none;
+    background: transparent;
+  }
+
+  .country-header:active,
+  .league-header:active {
+    background: transparent;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   .site-title-link:hover h1 {
     opacity: 1 !important;
   }
@@ -77,8 +89,15 @@
   }
 
   .live-toggle-btn:hover {
-    background: #f3f4f6 !important;
+    background: transparent;
     border-color: var(--border) !important;
+  }
+
+
+  .live-toggle-btn:active {
+    background: transparent;
+    border-color: var(--border) !important;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .search-clear:hover {
