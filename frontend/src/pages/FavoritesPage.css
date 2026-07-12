@@ -142,3 +142,40 @@
 .page-content > .match-card {
   margin: 0;
 }
+
+@media (max-width: 600px) {
+  .favorites-page {
+    padding-bottom: 72px;
+  }
+
+  .page-navigation {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1100;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    border-bottom: none;
+    padding: 8px 12px;
+    margin-bottom: 0;
+    justify-content: center;
+    gap: 0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .nav-link {
+    flex: 1;
+    text-align: center;
+    padding: 10px 8px;
+    border-bottom: none;
+    border-radius: 8px;
+    font-size: 0.8em;
+  }
+
+  .nav-link.active {
+    background: var(--accent);
+    color: #fff;
+    border-bottom: none;
+  }
+}

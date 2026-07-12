@@ -104,7 +104,7 @@ export default function LeagueGroupedList({ matches, bulkAction }) {
         <div key={league} className="league-group">
           <div className="league-header" onClick={() => toggleLeague(countryName, league)}>
               <span className="league-name-wrapper">
-                <span className="league-name">{league}</span>
+                <span className="league-name">{league.length > 35 ? league.slice(0, 35) + '...' : league}</span>
                 <span className="league-count">{leagueMatches.length}</span>
               </span>
               <span className={`league-toggle ${isLeagueOpen ? 'open' : ''}`}>{isLeagueOpen ? '▼' : '▼'}</span>

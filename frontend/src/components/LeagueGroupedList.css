@@ -26,6 +26,7 @@
   font-size: 1.25rem;
   color: var(--text-h);
   transition: opacity 0.15s;
+  overflow: hidden;
 }
 .country-header:hover {
   color: rgb(240, 179, 56);
@@ -130,6 +131,7 @@
   font-size: 1.1rem;
   color: var(--text-h);
   transition: opacity 0.15s;
+  overflow: hidden;
 }
 .league-header:hover {
   color:rgb(240, 179, 56)
