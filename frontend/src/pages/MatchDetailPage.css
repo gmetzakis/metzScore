@@ -1469,7 +1469,7 @@
   }
 
   .hero-team__name {
-    max-width: 100%;
+    max-width: min(32vw, 220px);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1535,6 +1535,10 @@
 
   .statsstream-summary-value {
     font-size: 10px;
+  }
+
+  .summary-stat-values {
+    font-size: 12px;
   }
 }
 
@@ -1621,7 +1625,7 @@
   }
 
   .summary-stat-values {
-    font-size: 12px;
+    font-size: 10px;
   }
 
   .statsstream-rings {
