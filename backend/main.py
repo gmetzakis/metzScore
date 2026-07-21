@@ -12,11 +12,18 @@ from fastapi import FastAPI # type: ignore
 from fastapi.middleware.cors import CORSMiddleware # type: ignore
 from fastapi.param_functions import Path # type: ignore
 
-from services.fetch_service import (
-    get_all_football_matches,
-    get_live_football_matches,
-)
-from services.match_detail_service import get_match_detail
+try:
+    from services.fetch_service import (
+        get_all_football_matches,
+        get_live_football_matches,
+    )
+    from services.match_detail_service import get_match_detail
+except ImportError:
+    from .services.fetch_service import (
+        get_all_football_matches,
+        get_live_football_matches,
+    )
+    from .services.match_detail_service import get_match_detail
 
 load_dotenv()
 app = FastAPI(
@@ -54,10 +61,15 @@ def _get_cors_origins():
 
 
 def _get_cors_origin_regex():
-    if _get_app_mode() != "lan":
-        return None
+    mode = _get_app_mode()
 
-    return r"^https?://(localhost|127\.0\.0\.1|10(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2}|100\.(?:6[4-9]|[7-9]\d|1\d\d|12[0-7])(?:\.\d{1,3}){2})(:\d+)?$"
+    if mode == "lan":
+        return r"^https?://(localhost|127\.0\.0\.1|10(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2}|100\.(?:6[4-9]|[7-9]\d|1\d\d|12[0-7])(?:\.\d{1,3}){2})(:\d+)?$"
+
+    if mode == "prod":
+        return r"^https://([a-z0-9-]+\.)?vercel\.app$"
+
+    return None
 
 # CORS for frontend
 app.add_middleware(
@@ -124,6 +136,18 @@ def get_match_detail_endpoint(
         if data is None:
             return {"status": "error", "message": f"Match {match_id} not found"}, 404
         return {"status": "success", **data}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}, 500
+
+
+@app.get("/api/football/statsplayer/{match_id}")
+def get_statsplayer_proxy_endpoint(
+    match_id: int = Path(..., description="Stoiximan match id")
+):
+    """Proxy the Stoiximan statsplayer endpoint used by the pitch hook."""
+    try:
+        data = get_player_stats(match_id)
+        return {"status": "success", "match_id": match_id, "data": data}
     except Exception as e:
         return {"status": "error", "message": str(e)}, 500
 

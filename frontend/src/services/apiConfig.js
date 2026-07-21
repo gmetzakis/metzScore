@@ -10,8 +10,13 @@ function resolveApiBaseUrl() {
   }
 
   if (typeof window !== "undefined") {
-    const { protocol, hostname } = window.location;
-    return `${protocol}//${hostname}:${DEFAULT_API_PORT}/api`;
+    const { hostname } = window.location;
+
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      return buildLocalApiBaseUrl();
+    }
+
+    return "/api";
   }
 
   return buildLocalApiBaseUrl();
