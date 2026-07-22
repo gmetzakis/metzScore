@@ -6,13 +6,16 @@ from dotenv import load_dotenv # type: ignore
 
 load_dotenv()
 
-API_URL = os.getenv("API_URL")
-DEFAULT_HEADERS_JSON = os.getenv("DEFAULT_HEADERS")
+API_URL = os.getenv("API_URL", "")
+DEFAULT_HEADERS_JSON = os.getenv("DEFAULT_HEADERS", "{}")
 
-if not API_URL or not DEFAULT_HEADERS_JSON:
-    raise ValueError("API_URL and DEFAULT_HEADERS environment variables are required.")
+if not DEFAULT_HEADERS_JSON:
+    DEFAULT_HEADERS_JSON = "{}"
 
-DEFAULT_HEADERS = json.loads(DEFAULT_HEADERS_JSON)
+try:
+    DEFAULT_HEADERS = json.loads(DEFAULT_HEADERS_JSON)
+except json.JSONDecodeError:
+    DEFAULT_HEADERS = {}
 
 
 def fetch_api_data():

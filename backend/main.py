@@ -45,12 +45,12 @@ def _get_cors_origins():
 
     if mode == "prod":
         origins = [origin.strip() for origin in os.getenv("FRONTEND_ORIGINS", "").split(",") if origin.strip()]
-        return origins or ["http://localhost:5173", "http://localhost:5174"]
+        return origins or ["http://localhost:5173", "http://localhost:5174", "https://metzscore.me", "https://www.metzscore.me"]
 
     if mode == "lan":
         return None
 
-    return ["http://localhost:5173", "http://localhost:5174"]
+    return ["http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "http://127.0.0.1:5174", "https://metzscore.me", "https://www.metzscore.me"]
 
 
 def _get_cors_origin_regex():

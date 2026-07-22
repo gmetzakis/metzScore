@@ -6,8 +6,14 @@ from dotenv import load_dotenv  # type: ignore
 
 load_dotenv()
 
-DEFAULT_HEADERS_JSON = os.getenv("DEFAULT_HEADERS")
-DEFAULT_HEADERS = json.loads(DEFAULT_HEADERS_JSON)
+DEFAULT_HEADERS_JSON = os.getenv("DEFAULT_HEADERS", "{}")
+if not DEFAULT_HEADERS_JSON:
+    DEFAULT_HEADERS_JSON = "{}"
+
+try:
+    DEFAULT_HEADERS = json.loads(DEFAULT_HEADERS_JSON)
+except json.JSONDecodeError:
+    DEFAULT_HEADERS = {}
 
 
 def _get_detail_headers() -> dict:

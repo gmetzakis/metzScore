@@ -1,0 +1,15 @@
+[Unit]
+Description=MetzScore FastAPI backend
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/metzScore-App/backend
+Environment=PATH=/home/ubuntu/metzScore-App/backend/.venv/bin:/usr/bin:/bin
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/ubuntu/metzScore-App/backend/.venv/bin/uvicorn main:app --host 127.0.0.1 --port 8001
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
