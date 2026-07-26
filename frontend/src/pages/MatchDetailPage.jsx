@@ -96,8 +96,8 @@ function buildQuickStats(results) {
   const seenKeys = new Set();
   const source = results && typeof results === 'object' ? results : {};
   const iconByKey = {
-    red: <img src="../../public/icons/red.svg"/>,
-    red_cards: <img src="../../public/icons/red.svg"/>,
+    red: <img src="../../icons/red.svg"/>,
+    red_cards: <img src="../../icons/red.svg"/>,
   };
 
   const addFixedStat = (key, label, icon, keys) => {
@@ -114,8 +114,8 @@ function buildQuickStats(results) {
     });
   };
 
-  addFixedStat('corners', 'Corners', <img src="../../public/icons/corner.svg"/>, ['corners']);
-  addFixedStat('yellow', 'Yellow cards', <img src="../../public/icons/yellow.svg"/>, ['yellow', 'yellow_cards']);
+  addFixedStat('corners', 'Corners', <img src="../../icons/corner.svg"/>, ['corners']);
+  addFixedStat('yellow', 'Yellow cards', <img src="../../icons/yellow.svg"/>, ['yellow', 'yellow_cards']);
 
   for (const [key, value] of Object.entries(source)) {
     const lowerKey = key.toLowerCase();
@@ -141,16 +141,16 @@ function buildQuickStats(results) {
 // ---------------------------------------------------------------------------
 
 const INCIDENT_ICONS = {
-  GOAL: <img src="../../public/icons/goal.svg"/>,
-  YELL: <img src="../../public/icons/yellow.svg"/>,
-  RED: <img src="../../public/icons/red.svg"/>,
-  SUBS: <img src="../../public/icons/sub.svg"/>,
-  OFFS: <img src="../../public/icons/offside.svg"/>,
-  PENL: <img src="../../public/icons/penalty.svg"/>,
-  CRNR: <img src="../../public/icons/corner.svg"/>,
-  EBEG: <img src="../../public/icons/whistle.svg"/>,
-  PEND: <img src="../../public/icons/whistle.svg"/>,
-  PBEG: <img src="../../public/icons/whistle.svg"/>,
+  GOAL: <img src="../../icons/goal.svg"/>,
+  YELL: <img src="../../icons/yellow.svg"/>,
+  RED: <img src="../../icons/red.svg"/>,
+  SUBS: <img src="../../icons/sub.svg"/>,
+  OFFS: <img src="../../icons/offside.svg"/>,
+  PENL: <img src="../../icons/penalty.svg"/>,
+  CRNR: <img src="../../icons/corner.svg"/>,
+  EBEG: <img src="../../icons/whistle.svg"/>,
+  PEND: <img src="../../icons/whistle.svg"/>,
+  PBEG: <img src="../../icons/whistle.svg"/>,
   Aggregated: '📊',
 };
 
@@ -377,12 +377,12 @@ function StatsstreamDetailedSection({ statsStreamDetailed, incidents, score, isF
     : defaultDisplayedStatEntries;
 
   const summaryCards = [
-    { label: 'Goals', home: displayHomeTotals.goals, away: displayAwayTotals.goals, accent: 'rose', icon: <img src="../../public/icons/goal.svg"/> },
-    { label: 'Yellow', home: displayHomeTotals.yellow_cards, away: displayAwayTotals.yellow_cards, accent: 'amber', icon: <img src="../../public/icons/yellow.svg"/> },
-    { label: 'Red', home: displayHomeTotals.red_cards, away: displayAwayTotals.red_cards, accent: 'rose', icon: <img src="../../public/icons/red.svg"/> },
-    { label: 'Corners', home: cornersHome, away: cornersAway, accent: 'sky', icon: <img src="../../public/icons/corner.svg"/> },
-    { label: 'Shots', home: totalShotsHome, away: totalShotsAway, accent: 'blue', icon: <img src="../../public/icons/shots.svg"/> },
-    { label: 'On target', home: displayHomeTotals.shots_on_target, away: displayAwayTotals.shots_on_target, accent: 'emerald', icon: <img src="../../public/icons/shots_on_target.svg"/>},
+    { label: 'Goals', home: displayHomeTotals.goals, away: displayAwayTotals.goals, accent: 'rose', icon: <img src="../../icons/goal.svg"/> },
+    { label: 'Yellow', home: displayHomeTotals.yellow_cards, away: displayAwayTotals.yellow_cards, accent: 'amber', icon: <img src="../../icons/yellow.svg"/> },
+    { label: 'Red', home: displayHomeTotals.red_cards, away: displayAwayTotals.red_cards, accent: 'rose', icon: <img src="../../icons/red.svg"/> },
+    { label: 'Corners', home: cornersHome, away: cornersAway, accent: 'sky', icon: <img src="../../icons/corner.svg"/> },
+    { label: 'Shots', home: totalShotsHome, away: totalShotsAway, accent: 'blue', icon: <img src="../../icons/shots.svg"/> },
+    { label: 'On target', home: displayHomeTotals.shots_on_target, away: displayAwayTotals.shots_on_target, accent: 'emerald', icon: <img src="../../icons/shots_on_target.svg"/>},
   ];
 
   const comparisonMetrics = [
@@ -745,7 +745,7 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
                 return (
                   <div key={`${p.id || p.name}-${i}`} className="roster-player">
                     <span className="player-name">{p.name}</span>
-                    {goals > 0 && <span className="player-goal">{Array.from({ length: goals }).map((_, i) => (<img key={i} src='../../public/icons/goal.svg' /> ))}</span>}
+                    {goals > 0 && <span className="player-goal">{Array.from({ length: goals }).map((_, i) => (<img key={i} src='../../icons/goal.svg' /> ))}</span>}
                     {outMinute && <span className="player-sub-out">{outMinute}'</span>}
                   </div>
                 );
@@ -763,7 +763,7 @@ function RosterSection({ roster, results, incidents, homeName, awayName }) {
                 return (
                   <div key={`${p.id || p.name}-${i}`} className="roster-player roster-bench-player">
                     <span className="player-name">{p.name}</span>
-                    {goals > 0 && <span className="player-goal">{Array.from({ length: goals }).map((_, i) => (<img key={i} src='../../public/icons/goal.svg' /> ))}</span>}
+                    {goals > 0 && <span className="player-goal">{Array.from({ length: goals }).map((_, i) => (<img key={i} src='../../icons/goal.svg' /> ))}</span>}
                     {minuteStr && <span className="player-sub-minute">{minuteStr}'</span>}
                   </div>
                 );
