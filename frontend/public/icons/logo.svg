@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 800 800">
+
+  <defs>
+
+    <!-- Soccer ball style pattern -->
+    <pattern id="soccerPattern"
+             width="140"
+             height="140"
+             patternUnits="userSpaceOnUse">
+
+      <rect width="140" height="140" fill="white"/>
+
+      <!-- Center pentagon -->
+      <polygon points="
+        70,22
+        104,46
+        91,88
+        49,88
+        36,46"
+        fill="black"/>
+
+      <!-- Surrounding hexagons -->
+      <polygon points="70,-18 103,4 90,36 50,36 37,4"
+               fill="white" stroke="black" stroke-width="3"/>
+
+      <polygon points="124,46 156,68 143,102 105,102 92,68"
+               fill="white" stroke="black" stroke-width="3"/>
+
+      <polygon points="70,102 103,124 90,158 50,158 37,124"
+               fill="white" stroke="black" stroke-width="3"/>
+
+      <polygon points="-14,46 18,68 5,102 -33,102 -46,68"
+               fill="white" stroke="black" stroke-width="3"/>
+
+      <!-- Connector lines -->
+      <line x1="70" y1="22" x2="70" y2="-18"
+            stroke="black" stroke-width="3"/>
+      <line x1="104" y1="46" x2="124" y2="46"
+            stroke="black" stroke-width="3"/>
+      <line x1="91" y1="88" x2="70" y2="102"
+            stroke="black" stroke-width="3"/>
+      <line x1="49" y1="88" x2="18" y2="68"
+            stroke="black" stroke-width="3"/>
+      <line x1="36" y1="46" x2="37" y2="4"
+            stroke="black" stroke-width="3"/>
+
+    </pattern>
+
+    <!-- Clip the pattern to the M -->
+    <clipPath id="clipM">
+      <text x="400"
+            y="630"
+            text-anchor="middle"
+            font-size="620"
+            font-family="Arial Black, Impact, sans-serif"
+            font-weight="900">
+        M
+      </text>
+    </clipPath>
+
+  </defs>
+
+  <!-- Pattern inside the M -->
+  <rect width="800"
+        height="800"
+        fill="url(#soccerPattern)"
+        clip-path="url(#clipM)"/>
+
+  <!-- Black outline -->
+  <text x="400"
+        y="630"
+        text-anchor="middle"
+        font-size="620"
+        font-family="Arial Black, Impact, sans-serif"
+        font-weight="900"
+        fill="none"
+        stroke="black"
+        stroke-width="8">
+    M
+  </text>
+
+</svg>
