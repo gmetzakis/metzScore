@@ -47,6 +47,34 @@ function sendBrowserNotification(title, body) {
   if (Notification.permission !== 'granted') return;
 
   try {
+    // Prefer showing via a registered service worker on mobile (Android Chrome)
+    // because some mobile browsers restrict direct Notification usage.
+    if ('serviceWorker' in navigator) {
+      // Try existing registration first
+      try {
+        navigator.serviceWorker.getRegistration().then((reg) => {
+          if (reg && reg.showNotification) {
+            reg.showNotification(title, { body, tag: 'metzscore', renotify: true });
+            return;
+          }
+          // If no registration, try registering one on-the-fly
+          navigator.serviceWorker.register('/sw.js').then((newReg) => {
+            if (newReg && newReg.showNotification) {
+              newReg.showNotification(title, { body, tag: 'metzscore', renotify: true });
+            }
+          }).catch(() => {
+            // fallback to in-page notification if registration fails
+            try { new Notification(title, { body }); } catch {}
+          });
+        }).catch(() => {
+          try { new Notification(title, { body }); } catch {}
+        });
+        return;
+      } catch {
+        // fallthrough to direct Notification below
+      }
+    }
+
     new Notification(title, { body });
   } catch {
     // ignore failures
@@ -57,13 +85,35 @@ export default function useScoreAlertNotifications(matches) {
   const { alertIds, alertModes, removeAlerts } = useFavorites();
   const prevScoresRef = useRef(new Map());
   const hasRequestedPermissionRef = useRef(false);
+  const hasRegisteredSWRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !('Notification' in window)) return;
     if (hasRequestedPermissionRef.current) return;
+
+    const tryRegisterSW = async () => {
+      if (!('serviceWorker' in navigator)) return;
+      try {
+        // register only once
+        if (!hasRegisteredSWRef.current) {
+          await navigator.serviceWorker.register('/sw.js');
+          hasRegisteredSWRef.current = true;
+        }
+      } catch {
+        // ignore registration failures
+      }
+    };
+
     if (Notification.permission === 'default') {
-      Notification.requestPermission().catch(() => {});
+      Notification.requestPermission().then((perm) => {
+        if (perm === 'granted') {
+          tryRegisterSW();
+        }
+      }).catch(() => {});
+    } else if (Notification.permission === 'granted') {
+      tryRegisterSW();
     }
+
     hasRequestedPermissionRef.current = true;
   }, []);
 
