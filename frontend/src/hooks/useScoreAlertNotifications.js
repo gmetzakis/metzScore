@@ -46,6 +46,15 @@ function sendBrowserNotification(title, body) {
   if (typeof window === 'undefined' || !('Notification' in window)) return;
   if (Notification.permission !== 'granted') return;
 
+  const notificationIcon = '/icons/logo2.png';
+  const notificationOptions = {
+    body,
+    tag: 'metzscore',
+    renotify: true,
+    icon: notificationIcon,
+    badge: notificationIcon,
+  };
+
   try {
     // Prefer showing via a registered service worker on mobile (Android Chrome)
     // because some mobile browsers restrict direct Notification usage.
@@ -54,20 +63,20 @@ function sendBrowserNotification(title, body) {
       try {
         navigator.serviceWorker.getRegistration().then((reg) => {
           if (reg && reg.showNotification) {
-            reg.showNotification(title, { body, tag: 'metzscore', renotify: true });
+            reg.showNotification(title, notificationOptions);
             return;
           }
           // If no registration, try registering one on-the-fly
           navigator.serviceWorker.register('/sw.js').then((newReg) => {
             if (newReg && newReg.showNotification) {
-              newReg.showNotification(title, { body, tag: 'metzscore', renotify: true });
+              newReg.showNotification(title, notificationOptions);
             }
           }).catch(() => {
             // fallback to in-page notification if registration fails
-            try { new Notification(title, { body }); } catch {}
+            try { new Notification(title, { ...notificationOptions, icon: notificationIcon, badge: notificationIcon }); } catch {}
           });
         }).catch(() => {
-          try { new Notification(title, { body }); } catch {}
+          try { new Notification(title, { ...notificationOptions, icon: notificationIcon, badge: notificationIcon }); } catch {}
         });
         return;
       } catch {
@@ -75,7 +84,7 @@ function sendBrowserNotification(title, body) {
       }
     }
 
-    new Notification(title, { body });
+    new Notification(title, { ...notificationOptions, icon: notificationIcon, badge: notificationIcon });
   } catch {
     // ignore failures
   }
