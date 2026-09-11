@@ -42,6 +42,13 @@ function getNotificationBody(previous, match) {
   return `${minute} — ${match.home_team} ${previous.home}:${previous.away} → ${match.home_team} ${match.home_score}:${match.away_score} ${match.away_team}`;
 }
 
+function generateNotificationTag() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return `metzscore-${crypto.randomUUID()}`;
+  }
+  return `metzscore-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
 function sendBrowserNotification(title, body) {
   if (typeof window === 'undefined' || !('Notification' in window)) return;
   if (Notification.permission !== 'granted') return;
@@ -49,9 +56,10 @@ function sendBrowserNotification(title, body) {
   const notificationIcon = '/icons/logo.svg';
   const notificationOptions = {
     body,
-    tag: 'metzscore',
+    tag: generateNotificationTag(),
     renotify: true,
-    //icon: notificationIcon,
+    requireInteraction: true,
+    icon: notificationIcon,
     badge: notificationIcon,
   };
 
