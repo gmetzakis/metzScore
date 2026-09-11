@@ -33,7 +33,7 @@ self.addEventListener('push', (event) => {
     // Explicitly provide both the main notification icon and the small Android badge.
     // Many browsers, especially Android Chrome, ignore badge unless the icon is set.
     // Use PNG files and keep them in the public folder so the service worker can fetch them.
-    icon: customIcon,
+    //icon: customIcon,
     badge: customBadge
   };
   event.waitUntil(self.registration.showNotification(title, options));
