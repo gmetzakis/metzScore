@@ -37,7 +37,7 @@ function AppContents() {
     <>
       <header className="site-header">
         <Link to="/" className="site-title-link" aria-label="Go to live matches">
-          <h1>MetzScore</h1>
+          <h1>MetzScor1e</h1>
         </Link>
         <button
           className="alerts-launcher"

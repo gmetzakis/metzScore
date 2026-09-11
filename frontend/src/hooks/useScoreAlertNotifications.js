@@ -46,12 +46,12 @@ function sendBrowserNotification(title, body) {
   if (typeof window === 'undefined' || !('Notification' in window)) return;
   if (Notification.permission !== 'granted') return;
 
-  const notificationIcon = '/icons/logo2.png';
+  const notificationIcon = '/icons/logo.svg';
   const notificationOptions = {
     body,
     tag: 'metzscore',
     renotify: true,
-    icon: notificationIcon,
+    //icon: notificationIcon,
     badge: notificationIcon,
   };
 
